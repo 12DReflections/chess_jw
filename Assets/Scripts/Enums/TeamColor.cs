@@ -1,5 +1,5 @@
 ﻿
-public enum TeamColor 
-{
-    Black, White
-}
+// public enum TeamColor 
+// {
+//     Black, White
+// }

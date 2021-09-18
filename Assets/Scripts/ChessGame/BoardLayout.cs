@@ -4,6 +4,16 @@ using UnityEngine;
 using System;
 using System.Linq;
 
+public enum TeamColor
+{
+    Black, White
+}
+
+public enum PieceType
+{
+    Pawn, Bishop, Knight, Rook, Queen, King
+}
+
 [CreateAssetMenu(menuName = "Scriptable Objects/Board/Layout")]
 public class BoardLayout : ScriptableObject
 {

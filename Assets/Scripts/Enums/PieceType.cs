@@ -1,5 +1,5 @@
 ﻿
-public enum PieceType
-{
-    Pawn, Knight, Bishop, Rook, King, Queen
-}
+// public enum PieceType
+// {
+//     Pawn, Knight, Bishop, Rook, King, Queen
+// }
