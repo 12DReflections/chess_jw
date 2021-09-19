@@ -14,6 +14,8 @@ public class Board : MonoBehaviour
 	private ChessGameController chessController;
 	private Piece selectedPiece;
 	private SquareSelectorCreator squareSelector;
+
+    // 2D array of type piece for the grid
 	private Piece[,] grid;
 
 	private void Awake()
@@ -106,6 +108,8 @@ public class Board : MonoBehaviour
 		}
 	}
 
+    // Iterate width a compare each piece to piece passed in method parameter
+    // return true if piece is in the grid
 	public bool HasPiece(Piece piece, TeamColor team)
 	{
 		for (int i = 0; i < BOARD_SIZE; i++)
