@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2397982}
   - component: {fileID: -4624007640304781289}
   - component: {fileID: -586109090817500085}
+  - component: {fileID: 547565443648447468}
   m_Layer: 0
   m_Name: Rook
   m_TagString: Untagged
@@ -106,3 +107,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   materialSetter: {fileID: 0}
   avaliableMoves: []
+--- !u!114 &547565443648447468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cabfb3f951164f089839743a8136c36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
