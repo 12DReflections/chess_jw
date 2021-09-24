@@ -33,8 +33,8 @@ public class ChessPlayer
 	{
 		foreach (var piece in activePieces)
 		{
-			if(board.HasPiece(piece, piece.team))
-				piece.SelectAvaliableSquares();
+            if (board.HasPiece(piece, piece.team))
+                piece.SelectAvaliableSquares();
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+[RequireComponent(typeof(SquareSelectorCreator))]
 public class Board : MonoBehaviour
 {
 	public const int BOARD_SIZE = 8;
@@ -22,7 +23,7 @@ public class Board : MonoBehaviour
 	{
 		squareSelector = GetComponent<SquareSelectorCreator>();
 		CreateGrid();
-	}
+	} 
 
 	private void CreateGrid()
 	{
@@ -140,7 +141,8 @@ public class Board : MonoBehaviour
 
 	private void ShowSelectionSquares(List<Vector2Int> selection)
 	{
-		Dictionary<Vector3, bool> selectionPositions = new Dictionary<Vector3, bool>();
+        // Add position to dictionary as key, with square availability as bool value
+        Dictionary<Vector3, bool> selectionPositions = new Dictionary<Vector3, bool>();
 		for (int i = 0; i < selection.Count; i++)
 		{
 			Vector3 squarePosition = CalculatePositionFromCoords(selection[i]);
