@@ -68,14 +68,14 @@ public abstract class Piece : MonoBehaviour
 		transform.position = board.CalculatePositionFromCoords(coords);
 	}
 
-	// public bool IsAttackingPieceOfType<T>() where T : Piece
-	// {
-	// 	foreach (var square in avaliableMoves)
-	// 	{
-	// 		if (board.GetPieceOnSquare(square) is T)
-	// 			return true;
-	// 	}
-	// 	return false;
-	// }
+	 public bool IsAttackingPieceOfType<T>() where T : Piece
+	 {
+	 	foreach (var square in avaliableMoves)
+	 	{
+	 		if (board.GetPieceOnSquare(square) is T)
+	 			return true;
+	 	}
+	 	return false;
+	 }
 
 }

@@ -87,6 +87,7 @@ public class Board : MonoBehaviour
 
 	private void SelectPiece(Piece piece)
 	{
+        chessController.RemoveMovesEnablingAttakOnPieceOfType<King>(piece);
 		selectedPiece = piece;
 		List<Vector2Int> selection = selectedPiece.avaliableMoves;
 		ShowSelectionSquares(selection);
@@ -109,22 +110,20 @@ public class Board : MonoBehaviour
 		}
 	}
 
-    // Iterate width a compare each piece to piece passed in method parameter
-    // return true if piece is in the grid
-	public bool HasPiece(Piece piece, TeamColor team)
-	{
-		for (int i = 0; i < BOARD_SIZE; i++)
-		{
-			for (int j = 0; j < BOARD_SIZE; j++)
-			{
-				if (grid[i, j] == piece)
-					return true;
-			}
-		}
-		return false;
-	}
+    public bool HasPiece(Piece piece)
+    {
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
+            for (int j = 0; j < BOARD_SIZE; j++)
+            {
+                if (grid[i, j] == piece)
+                    return true;
+            }
+        }
+        return false;
+    }
 
-	public bool CheckIfCoordinatesAreOnBoard(Vector2Int coords)
+    public bool CheckIfCoordinatesAreOnBoard(Vector2Int coords)
 	{
 		if (coords.x < 0 || coords.y < 0 || coords.x >= BOARD_SIZE || coords.y >= BOARD_SIZE)
 		{

@@ -96,12 +96,54 @@ public class ChessGameController : MonoBehaviour
         return activePlayer.team == team;
     }
 
-	public void EndTurn()
+    public void EndTurn()
     {
-        GeneratePlayersValidMoves(activePlayer);
-        GeneratePlayersValidMoves(GetOpponentToPlayer(activePlayer));
-        ChangeActiveTeam();       
+        GenerateAllPossiblePlayerMoves(activePlayer);
+        GenerateAllPossiblePlayerMoves(GetOpponentToPlayer(activePlayer));
+        if (CheckIfGameIsFinished())
+        {
+            EndGame();
+        }
+        else
+        {
+            ChangeActiveTeam();
+        }
     }
+
+    private void GenerateAllPossiblePlayerMoves(ChessPlayer player)
+    {
+        player.GenerateAllPossibleMoves();
+    }
+
+    private void EndGame()
+    {
+        SetGameState(GameState.Finished);
+        Debug.Log("Game finished");
+        //UIManager.OnGameFinished(activePlayer.team.ToString());
+    }
+
+    private bool CheckIfGameIsFinished()
+    {
+        // Check mate logic
+        // Check if king is attacked, check if available moves, or block of attack
+        Piece[] kingAttackingPieces = activePlayer.GetPieceAtackingOppositePiceOfType<King>();
+        if (kingAttackingPieces.Length > 0)
+        {
+            ChessPlayer oppositePlayer = GetOpponentToPlayer(activePlayer);
+            Piece attackedKing = oppositePlayer.GetPiecesOfType<King>().FirstOrDefault();
+            oppositePlayer.RemoveMovesEnablingAttakOnPieceOfType<King>(activePlayer, attackedKing);
+
+            int avaliableKingMoves = attackedKing.avaliableMoves.Count;
+            if (avaliableKingMoves == 0)
+            {
+                bool canCoverKing = oppositePlayer.CanHidePieceFromAttack<King>(activePlayer);
+                if (!canCoverKing)
+                    return true;
+            }
+        }
+        return false;
+    }
+
 
     private void GeneratePlayersValidMoves(ChessPlayer player)
     {
@@ -120,10 +162,17 @@ public class ChessGameController : MonoBehaviour
     {
         ChessPlayer pieceOwner = (piece.team == TeamColor.White) ? whitePlayer : blackPlayer;
         pieceOwner.RemovePiece(piece);
+        Destroy(piece.gameObject);
     }
 
     private ChessPlayer GetOpponentToPlayer(ChessPlayer player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
+    }
+
+    // Don't show invalid moves to player
+    internal void RemoveMovesEnablingAttakOnPieceOfType<T>(Piece piece) where T : Piece
+    {
+        activePlayer.RemoveMovesEnablingAttakOnPieceOfType<T>(GetOpponentToPlayer(activePlayer), piece);
     }
 }
