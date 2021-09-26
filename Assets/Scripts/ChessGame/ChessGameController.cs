@@ -14,6 +14,7 @@ public class ChessGameController : MonoBehaviour
 
     [SerializeField] private BoardLayout startingBoardLayout;
     [SerializeField] private Board board;
+    [SerializeField] private ChessUIManager uiManager;
 
     private GameState state;
     private ChessPlayer whitePlayer;
@@ -51,6 +52,7 @@ public class ChessGameController : MonoBehaviour
 
     private void StartNewGame()
     {
+        uiManager.HideUI();
         SetGameState(GameState.Init);
         board.SetDependencies(this);
         CreatePiecesFromLayout(startingBoardLayout);
@@ -119,7 +121,7 @@ public class ChessGameController : MonoBehaviour
     {
         SetGameState(GameState.Finished);
         Debug.Log("Game finished");
-        //UIManager.OnGameFinished(activePlayer.team.ToString());
+        uiManager.OnGameFinished(activePlayer.team.ToString());
     }
 
     public void RestartGame()
