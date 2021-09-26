@@ -122,6 +122,21 @@ public class ChessGameController : MonoBehaviour
         //UIManager.OnGameFinished(activePlayer.team.ToString());
     }
 
+    public void RestartGame()
+    {
+        DestroyPieces();
+        board.OnGameRestarted();
+        whitePlayer.OnGameRestarted();
+        blackPlayer.OnGameRestarted();
+        StartNewGame();
+    }
+
+    private void DestroyPieces()
+    {
+        whitePlayer.activePieces.ForEach(p => Destroy(p.gameObject));
+        blackPlayer.activePieces.ForEach(p => Destroy(p.gameObject));
+    }
+
     private bool CheckIfGameIsFinished()
     {
         // Check mate logic

@@ -175,7 +175,13 @@ public class Board : MonoBehaviour
 		}
 	}
 
-	private void EndTurn()
+    internal void OnGameRestarted()
+    {
+        selectedPiece = null;
+        CreateGrid();
+    }
+
+    private void EndTurn()
 	{
 		chessController.EndTurn();
 	}
