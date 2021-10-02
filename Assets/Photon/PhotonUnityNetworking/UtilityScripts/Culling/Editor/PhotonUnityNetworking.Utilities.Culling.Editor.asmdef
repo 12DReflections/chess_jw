@@ -1,0 +1,13 @@
+{
+    "name": "PhotonUnityNetworking.Utilities.Culling.Editor",
+    "references": [
+        "PhotonUnityNetworking.Utilities",
+        "UnityEngine.UI"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

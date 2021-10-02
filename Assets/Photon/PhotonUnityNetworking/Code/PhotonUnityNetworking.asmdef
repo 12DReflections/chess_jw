@@ -1,0 +1,12 @@
+{
+    "name": "PhotonUnityNetworking",
+    "references": [
+        "PhotonRealtime",
+        "UnityEngine.UI"
+        
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Linq;
 
 [RequireComponent(typeof(SquareSelectorCreator))]
-public class Board : MonoBehaviour
+public abstract class Board : MonoBehaviour
 {
 	public const int BOARD_SIZE = 8;
 
@@ -16,8 +16,15 @@ public class Board : MonoBehaviour
 	private Piece selectedPiece;
 	private SquareSelectorCreator squareSelector;
 
+
+    // Switch Vector2 to Quaternian type for Vector4Int network conversion and pass
+    //https://doc.photonengine.com/zh-cn/pun/current/reference/serialization-in-photon
+    public abstract void SelectedPieceMoved(Vector2 coords);
+    public abstract void SetSelectedPiece(Vector2 coords);
+
+
     // 2D array of type piece for the grid
-	private Piece[,] grid;
+    private Piece[,] grid;
 
 	private void Awake()
 	{
@@ -49,18 +56,18 @@ public class Board : MonoBehaviour
 			}
 			else if (piece != null && selectedPiece != piece && chessController.IsTeamTurnActive(piece.team))
 			{
-				SelectPiece(piece);
+				SelectPiece(coords);
 			}
 			else if (selectedPiece.CanMoveTo(coords))
 			{
-				OnSelectedPieceMoved(coords, selectedPiece);
+				SelectedPieceMoved(coords);
 			}
 		}
 		else
 		{
 			if (piece != null && chessController.IsTeamTurnActive(piece.team))
 			{
-				SelectPiece(piece);
+				SelectPiece(coords);
 			}
 		}
 	}
@@ -85,22 +92,30 @@ public class Board : MonoBehaviour
 		squareSelector.ClearSelection();
 	}
 
-	private void SelectPiece(Piece piece)
+    // Get the coordinates, identify piece, select piece from coords
+	private void SelectPiece(Vector2Int coords)
 	{
+        Piece piece = GetPieceOnSquare(coords);
         chessController.RemoveMovesEnablingAttakOnPieceOfType<King>(piece);
-		selectedPiece = piece;
+		SetSelectedPiece(coords);
 		List<Vector2Int> selection = selectedPiece.avaliableMoves;
 		ShowSelectionSquares(selection);
 	}
 
-	private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
+	public void OnSelectedPieceMoved(Vector2Int coords)
 	{
 		TryToTakeOppositePiece(coords);
-		UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
+		UpdateBoardOnPieceMove(coords, selectedPiece.occupiedSquare, selectedPiece, null);
 		selectedPiece.MovePiece(coords);
 		DeselectPiece();
 		EndTurn();
 	}
+
+    public void OnSetSelectedPiece(Vector2Int coords)
+    {
+        Piece piece = GetPieceOnSquare(coords);
+        selectedPiece = piece;
+    }
 
 	public void SetPieceOnSquare(Vector2Int coords, Piece piece)
 	{

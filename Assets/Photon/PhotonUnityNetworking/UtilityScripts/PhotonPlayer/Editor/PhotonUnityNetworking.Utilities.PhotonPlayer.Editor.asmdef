@@ -1,0 +1,16 @@
+{
+    "name": "PhotonUnityNetworking.Utilities.PhotonPlayer.Editor",
+    "references": [
+        "PhotonRealtime",
+        "PhotonUnityNetworking",
+        "PhotonUnityNetworking.Utilities",
+		 "PhotonUnityNetworking.Editor",
+         "UnityEngine.UI"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

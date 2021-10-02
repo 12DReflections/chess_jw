@@ -1,0 +1,6 @@
+{
+    "name": "PhotonRealtime",
+    "references": ["UnityEngine.UI"],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
