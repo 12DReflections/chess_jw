@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +32,8 @@ public class ChessUIManager : MonoBehaviour
 
     private void Awake()
     {
+        // Get options for rooms as Chess Levels enum
+        gameLevelSelection.AddOptions(Enum.GetNames(typeof(ChessLevel)).ToList());
         OnGameLaunched();
     }
 
@@ -52,8 +55,10 @@ public class ChessUIManager : MonoBehaviour
         connectScreen.SetActive(true);
     }
 
+    // Set the room type from enum and connect
     public void OnConnect()
     {
+        networkManager.SetPlayerLevel((ChessLevel)gameLevelSelection.value);
         networkManager.Connect();
     }
 
