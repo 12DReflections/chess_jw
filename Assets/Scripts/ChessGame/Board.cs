@@ -26,7 +26,7 @@ public abstract class Board : MonoBehaviour
     // 2D array of type piece for the grid
     private Piece[,] grid;
 
-	private void Awake()
+	protected virtual void Awake()
 	{
 		squareSelector = GetComponent<SquareSelectorCreator>();
 		CreateGrid();
@@ -44,7 +44,7 @@ public abstract class Board : MonoBehaviour
 
 	public void OnSquareSelected(Vector3 inputPosition)
 	{
-		if (!chessController.IsGameInProgress())
+		if (!chessController || !chessController.IsGameInProgress())
 			return;
 		Vector2Int coords = CalculateCoordsFromPosition(inputPosition);
 		Piece piece = GetPieceOnSquare(coords);
@@ -117,13 +117,20 @@ public abstract class Board : MonoBehaviour
         selectedPiece = piece;
     }
 
-	public void SetPieceOnSquare(Vector2Int coords, Piece piece)
-	{
-		if (CheckIfCoordinatesAreOnBoard(coords))
-		{
-			grid[coords.x, coords.y] = piece;
-		}
-	}
+	//public void SetPieceOnSquare(Vector2Int coords, Piece piece)
+	//{
+	//	if (CheckIfCoordinatesAreOnBoard(coords))
+	//	{
+	//		grid[coords.x, coords.y] = piece;
+	//	}
+	//}
+
+    public void SetPieceOnBoard(Vector2Int coords, Piece piece)
+    {
+        if (CheckIfCoordinatesAreOnBoard(coords))
+            grid[coords.x, coords.y] = piece;
+    }
+
 
     public bool HasPiece(Piece piece)
     {
