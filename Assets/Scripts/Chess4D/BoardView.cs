@@ -33,13 +33,17 @@ namespace Chess4D.Unity
         public Color EmptyCell = new Color(0.6f, 0.6f, 0.65f, 0.35f);
         public Color SelectedCell = new Color(1f, 0.55f, 0.1f, 0.45f);
         public Color HoverCell = new Color(1f, 1f, 1f, 0.3f);
+        public Color MoveTarget = new Color(0.3f, 1f, 0.4f, 0.75f);
+        public Color CaptureTarget = new Color(1f, 0.25f, 0.2f, 0.8f);
         public float DistanceFadeNear = 6f;
         public float DistanceFadeFar = 34f;
 
         private ViewState state;
         private Mesh[][] meshes;
         private Material pieceMaterial;
-        private Material cellEmptyMat, cellWhiteMat, cellBlackMat, cellSelectedMat, cellHoverMat;
+        private Material cellEmptyMat, cellWhiteMat, cellBlackMat, cellSelectedMat, cellHoverMat, targetMat, captureMat;
+        private InstanceData[] targetInst = new InstanceData[512];
+        private InstanceData[] captureInst = new InstanceData[512];
         private Mesh cubeMesh;
         private readonly Dictionary<int, PieceObj> live = new Dictionary<int, PieceObj>();
         private readonly Stack<PieceObj> pool = new Stack<PieceObj>();
@@ -63,6 +67,8 @@ namespace Chess4D.Unity
             cellBlackMat = Tinted(cellFade, BlackCell);
             cellSelectedMat = Tinted(cellFade, SelectedCell);
             cellHoverMat = Tinted(cellFade, HoverCell);
+            targetMat = Tinted(cellFade, MoveTarget);
+            captureMat = Tinted(cellFade, CaptureTarget);
             var tmp = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cubeMesh = tmp.GetComponent<MeshFilter>().sharedMesh;
             Destroy(tmp);
@@ -208,6 +214,15 @@ namespace Chess4D.Unity
 
             if (onLattice)
             {
+                int nT = 0, nC = 0;
+                foreach (int cell in state.MoveTargets)
+                {
+                    if (!state.IsVisibleInVolume(cell) || state.IsolatedAway(cell)) continue;
+                    var m = Matrix4x4.TRS(state.WorldOf(cell), Quaternion.identity, Vector3.one * 0.34f);
+                    if (state.CaptureTargets.Contains(cell)) captureInst[nC++].objectToWorld = m; else targetInst[nT++].objectToWorld = m;
+                }
+                Render(targetMat, targetInst, nT);
+                Render(captureMat, captureInst, nC);
                 if (state.SelectedCell >= 0 && state.IsVisibleInVolume(state.SelectedCell))
                 {
                     oneInst[0].objectToWorld = Matrix4x4.TRS(state.WorldOf(state.SelectedCell), Quaternion.identity, Vector3.one * 1.0f);

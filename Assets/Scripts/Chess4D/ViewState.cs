@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Chess4D.Core;
 using UnityEngine;
 
@@ -24,6 +25,9 @@ namespace Chess4D.Unity
 
         public int SelectedCell = -1;
         public int HoverCell = -1;
+        /// <summary>Legal destinations of the selected piece, for highlighting. Filled by the game, not by the view.</summary>
+        public readonly HashSet<int> MoveTargets = new HashSet<int>();
+        public readonly HashSet<int> CaptureTargets = new HashSet<int>();
 
         public bool Armed { get; private set; }
         public int RotatingSlot { get; private set; } = -1;

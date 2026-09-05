@@ -202,7 +202,63 @@ rotation implies. A camera-only "reorient" cannot undo a reflection. If a
 canonical orientation per perspective is wanted, it needs a rule in the spec.
 
 ## Stage 4 — Game management and position editor
-Status: NOT STARTED
+Status: COMPLETE (2026-09-05)
+
+Core (`Packages/com.chess4d.core/Runtime`):
+
+- `Game`: board plus move history, undo and redo (redo branch discarded on a
+  new move), cached legal list, status, `LegalFrom(cell)`, numbered history
+  lines with `+` and `#` suffixes. View operations never touch it.
+- `Notation`: the long tuple form (`Q(3,0,3,3)-(0,3,3,3)+`, `x`, `=N`, ` e.p.`,
+  `O-O` / `O-O-O`) and `TryParseMove`, which resolves flags such as double step
+  and en passant against the legal list so the player never types them; a
+  promotion without a suffix is a queen.
+- `PositionText`: the version 1 position file format, tuples only, with
+  `moved` flags, side to move, en passant cell and halfmove clock. Round-trip
+  tested; rejects mismatched geometry and unknown lines.
+- Eight tests, including a hand-constructed 4D checkmate (corner king smothered
+  by its own pawns on all 15 neighbours, knight arrives from (4,2,0,0)) and a
+  K+Q vs K position set up through the editor API and played.
+
+`docs/NOTATION.md` written: section 1 documents the long form now in use,
+section 2 proposes a compact form (`Qd1.dd-a4.dd+`) **awaiting the owner's
+approval**, section 3 documents the position file format. Nothing emits or
+parses the compact form.
+
+Unity (`Assets/Scripts/Chess4D`):
+
+- Play mode: click an own piece to select it; its legal destinations are drawn
+  as green cubes (red for captures) in the visible volume, and the message
+  says how many destinations lie in other layers. Click a highlighted cell to
+  move. Typed input `(from) (to)[=X]` plays a move; a single coordinate selects
+  (and pages the view to it). Turn order is enforced by the legal list.
+- Status line: side to move, legal move count, CHECK, checkmate with the
+  winner, stalemate, draw flags. Promotion dialog with four choices when a
+  pawn reaches the last layer.
+- Move history panel (last 12 lines, redo count), Undo / Redo buttons and Z / Y
+  keys, New game.
+- Setup mode from a button: brush per piece type plus erase, brush colour,
+  side to move, clear board, standard start, click or typed coordinate to
+  place, "Done, play" resets history and plays from the position. Pawns placed
+  outside their shell rows are marked moved.
+- Save / Load: writes `<persistentDataPath>/positions/<name>.txt` and copies
+  the text to the clipboard; Load reads the file; Paste loads from the
+  clipboard.
+- Rotate, page, orbit and isolate never enter the history and never change the
+  side to move (they live in `ViewState`, the game lives in `Game`).
+
+Gate result (2026-09-05): PASS, verified by the scripted game walkthrough in the
+standalone player (`-chess4d-demo-game`): the ply-3 check line played by
+clicks with target highlighting, undo twice and redo twice restoring the check,
+a typed illegal move refused while in check and a typed legal reply accepted,
+the promotion dialog and a knight promotion, setup mode building K+Q vs K,
+eight plies played from it, saved to file, reloaded with an identical hash, and
+a position played to checkmate with the status line reporting the winner.
+Screenshots and the log are under `docs/screenshots/stage4/`. Player log clean.
+
+Not done, by design: piece movement is not animated (pieces re-appear at the
+destination). The kept tweeners can be wired in later; nothing in the gate
+asks for animation.
 
 ## Stage 5 — Engine
 Status: NOT STARTED
@@ -317,3 +373,13 @@ standalone player idles when unfocused unless `runInBackground` is set, and it
 stops presenting frames when its window is occluded, so the demo captures via
 a render texture. Gate result: PASS. Next: Stage 4, game management and the
 position editor.
+
+### 2026-09-05 — Stage 4
+
+Owner directed continuing to Stage 4. Game, Notation and PositionText added to
+Core with tests; NOTATION.md written with the compact form as a proposal only;
+play mode, promotion dialog, history with undo and redo, setup editor and
+save/load built in the Unity HUD; gate verified by the scripted game
+walkthrough. Gate result: PASS. Next: Stage 5, the engine (AttackMapService
+and the single-threaded SearchEngine). Owner decision pending: the compact
+notation in NOTATION.md section 2.

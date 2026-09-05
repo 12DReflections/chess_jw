@@ -150,6 +150,8 @@ namespace Chess4D.Unity
             trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one; trt.offsetMin = new Vector2(6, 0); trt.offsetMax = new Vector2(-6, 0);
             var ph = Label(go.transform, placeholder, 14, TextAnchor.MiddleLeft, height);
             ph.color = new Color(0.6f, 0.6f, 0.6f);
+            ph.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
             var prt = ph.GetComponent<RectTransform>();
             prt.anchorMin = Vector2.zero; prt.anchorMax = Vector2.one; prt.offsetMin = new Vector2(6, 0); prt.offsetMax = new Vector2(-6, 0);
             var f = go.GetComponent<InputField>();

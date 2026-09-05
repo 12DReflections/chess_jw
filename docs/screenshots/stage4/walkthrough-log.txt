@@ -1,0 +1,38 @@
+01-play-pawn-selected-targets.png  view x y z | w   w=3  |  White to move   (196 legal moves)  |  2 legal moves for White Pawn at (2,1,3,3)
+02-play-queen-selected-targets.png  view x y z | w   w=3  |  White to move   (199 legal moves)  |  3 legal moves for White Queen at (3,0,3,3)
+03-play-queen-gives-check.png  view x y z | w   w=3  |  Black to move   CHECK   (6 legal moves)  |  Played 2. W Q(3,0,3,3)-(0,3,3,3)+   CHECK
+in check after ply 3: True, status Ongoing, history: (2,1,3,3)-(2,3,3,3) / (3,6,3,3)-(3,4,3,3) / Q(3,0,3,3)-(0,3,3,3)+
+04-undo-twice.png  view x y z | w   w=3  |  Black to move   (196 legal moves)  |  Undid a move
+after two undos: 1 moves, redo 2
+05-redo-twice.png  view x y z | w   w=3  |  Black to move   CHECK   (6 legal moves)  |  Redid 2. W Q(3,0,3,3)-(0,3,3,3)+
+after two redos: 3 moves, in check True
+typed king move accepted: False (expected False: (4,6,3,3) is occupied)
+typed pawn move while in check accepted: False (expected False) message: Illegal move: (1,6,3,3)-(1,5,3,3) (you are in check)
+typed legal reply accepted: True -> N(1,7,3,3)-(3,6,3,3)
+06-typed-move-played.png  view x y z | w   w=3  |  White to move   (274 legal moves)  |  Played 2. B N(1,7,3,3)-(3,6,3,3)
+07-promotion-dialog.png  view x y z | w   w=3  |  White to move   (29 legal moves)  |  Choose a promotion piece
+promotion pending: True
+08-promoted-to-knight.png  view x y z | w   w=3  |  Black to move   (14 legal moves)  |  Played 1. W (0,6,3,3)-(0,7,3,3)=N
+promotion result: (0,6,3,3)-(0,7,3,3)=N, piece at (0,7,3,3): Knight
+09-setup-mode.png  view x y z | w   w=3  |  SETUP MODE   to move: Black  |  Setup: click a cell or type a coordinate to place the brush
+10-setup-kqk-placed.png  view x y z | w   w=3  |  SETUP MODE   to move: White  |  Placed Black King at (4,7,3,3)
+11-kqk-queen-targets.png  view x y z | w   w=3  |  White to move   (108 legal moves)  |  84 legal moves for White Queen at (3,0,3,3), 40 in other layers (page or type the target)
+12-kqk-played-8-plies.png  view x y z | w   w=1  |  White to move   (104 legal moves)  |  Played 4. B K(5,6,1,2)-(5,6,2,1)
+K+Q vs K after 8 plies: Q(3,0,3,3)-(3,0,3,2) / K(4,7,3,3)-(4,7,2,2) / Q(3,0,3,2)-(4,0,4,2) / K(4,7,2,2)-(5,7,2,2) / Q(4,0,4,2)-(4,0,3,2) / K(5,7,2,2)-(5,6,1,2) / K(4,0,3,3)-(4,0,4,3) / K(5,6,1,2)-(5,6,2,1) | status Ongoing
+saved to /Users/julianwise/Library/Application Support/com.DefaultCompany.chess-jw/positions/demo-kqk.txt; loaded back: True; hash equal: True
+saved text:
+chess4d-position 1
+dimensions 4
+side 8
+to-move white
+en-passant -
+halfmove 8
+W Q (4,0,3,2) moved
+W K (4,0,4,3) moved
+B K (5,6,2,1) moved
+
+13-kqk-reloaded-from-file.png  view x y z | w   w=1  |  White to move   (104 legal moves)  |  Loaded /Users/julianwise/Library/Application Support/com.DefaultCompany.chess-jw/positions/demo-kqk.txt
+14-mate-knight-selected.png  view x y z | w   w=0  |  White to move   (36 legal moves)  |  26 legal moves for White Knight at (4,2,0,0), 10 in other layers (page or type the target)
+15-checkmate.png  view x y z | w   w=0  |  Checkmate. White wins.  |  Played 1. W N(4,2,0,0)-(2,1,0,0)#   CHECKMATE, White wins
+final status: Checkmate, history: N(4,2,0,0)-(2,1,0,0)#
+done
