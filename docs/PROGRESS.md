@@ -51,17 +51,67 @@ highlighting and executed. Owner confirms the existing game is complete and both
 sides play. Stage 0 gate passed. Next: Stage 1 in a fresh session.
 
 ## Stage 1 — Rules core, validated at n=2
-Status: NOT STARTED
+Status: COMPLETE (2026-09-05)
 Gate: perft from the standard opening must equal 20 / 400 / 8902 / 197281 / 4865609
+
+Built in `Packages/com.chess4d.core/Runtime` (shared source, compiled by both .NET and Unity):
+
+- `Coord`: readonly struct, up to 6 axes plus dimension count, `(x,y,z,w)` text form.
+- `BoardGeometry`: side^dimensions mailbox indexing, coordinate table, and direction
+  sets generated from the dimension count (rook, bishop, queen/king, knight, pawn
+  forward, pawn capture, and the reversed capture set for attack queries).
+- `Board`: byte mailbox (type, colour, moved bit), per-colour piece lists, king cell
+  tracking, make/unmake on one instance, ray-walk attack test, pseudo-legal and legal
+  move generation (castling, en passant, promotion, double step), check / checkmate /
+  stalemate, castling rights derived from the moved bits of king and corner rooks,
+  incremental Zobrist hash, fifty-move and threefold repetition behind `GameRules`
+  flags defaulting to off, and an editor API (`PlacePiece`, `RemovePiece`, `Clear`,
+  `SetSideToMove`, `SetEnPassantCell`).
+- `Zobrist`: cells x 12 piece keys, side, 16 castling combinations, en passant per
+  cell, SplitMix64 from a fixed seed.
+- `StartPosition`: back rank plus the programmatic pawn shell (Chebyshev distance 1
+  from any back-rank cell, minus the back rank). At n=2 it produces the standard
+  second rank, asserted.
+- `Perft` with `Divide`; `Fen` (2D only) for loading the published test positions.
+
+Gate result (2026-09-05), `dotnet test`, Debug build, Apple Silicon:
+
+| Depth | Expected | Got | Time |
+|---|---|---|---|
+| 1 | 20 | 20 | <1 ms |
+| 2 | 400 | 400 | <1 ms |
+| 3 | 8,902 | 8,902 | 6 ms |
+| 4 | 197,281 | 197,281 | 133 ms |
+| 5 | 4,865,609 | 4,865,609 | 3,270 ms |
+
+All five match on the first run with no adjustment. Additional published positions
+also match: Kiwipete to depth 4 (4,085,603), Position 3 to depth 5 (674,624),
+Position 4 to depth 4 (422,333), Position 5 to depth 3 (62,379), Position 6 to
+depth 3 (89,890). Also asserted: direction counts at n=2 (4/4/8/8/8), n=4
+(8/24/32/32/48) and n=6 (12/60/72/72/120); castling, en passant and promotion
+present in the n=2 move list and refused when illegal; pinned pieces; fool's mate
+and a stalemate detected; draw flags off by default and working when on;
+incremental hash equals a full recompute at every node of a perft-3 walk and every
+unmake restores the FEN exactly. 52 tests, all green.
+
+Old 2D code under `Assets/Scripts/ChessGame` left in place per the revised spec;
+it goes at the start of Stage 3.
 
 ### Benchmarks (keep current; SPEC.md section 2 sets the budget)
 
-Open benchmark position: _define in Stage 1 and describe it here as a list of `(piece, colour, (x,y,z,w))` tuples._
+Open benchmark position (`BenchmarkTests.OpenPosition`), White to move, all pieces
+marked moved except the two rooks and the two unmoved pawns:
+White K (4,0,3,3), Q (4,4,3,3), R (0,0,3,3), B (2,2,1,5), N (6,3,3,3), P (4,3,3,3), P (1,1,2,2).
+Black K (4,7,3,3), Q (3,4,2,2), R (7,7,3,3), N (2,5,3,3), B (5,5,4,4), P (4,4,3,2), P (6,6,4,4).
 
 | Date | Position | Pseudo-legal gen | Legal gen | Attack query, one cell | Budget met |
 |---|---|---|---|---|---|
-| | starting | | | | |
-| | open | | | | |
+| 2026-09-05 | starting (196 moves) | 0.026 ms | 0.361 ms | 0.0014 ms | yes (5 / 50 / 1 ms) |
+| 2026-09-05 | open (252 moves) | 0.008 ms | 0.708 ms | 0.0026 ms | yes |
+
+Note: the 4D starting position already produces 196 pseudo-legal and 196 legal
+moves, which is the Stage 2 depth-1 figure. Not claimed as the Stage 2 gate; it is
+asserted there.
 
 ## Stage 2 — Four dimensions
 Status: NOT STARTED
@@ -139,3 +189,10 @@ Branch `4d-rewrite` created from `spec-review`. Project upgraded in batch mode,
 packages and `/src` solution created, all four gate items pass. See the Stage 0
 section above for detail. Commits: 70ae3e8 (scaffolding), plus this closing commit.
 Next: Stage 1, dimension-generic rules core validated by perft at n=2.
+
+### 2026-09-05 — Stage 1
+
+Owner directed continuing past Stage 0 in the same session. Rules core written into
+the Core package; perft gate passed on the first run at all five depths plus five
+published reference positions. Benchmarks recorded above. Gate result: PASS.
+Next: Stage 2, switch to four dimensions and record the 4D perft numbers.
