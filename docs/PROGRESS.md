@@ -114,7 +114,28 @@ moves, which is the Stage 2 depth-1 figure. Not claimed as the Stage 2 gate; it 
 asserted there.
 
 ## Stage 2 — Four dimensions
-Status: NOT STARTED
+Status: COMPLETE (2026-09-05)
+
+No core changes were needed: the Stage 1 code is dimension-generic and the
+switch is `new Board(4, 8)`. Tests in `Stage2FourDimensionsTests`:
+
+- Direction counts at n=4: rook 8, bishop 24, queen 32, king 32, knight 48, pawn
+  capture 6. PASS.
+- Starting position: 144 pieces per side, 136 pawns, 72 at y=1 and 64 at y=0,
+  King at x=4 and Queen at x=3 on both back ranks. PASS.
+- Every on-board Chebyshev-1 neighbour of every back-rank cell, both sides, is a
+  friendly piece (the spec's "verify by hand" item, now a test). PASS.
+- Depth-1 perft = 196, and the breakdown matches the hand derivation category by
+  category: 0 back-rank moves, 52 knight, 144 pawn from y=1, 0 pawn from y=0,
+  0 captures. PASS.
+- 4D perft depths 1 to 3 recorded in `docs/PERFT_4D.md` and asserted: 196 /
+  38,416 / 7,584,070. Depth 2 is exactly 196 squared, as it must be since no
+  first moves interact. PASS.
+- Bishop coordinate-sum parity preserved over 10,000 random legal moves (1,637 of
+  them bishop moves). PASS.
+- First-check finding over 1,000 random games (below). PASS.
+
+Gate result: PASS. 62 tests green (one discovery test marked Explicit).
 
 ## Stage 3 — Rendering and perspective
 Status: NOT STARTED
@@ -135,9 +156,28 @@ Status: NOT STARTED
 Research results the spec asks for. Record them here as they land, then copy
 the tablebase results to `docs/FINDINGS.md` in Stage 6.
 
-- **4D perft depths 1 to 3** (Stage 2): _pending. Also goes in `docs/PERFT_4D.md`._
-- **First available check** over random self-play, by ply and piece type (Stage 2): _pending._
-- **Bishop parity property** held over N random legal moves (Stage 2): _pending._
+- **4D perft depths 1 to 3** (Stage 2, 2026-09-05): 196 / 38,416 / 7,584,070.
+  Depth 3 took 14.7 s single-threaded in a Debug build. Full write-up in
+  `docs/PERFT_4D.md`.
+- **Early check is possible, and the spec's claim was wrong** (Stage 2,
+  2026-09-05). The spec said early check is impossible by construction because
+  no piece reaches the enemy camp in under four moves. Reaching the camp is not
+  required: once one shell pawn vacates, a slider checks from a distance along
+  the opened line. Concrete line, asserted in `CheckIsPossibleAtPlyThree`:
+  `P(2,1,3,3)-(2,3,3,3)`, `P(3,6,3,3)-(3,4,3,3)`, `Q(3,0,3,3)-(0,3,3,3)+`. The
+  queen leaves along the (x,y) diagonal the first pawn opened and sees the King
+  at (4,7,3,3) through the cell the Black pawn vacated. Ply 3 is the theoretical
+  minimum, since no first move can give check. Section 2 of SPEC.md carries a
+  correction note; no rule changed.
+- **First available check over 1,000 random games** (seed 4, cap 300 plies): a
+  check became available in all 1,000 games. Earliest ply 5, median 41, latest
+  181. Piece types able to deliver the first available check (a game can count
+  more than one): Queen 413, Bishop 318, Knight 249, Pawn 40, Rook 2. Random
+  play never sampled the ply-3 line, which needs two specific pawn moves.
+  Rooks almost never give the first check because their lines run along the
+  packed shell axes. Histogram is in the test output.
+- **Bishop parity property** held over 10,000 random legal moves, 1,637 bishop
+  moves checked, zero violations.
 - **Engine self-play**: games run, crashes, illegal moves, desyncs (Stage 5): _pending._
 - **Tablebase**: can K+Q force mate, longest forced mate, minimum mating material (Stage 6): _pending._
 
@@ -196,3 +236,11 @@ Owner directed continuing past Stage 0 in the same session. Rules core written i
 the Core package; perft gate passed on the first run at all five depths plus five
 published reference positions. Benchmarks recorded above. Gate result: PASS.
 Next: Stage 2, switch to four dimensions and record the 4D perft numbers.
+
+### 2026-09-05 — Stage 2
+
+Owner directed continuing to Stage 2. All assertions pass with no core changes.
+4D perft recorded in `docs/PERFT_4D.md`. The "early check impossible" claim in
+SPEC.md section 2 was found false (check at ply 3) and annotated. Gate result:
+PASS. Next: Stage 3, rendering and perspective in Unity. Its first step deletes
+the old 2D rules code under `Assets/Scripts/ChessGame`.

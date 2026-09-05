@@ -147,7 +147,13 @@ Total per side: 8 + 136 = **144 pieces**. 288 on the board.
   front of it and cannot move until that one advances. This is intended.
 - No piece of either side can reach the enemy camp in fewer than four moves. The
   armies are 7 apart along y and the fastest mover, the Knight, covers 2 per
-  move. Early check is impossible by construction, not merely unlikely.
+  move. **Correction recorded at the Stage 2 gate (2026-09-05):** reaching the
+  camp is not needed for check. Sliders check from a distance once a shell
+  pawn vacates, and check is possible at ply 3 exactly as in 2D chess:
+  `P(2,1,3,3)-(2,3,3,3)`, `P(3,6,3,3)-(3,4,3,3)`, `Q(3,0,3,3)-(0,3,3,3)+`.
+  The original sentence "early check is impossible by construction" was wrong.
+  This is a consequence note, not a rule; no rule changed. See
+  `PROGRESS.md` Findings.
 - Verify once, by hand, that every cell at Chebyshev distance 1 from the White
   King at (4,0,3,3) is occupied at game start. It should be. If it is not, the
   shell generator is wrong.
@@ -312,8 +318,9 @@ Switch the core to `dimensions = 4`.
   random legal games, record the ply at which a check first becomes
   *available* to the side to move, split by the checking piece type. Report
   the minimum, median and distribution in `PROGRESS.md` under Findings. The
-  spec predicts no check is possible before ply 7; if the data disagrees,
-  record it, it is a research finding and not a bug.
+  spec originally predicted no check before ply 7; the Stage 2 data showed a
+  check is possible at ply 3 (recorded in `PROGRESS.md` Findings). It is a
+  research finding and not a bug.
 - Generate perft numbers at 4D depths 1, 2 and 3 and record them in
   `docs/PERFT_4D.md`. Nobody has published these. They become the reference for
   anyone reimplementing this.
