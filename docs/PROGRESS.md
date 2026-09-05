@@ -22,7 +22,7 @@ Fill in during Stage 0. Update whenever a tool version changes.
 ---
 
 ## Stage 0 — Project setup
-Status: IN PROGRESS (2026-09-05)
+Status: COMPLETE (2026-09-05)
 
 Done:
 - Branch `4d-rewrite` created from `spec-review` (which is `main` plus the reviewed docs).
@@ -43,9 +43,12 @@ Done:
   reflection check that Core references no `UnityEngine*` assembly).
 - `.gitignore` negations verified: the slnx and csproj files are tracked.
 
-Gate items: `dotnet build` PASS, empty test green PASS, Unity compiles packages PASS,
-2D game launches and plays in the editor: PENDING (editor GUI blocked on the
-Unity Editor Software Terms dialog, which the owner must accept).
+Gate result (2026-09-05): `dotnet build` PASS (0 warnings, 0 errors). `dotnet test`
+PASS (2/2). Unity 6000.3.23f1 compiles both embedded packages PASS (0 errors).
+2D game launches and plays in the Unity 6.3 editor PASS: Main scene entered Play
+mode, 32 pieces instantiated, console clean, e2-e4 selected with legal-square
+highlighting and executed. Owner confirms the existing game is complete and both
+sides play. Stage 0 gate passed. Next: Stage 1 in a fresh session.
 
 ## Stage 1 — Rules core, validated at n=2
 Status: NOT STARTED
@@ -126,5 +129,13 @@ code work. Corrections adjudicated by the owner and applied on branch
 - Stage 0 packaging decided: local UPM packages sharing source with `/src`.
 - `.gitignore` given negations so `/src/*.sln` and `/src/**/*.csproj` are tracked.
 
-Gate result: not applicable. Next: owner picks the Unity version and installs
-it plus the .NET SDK, then Stage 0 begins on `4d-rewrite`.
+Gate result: not applicable.
+
+### 2026-09-05 — Stage 0
+
+Owner installed Unity 6.3 (6000.3.23f1, WebGL module). Homebrew dotnet-sdk cask had
+only downloaded its pkg, so the SDK was unpacked from that pkg into `~/.dotnet`.
+Branch `4d-rewrite` created from `spec-review`. Project upgraded in batch mode,
+packages and `/src` solution created, all four gate items pass. See the Stage 0
+section above for detail. Commits: 70ae3e8 (scaffolding), plus this closing commit.
+Next: Stage 1, dimension-generic rules core validated by perft at n=2.
