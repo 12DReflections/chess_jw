@@ -1,0 +1,7 @@
+{
+  "name": "com.chess4d.core",
+  "version": "0.1.0",
+  "displayName": "Chess4D Core",
+  "description": "Dimension-generic chess rules: board, move generation, legality, game state. Pure C#, no UnityEngine references. Source is shared with the .NET solution under /src.",
+  "unity": "6000.0"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Chess4D.Engine",
+  "rootNamespace": "Chess4D.Engine",
+  "references": [ "Chess4D.Core" ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

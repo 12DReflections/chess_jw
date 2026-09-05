@@ -1,0 +1,10 @@
+{
+  "name": "com.chess4d.engine",
+  "version": "0.1.0",
+  "displayName": "Chess4D Engine",
+  "description": "AttackMapService and single-threaded SearchEngine over Chess4D.Core. Pure C#, no UnityEngine references. Source is shared with the .NET solution under /src.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.chess4d.core": "0.1.0"
+  }
+}

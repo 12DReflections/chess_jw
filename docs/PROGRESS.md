@@ -13,16 +13,39 @@ Fill in during Stage 0. Update whenever a tool version changes.
 
 | Item | Value |
 |---|---|
-| Unity editor (target, per owner's decision) | _pending: Unity 6 LTS if WebGL matters, else 2022.3.47f1 already installed_ |
-| Unity editor (actually in use) | _not yet upgraded; project file says 2020.3.19f1_ |
-| .NET SDK | _not installed as of 2026-09-05_ |
+| Unity editor (target, per owner's decision) | Unity 6.3 LTS, 6000.3.23f1 (owner chose Unity 6 for the WebGL target) |
+| Unity editor (actually in use) | 6000.3.23f1, upgraded from 2020.3.19f1 on 2026-09-05; WebGL module installed |
+| .NET SDK | 10.0.400 at `~/.dotnet` (unpacked from the Homebrew cask pkg; the cask's privileged install step never ran). `DOTNET_ROOT` and `PATH` set in `~/.zshrc`. Solution file is `src/Chess4D.slnx` (the .NET 10 default format). Tests use NUnit 4 on net10.0. |
 | Machine | macOS 24.3 (Darwin), Apple Silicon, Homebrew present |
 | Library packaging | Local UPM packages `Packages/com.chess4d.core` and `Packages/com.chess4d.engine`, source globbed into `/src` .NET projects. See SPEC.md Stage 0 item 5. |
 
 ---
 
 ## Stage 0 — Project setup
-Status: NOT STARTED
+Status: IN PROGRESS (2026-09-05)
+
+Done:
+- Branch `4d-rewrite` created from `spec-review` (which is `main` plus the reviewed docs).
+- Unity project upgraded to 6000.3.23f1 in batch mode. Manifest cleaned first:
+  removed `com.unity.textmeshpro` (merged into ugui 2.0.0), `com.unity.ide.vscode`
+  (deprecated) and `com.unity.collab-proxy`; Unity then added `com.unity.ai.navigation`
+  and `com.unity.multiplayer.center` as Unity 6 defaults. Script compilation: 0 errors,
+  0 warnings, including DOTween under `Assets/Plugins`.
+- Embedded UPM packages `Packages/com.chess4d.core` and `Packages/com.chess4d.engine`,
+  each with an asmdef that has `noEngineReferences: true` (ground rule 2, enforced
+  by the compiler). Unity resolves both and compiles them: 0 errors.
+- `/src/Chess4D.slnx` with `Chess4D.Core` (netstandard2.1), `Chess4D.Engine`
+  (netstandard2.1), `Chess4D.Core.Tests` (net10.0, NUnit), `Chess4D.Tablebase`
+  (net10.0 console). Core and Engine contain no source of their own; they glob the
+  package `Runtime/**/*.cs`. `src/Directory.Build.props` pins C# 9, nullable off,
+  warnings as errors, to match what Unity 6 compiles.
+- `dotnet build`: 0 warnings, 0 errors. `dotnet test`: 2 passed (link check, and a
+  reflection check that Core references no `UnityEngine*` assembly).
+- `.gitignore` negations verified: the slnx and csproj files are tracked.
+
+Gate items: `dotnet build` PASS, empty test green PASS, Unity compiles packages PASS,
+2D game launches and plays in the editor: PENDING (editor GUI blocked on the
+Unity Editor Software Terms dialog, which the owner must accept).
 
 ## Stage 1 — Rules core, validated at n=2
 Status: NOT STARTED

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Chess4D.Core</RootNamespace>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <!-- Source lives in the Unity package. One tree, compiled twice, no copy step. -->
+  <ItemGroup>
+    <Compile Include="$(PackagesRoot)com.chess4d.core/Runtime/**/*.cs" />
+  </ItemGroup>
+</Project>

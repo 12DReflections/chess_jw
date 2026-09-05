@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Chess4D.Core.Tests/Chess4D.Core.Tests.csproj" />
+  <Project Path="Chess4D.Core/Chess4D.Core.csproj" />
+  <Project Path="Chess4D.Engine/Chess4D.Engine.csproj" />
+  <Project Path="Chess4D.Tablebase/Chess4D.Tablebase.csproj" />
+</Solution>

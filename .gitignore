@@ -35,6 +35,7 @@ ExportedObj/
 # The hand-written .NET solution under /src is source, not Unity output.
 # Negate the patterns above for it (see docs/SPEC.md Stage 0).
 !/src/*.sln
+!/src/*.slnx
 !/src/**/*.csproj
 /src/**/bin/
 /src/**/obj/
