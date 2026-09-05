@@ -138,7 +138,68 @@ switch is `new Board(4, 8)`. Tests in `Stage2FourDimensionsTests`:
 Gate result: PASS. 62 tests green (one discovery test marked Explicit).
 
 ## Stage 3 — Rendering and perspective
-Status: NOT STARTED
+Status: COMPLETE (2026-09-05)
+
+First step done: `Assets/Scripts/ChessGame`, `Assets/Data` (the BoardLayout asset),
+`Assets/Scripts/Enums` and `BoardInputHandler` deleted. Input receivers, tweeners,
+materials, prefabs, models and `Main.unity` kept; the scene builder strips the
+five dangling script components from `Main.unity` and the six piece prefabs.
+
+Core: `AxisView` (in the package, no Unity) is a signed permutation of axes into
+view slots, three visible and the rest hidden. `Project` applies the a-b plane
+rotation about (side-1)/2 and returns exact integer permutations at phi = 0 and
+phi = 90 without trigonometry; `AfterQuarterTurn` gives the exact next view, with
+the incoming axis reflected (a' = -b, b' = a). Seven tests: identity at 0, all
+4096 cells map exactly to their reflected swapped counterpart at 90 for every
+visible slot, the float path is within 1e-3 of the endpoints at 0.001 and
+89.999, mid-rotation preserves distance from the centre, four quarter turns
+return to the start, every reachable state is a signed permutation and all four
+perspectives are reachable, six dimensions has three hidden slots.
+
+Unity (`Assets/Scripts/Chess4D`, default assembly, references the Core package):
+
+- `ViewState`: view, per-axis pages, arm / scrub / release (snap past 45, spring
+  back below), 0.6 s smoothstep timed sweep, commit to the exact view, selection,
+  hover, layer isolation. Picking is disabled whenever phi is not 0.
+- `BoardView`: all 288 pieces as pooled GameObjects with a shared Fade material
+  and per-renderer colour; opacity = max(base, sin phi) with base = 1 in the
+  current layer of the nearer endpoint, times a distance fade; visible 8x8x8
+  lattice drawn with `Graphics.RenderMeshInstanced`, occupied cells as
+  translucent team-coloured cubes and empty cells as faint markers; ray-vs-cell
+  picking on the lattice.
+- `OrbitCamera`: left-drag orbit, scroll zoom, framed for 10 cells at 45 degrees.
+- `HudUi`: four perspective buttons (click sweeps, shift+click arms; keys 1-4),
+  phi slider (drives phi when armed, release snaps or springs), shift+drag
+  scrub, layer isolation (mode and screen axis, keys I and O), typed coordinate
+  selection which pages the view to the cell, status text, and the
+  picture-in-picture list of hidden-axis widgets: one per hidden slot, an
+  8-cell occupancy strip through the selected or hovered cell coloured by team
+  with the current page outlined and click-to-page, plus a density bar of piece
+  counts per hidden layer. Occupancy only, no threats.
+- `Chess4DGame`: bootstrap and input routing. `DemoRunner`: scripted walkthrough
+  for `-chess4d-demo <dir>` that captures through the camera into a render
+  texture so it does not depend on window focus.
+- `Assets/Editor/Chess4DSceneBuilder`: builds `Assets/Scenes/Chess4D.unity` in
+  code, creates the two Fade materials as assets so their shader variant ships,
+  wires the twelve piece meshes into the bootstrap, cleans the old scene and
+  prefabs, and builds the macOS player (`Chess4D/Build macOS Player`, or
+  `-executeMethod Chess4DSceneBuilder.BuildAll`).
+
+Gate result (2026-09-05): PASS, verified by screenshot from the standalone
+player's scripted walkthrough: 24 captures covering a scrubbed rotation held at
+20, 45 and 70 degrees then released past the snap point, a scrub released below
+45 that sprang back, timed sweeps through the remaining perspectives with a
+mid-sweep capture each, all eight pages of the hidden axis, typed selection,
+isolation and orbit. Nine of them plus the walkthrough log are kept under
+`docs/screenshots/stage3/`. Player log: no errors or exceptions.
+
+Design observation for the owner, not a defect: because each quarter turn is
+exact and reflects the incoming axis, the orientation of a perspective depends
+on the path taken to it. After x y z -> x y w -> x z w -> y z w -> x y z the
+view reads `-y -z -x | -w`: the same three axes, but permuted and reflected on
+screen. This is what the spec's "mathematically exact, up to a reflection"
+rotation implies. A camera-only "reorient" cannot undo a reflection. If a
+canonical orientation per perspective is wanted, it needs a rule in the spec.
 
 ## Stage 4 — Game management and position editor
 Status: NOT STARTED
@@ -244,3 +305,15 @@ Owner directed continuing to Stage 2. All assertions pass with no core changes.
 SPEC.md section 2 was found false (check at ply 3) and annotated. Gate result:
 PASS. Next: Stage 3, rendering and perspective in Unity. Its first step deletes
 the old 2D rules code under `Assets/Scripts/ChessGame`.
+
+### 2026-09-05 — Stage 3
+
+Owner directed continuing to Stage 3. Old 2D rules code deleted. `AxisView`
+added to Core with exact-endpoint tests. Unity rendering, rotation, paging,
+orbit, HUD and hidden-axis widgets built in code; scene assembled by an editor
+script in batch mode; macOS player built and driven through a scripted
+walkthrough for the screenshot gate. Two build-side lessons recorded: a
+standalone player idles when unfocused unless `runInBackground` is set, and it
+stops presenting frames when its window is occluded, so the demo captures via
+a render texture. Gate result: PASS. Next: Stage 4, game management and the
+position editor.

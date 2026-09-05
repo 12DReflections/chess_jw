@@ -1,0 +1,25 @@
+01-start-xyz-page-w3.png  view x y z | w   w=3
+02-selected-4133-strip.png  view x y z | w   w=3
+03-selected-bishop-2033-strip.png  view x y z | w   w=3
+04-scrub-xyz-to-xyw-phi20.png  view x y z | w   w=3   rotating 20.0° toward x y -w | z
+05-scrub-xyz-to-xyw-phi45.png  view x y z | w   w=3   rotating 45.0° toward x y -w | z
+06-scrub-xyz-to-xyw-phi70.png  view x y z | w   w=3   rotating 70.0° toward x y -w | z
+07-arrived-xyw.png  view x y -w | z   z=3
+08-sprang-back-xyw.png  view x y -w | z   z=3
+09-sweep-to-xzw-mid.png  view x y -w | z   z=3   rotating 48.7° toward x -z -w | y
+10-arrived-xzw.png  view x -z -w | y   y=0
+11-sweep-to-yzw-mid.png  view x -z -w | y   y=0   rotating 48.7° toward -y -z -w | x
+12-arrived-yzw.png  view -y -z -w | x   x=4
+13-back-to-xyz.png  view -y -z -x | -w   w=3
+14-page-w0.png  view -y -z -x | -w   w=0
+15-page-w1.png  view -y -z -x | -w   w=1
+16-page-w2.png  view -y -z -x | -w   w=2
+17-page-w3.png  view -y -z -x | -w   w=3
+18-page-w4.png  view -y -z -x | -w   w=4
+19-page-w5.png  view -y -z -x | -w   w=5
+20-page-w6.png  view -y -z -x | -w   w=6
+21-page-w7.png  view -y -z -x | -w   w=7
+22-typed-select-6724.png  view -y -z -x | -w   w=4
+23-isolate-hide-above-y1.png  view -y -z -x | -w   w=3
+24-orbited-and-zoomed.png  view -y -z -x | -w   w=3
+done
