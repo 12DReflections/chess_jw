@@ -383,3 +383,17 @@ save/load built in the Unity HUD; gate verified by the scripted game
 walkthrough. Gate result: PASS. Next: Stage 5, the engine (AttackMapService
 and the single-threaded SearchEngine). Owner decision pending: the compact
 notation in NOTATION.md section 2.
+
+### 2026-09-06 — Owner decisions after Stage 4
+
+- Compact notation proposal rejected (three encodings for four alike axes,
+  1-based y against 0-based code, and the "looks like 2D chess" pitch was
+  false because the shell spreads pawns across z and w). Decided: drop the
+  brackets, `Q3033-0333+`. Same numbering as the code, six digits at 6D.
+  Long tuple form stays in save files. `NOTATION.md` rewritten as approved;
+  `Notation` emits the compact form and parses both; tests updated.
+- Move animation moved into Stage 5 as part of its gate, with three cases
+  (both cells visible: animate; one visible: animate the visible half;
+  neither: flash the history line and mark the changed hidden layer) plus a
+  jump-to-last-move button that pages the view. The view never moves on its
+  own. SPEC.md Stage 5 updated.

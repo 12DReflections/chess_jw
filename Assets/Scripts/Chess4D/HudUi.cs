@@ -121,9 +121,9 @@ namespace Chess4D.Unity
             UiKit.Button(row, "Redo", () => game.Redo(), 26, 13);
             setupToggle = UiKit.Button(row, "Setup", () => { if (game.Mode == GameMode.Setup) game.ExitSetup(); else game.EnterSetup(); }, 26, 13);
 
-            UiKit.Label(col, "Move  (from) (to)[=Q]   long tuple notation, see docs/NOTATION.md", 11, TextAnchor.MiddleLeft, 16);
+            UiKit.Label(col, "Move   e.g. 2133-2333, Q3033x0333=Q   (docs/NOTATION.md)", 11, TextAnchor.MiddleLeft, 16);
             var moveRow = UiKit.HorizontalGroup(col, "move", 6, 26);
-            moveInput = UiKit.InputField(moveRow, "(from) (to)");
+            moveInput = UiKit.InputField(moveRow, "from-to");
             moveInput.onEndEdit.AddListener(t => { if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) { if (game.OnTyped(t)) moveInput.text = ""; } });
             var moveBtn = UiKit.Button(moveRow, "Play", () => { if (game.OnTyped(moveInput.text)) moveInput.text = ""; }, 26);
             moveBtn.GetComponent<LayoutElement>().preferredWidth = 56;

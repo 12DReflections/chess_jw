@@ -507,9 +507,9 @@ axis. Verified by screenshot. Commit.
   board, then play on from that position. This must accept typed coordinates,
   because most cells are not visible.
 - Save and load positions to a text format.
-- Until a notation is agreed in `docs/NOTATION.md`, use plain `(x,y,z,w)` tuples
-  for all typed coordinate input and for the save format. Do not invent a
-  notation and start using it before it is approved.
+- Notation decided 2026-09-06 (`docs/NOTATION.md`): moves are written in the
+  compact digit form `Q3033-0333+`; typed input accepts that or tuples; save
+  files use tuples.
 
 **Exit gate:** a full game is playable start to finish. A K+Q vs K position can
 be set up in the editor and played out. Commit.
@@ -542,10 +542,29 @@ compensate.
 Both players may have an engine attached, independently configurable as human or
 engine, so the game supports human vs human, human vs engine and engine vs engine.
 
+**Move animation (added by the owner after Stage 4; part of this stage's gate).**
+Without it an engine move between two hidden layers changes nothing on screen
+and the game feels broken. Three cases, decided by which of the move's cells
+are in the visible volume:
+
+- **Both visible:** animate the piece from cell to cell.
+- **One visible:** animate the half you can see. A piece leaving the volume
+  slides from its cell toward the volume boundary and fades out; a piece
+  arriving fades in at the boundary and slides into its cell.
+- **Neither visible:** nothing moves on the board. Flash the history line and
+  mark which hidden layer changed in the hidden-axis widgets (the from layer
+  and the to layer of the hidden axis).
+
+Add a **jump-to-last-move** button that pages the view so the last move's
+destination is visible. The view must never move on its own; rotation, paging
+and orbit remain the player's actions only.
+
 **Exit gate:** engine vs engine self-play completes 100 games without a crash,
 an illegal move, or a state desync, plus a fuzz test playing 10,000 random legal
 moves across random positions with no make/unmake mismatch. If 100 games takes
-more than a few hours, reduce to 20 and log the number actually run. Commit.
+more than a few hours, reduce to 20 and log the number actually run. The three
+animation cases and the jump-to-last-move button are demonstrated by
+screenshot. The hidden-axis strip shows threats from the attack map. Commit.
 
 ---
 
@@ -620,4 +639,6 @@ None of these block any stage. Ask before deciding.
 - Whether the Bishop should also move on 3-axis and 4-axis diagonals, which
   would take it from 24 directions to 72 (24 + 32 + 16; equivalently the
   80-direction Queen minus the 8 Rook directions). Currently 24.
-- A 4D move notation. Propose one in Stage 4 and get it approved.
+- ~~A 4D move notation. Propose one in Stage 4 and get it approved.~~ Decided
+  2026-09-06: compact digit form `Q3033-0333+` for moves, history and typed
+  input; tuples stay in save files. See `docs/NOTATION.md`.

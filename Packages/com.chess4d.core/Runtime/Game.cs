@@ -106,14 +106,19 @@ namespace Chess4D.Core
     }
 
     /// <summary>
-    /// The long, tuple-based move notation in use until a compact notation is
-    /// approved in docs/NOTATION.md: piece letter, from cell, "-" or "x", to
-    /// cell, "=X" for promotion, " e.p." for en passant, "O-O" / "O-O-O" for
-    /// castling toward +x / -x, with "+" and "#" appended by Game.
+    /// Move notation (docs/NOTATION.md). Compact form for history and typed
+    /// input: piece letter, from cell as digits, "-" or "x", to cell as digits,
+    /// "=X" for promotion, " e.p." for en passant, "O-O" / "O-O-O" for castling
+    /// toward +x / -x, with "+" and "#" appended by Game. The long form uses
+    /// tuples in place of digit runs and is what save files use.
     /// </summary>
     public static class Notation
     {
-        public static string Describe(Board board, in Move m)
+        public static string Describe(Board board, in Move m) { return Describe(board, m, true); }
+
+        public static string DescribeLong(Board board, in Move m) { return Describe(board, m, false); }
+
+        private static string Describe(Board board, in Move m, bool compact)
         {
             BoardGeometry g = board.G;
             byte p = board.GetPiece(m.From);
@@ -121,33 +126,40 @@ namespace Chess4D.Core
             var sb = new System.Text.StringBuilder();
             PieceType t = Piece.TypeOf(p);
             if (t != PieceType.Pawn) sb.Append(char.ToUpperInvariant(Piece.ToChar(Piece.Make(t, Color.White))));
-            sb.Append(g.CoordOf(m.From).ToString());
+            Coord from = g.CoordOf(m.From), to = g.CoordOf(m.To);
+            sb.Append(compact ? from.ToCompact() : from.ToString());
             sb.Append(m.IsCapture ? "x" : "-");
-            sb.Append(g.CoordOf(m.To).ToString());
+            sb.Append(compact ? to.ToCompact() : to.ToString());
             if (m.IsPromotion) sb.Append('=').Append(char.ToUpperInvariant(Piece.ToChar(Piece.Make(m.Promotion, Color.White))));
             if (m.IsEnPassant) sb.Append(" e.p.");
             return sb.ToString();
         }
 
-        /// <summary>Parses "(from) (to)" or "(from)-(to)" with an optional "=Q" promotion suffix, resolving flags against the legal move list.</summary>
+        /// <summary>
+        /// Parses a typed move in compact or long form ("3033 0333", "Q3033-0333", "(3,0,3,3)x(0,3,3,3)",
+        /// with optional "=X", trailing "+" or "#" and " e.p."), resolving flags against the legal move list.
+        /// </summary>
         public static bool TryParseMove(Board board, MoveList legal, string text, out Move move)
         {
             move = default;
             if (string.IsNullOrWhiteSpace(text)) return false;
-            string s = text.Trim();
+            string s = text.Trim().Replace("e.p.", "").TrimEnd('+', '#', ' ');
             PieceType promotion = PieceType.None;
             int eq = s.LastIndexOf('=');
             if (eq >= 0 && eq == s.Length - 2)
             {
                 if (!Piece.TryFromChar(char.ToUpperInvariant(s[eq + 1]), out byte pp)) return false;
                 promotion = Piece.TypeOf(pp);
-                s = s.Substring(0, eq);
+                s = s.Substring(0, eq).TrimEnd();
             }
-            int close = s.IndexOf(')');
-            if (close < 0) return false;
-            string first = s.Substring(0, close + 1);
-            string rest = s.Substring(close + 1).Trim().TrimStart('-', 'x', ' ').Trim();
-            if (!Coord.TryParse(first, board.G.Dimensions, out Coord from) || !Coord.TryParse(rest, board.G.Dimensions, out Coord to)) return false;
+            if (s.Length > 1 && "KQRBN".IndexOf(s[0]) >= 0 && (char.IsDigit(s[1]) || s[1] == '(')) s = s.Substring(1);
+
+            int dims = board.G.Dimensions;
+            if (!TakeCell(ref s, dims, out Coord from)) return false;
+            s = s.TrimStart(' ', '-', 'x', 'X');
+            if (!TakeCell(ref s, dims, out Coord to)) return false;
+            if (s.Trim().Length != 0) return false;
+
             int f, t;
             try { f = board.G.CellOf(from); t = board.G.CellOf(to); } catch (ArgumentException) { return false; }
             for (int i = 0; i < legal.Count; i++)
@@ -159,6 +171,26 @@ namespace Chess4D.Core
                 return true;
             }
             return false;
+        }
+
+        /// <summary>Consumes one cell from the front of <paramref name="s"/>: a parenthesised tuple or a run of exactly dims digits.</summary>
+        private static bool TakeCell(ref string s, int dims, out Coord c)
+        {
+            c = default;
+            s = s.TrimStart();
+            if (s.Length == 0) return false;
+            if (s[0] == '(')
+            {
+                int close = s.IndexOf(')');
+                if (close < 0) return false;
+                string tuple = s.Substring(0, close + 1);
+                s = s.Substring(close + 1);
+                return Coord.TryParse(tuple, dims, out c);
+            }
+            if (s.Length < dims) return false;
+            string digits = s.Substring(0, dims);
+            s = s.Substring(dims);
+            return Coord.TryParseCompact(digits, dims, out c);
         }
     }
 }

@@ -81,11 +81,37 @@ namespace Chess4D.Core
             return sb.ToString();
         }
 
-        /// <summary>Parses "(x,y,z,w)" with exactly <paramref name="dimensions"/> entries. Whitespace and the parentheses are optional.</summary>
+        /// <summary>Digits only, one per axis in axis order: (3,0,3,3) is "3033". Requires side at most 10.</summary>
+        public string ToCompact()
+        {
+            var sb = new StringBuilder(Dimensions);
+            for (int i = 0; i < Dimensions; i++) sb.Append((char)('0' + this[i]));
+            return sb.ToString();
+        }
+
+        /// <summary>Parses the compact digit form: exactly <paramref name="dimensions"/> digits.</summary>
+        public static bool TryParseCompact(string text, int dimensions, out Coord coord)
+        {
+            coord = default;
+            if (text == null) return false;
+            string s = text.Trim();
+            if (s.Length != dimensions) return false;
+            int[] v = new int[6];
+            for (int i = 0; i < dimensions; i++)
+            {
+                if (!char.IsDigit(s[i])) return false;
+                v[i] = s[i] - '0';
+            }
+            coord = new Coord(dimensions, v[0], v[1], v[2], v[3], v[4], v[5]);
+            return true;
+        }
+
+        /// <summary>Parses "(x,y,z,w)" with exactly <paramref name="dimensions"/> entries (parentheses optional), or the compact digit form.</summary>
         public static bool TryParse(string text, int dimensions, out Coord coord)
         {
             coord = default;
             if (string.IsNullOrEmpty(text)) return false;
+            if (text.Trim().IndexOf(',') < 0) return TryParseCompact(text, dimensions, out coord);
             string s = text.Trim().TrimStart('(').TrimEnd(')');
             string[] parts = s.Split(',');
             if (parts.Length != dimensions) return false;

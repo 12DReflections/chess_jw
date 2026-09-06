@@ -21,9 +21,9 @@ namespace Chess4D.Core.Tests
             Assert.That(game.TryMove(new Move(g.CellOf(2, 1, 3, 3), g.CellOf(2, 3, 3, 3), PieceType.None, MoveFlags.DoubleStep, g.CellOf(2, 2, 3, 3))), Is.True);
             Assert.That(game.TryMove(new Move(g.CellOf(3, 6, 3, 3), g.CellOf(3, 4, 3, 3), PieceType.None, MoveFlags.DoubleStep, g.CellOf(3, 5, 3, 3))), Is.True);
             Assert.That(game.TryMove(new Move(g.CellOf(3, 0, 3, 3), g.CellOf(0, 3, 3, 3))), Is.True);
-            Assert.That(game.HistoryText[0], Is.EqualTo("(2,1,3,3)-(2,3,3,3)"));
-            Assert.That(game.HistoryText[2], Is.EqualTo("Q(3,0,3,3)-(0,3,3,3)+"));
-            Assert.That(game.HistoryLine(2), Is.EqualTo("2. W Q(3,0,3,3)-(0,3,3,3)+"));
+            Assert.That(game.HistoryText[0], Is.EqualTo("2133-2333"));
+            Assert.That(game.HistoryText[2], Is.EqualTo("Q3033-0333+"));
+            Assert.That(game.HistoryLine(2), Is.EqualTo("2. W Q3033-0333+"));
             Assert.That(game.Board.InCheck(), Is.True);
             ulong afterCheck = game.Board.Hash;
 
@@ -36,7 +36,7 @@ namespace Chess4D.Core.Tests
             Assert.That(game.RedoCount, Is.EqualTo(3));
             Assert.That(game.Redo() && game.Redo() && game.Redo(), Is.True);
             Assert.That(game.Board.Hash, Is.EqualTo(afterCheck));
-            Assert.That(game.HistoryText[2], Is.EqualTo("Q(3,0,3,3)-(0,3,3,3)+"));
+            Assert.That(game.HistoryText[2], Is.EqualTo("Q3033-0333+"));
 
             // A new move after undo discards the redo branch.
             game.Undo();
@@ -64,6 +64,15 @@ namespace Chess4D.Core.Tests
             Assert.That(m.IsDoubleStep, Is.False);
             Assert.That(Notation.TryParseMove(game.Board, game.Legal, "(4,0,3,3)-(4,1,3,3)", out m), Is.False);
             Assert.That(Notation.TryParseMove(game.Board, game.Legal, "nonsense", out m), Is.False);
+            // Compact form, with and without the piece letter, separator, and suffixes.
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "2133 2333", out m), Is.True);
+            Assert.That(m.IsDoubleStep, Is.True);
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "N1033-0233", out m), Is.True);
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "N1033-0233+", out m), Is.True);
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "2133-(2,2,3,3)", out m), Is.True);
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "213-2333", out m), Is.False, "three digits is not a cell");
+            Assert.That(Notation.TryParseMove(game.Board, game.Legal, "2133-23331", out m), Is.False, "trailing junk");
+            Assert.That(Notation.DescribeLong(game.Board, game.Legal[0]), Does.Match(@"^[KQRBN]?\(\d,\d,\d,\d\)[-x]\(\d,\d,\d,\d\)"));
         }
 
         [Test]
@@ -79,10 +88,10 @@ namespace Chess4D.Core.Tests
             var game = new Game(b);
             Assert.That(Notation.TryParseMove(b, game.Legal, "(0,6,3,3)-(0,7,3,3)", out Move q), Is.True);
             Assert.That(q.Promotion, Is.EqualTo(PieceType.Queen));
-            Assert.That(Notation.TryParseMove(b, game.Legal, "(0,6,3,3)-(0,7,3,3)=N", out Move n), Is.True);
+            Assert.That(Notation.TryParseMove(b, game.Legal, "0633-0733=N", out Move n), Is.True);
             Assert.That(n.Promotion, Is.EqualTo(PieceType.Knight));
             Assert.That(game.TryMove(n), Is.True);
-            Assert.That(game.HistoryText[0], Is.EqualTo("(0,6,3,3)-(0,7,3,3)=N"));
+            Assert.That(game.HistoryText[0], Is.EqualTo("0633-0733=N"));
         }
 
         /// <summary>A hand-constructed 4D checkmate: the black king in the corner is smothered by its own pawns on all 15 neighbours, and a knight arrives to give check it cannot capture or block.</summary>
@@ -103,7 +112,7 @@ namespace Chess4D.Core.Tests
             Assert.That(game.TryMove(new Move(g.CellOf(4, 2, 0, 0), g.CellOf(2, 1, 0, 0))), Is.True);
             Assert.That(game.Status, Is.EqualTo(GameStatus.Checkmate));
             Assert.That(game.IsOver, Is.True);
-            Assert.That(game.HistoryText[0], Is.EqualTo("N(4,2,0,0)-(2,1,0,0)#"));
+            Assert.That(game.HistoryText[0], Is.EqualTo("N4200-2100#"));
             Assert.That(game.TryMove(new Move(g.CellOf(0, 0, 0, 0), g.CellOf(0, 0, 0, 1))), Is.False, "no moves after mate");
             game.Undo();
             Assert.That(game.Status, Is.EqualTo(GameStatus.Ongoing));
