@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Threading;
 using Chess4D.Core;
+using Chess4D.Engine;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Color = UnityEngine.Color;
@@ -9,6 +11,7 @@ using Side = Chess4D.Core.Color;
 namespace Chess4D.Unity
 {
     public enum GameMode { Play, Setup }
+    public enum PlayerKind { Human, Engine }
 
     /// <summary>
     /// Bootstrap, game management and input. Owns the Core game and the view
@@ -43,6 +46,23 @@ namespace Chess4D.Unity
         public Side SetupColor = Side.White;
         public bool SetupErase;
 
+        /// <summary>Always-on attack map for both sides; the UI reads threats from it.</summary>
+        public AttackMap Attacks { get; private set; }
+        public bool ShowThreats = true;
+        public readonly PlayerKind[] Players = { PlayerKind.Human, PlayerKind.Human };
+        public static readonly int[] EngineTimeChoicesMs = { 300, 1000, 3000 };
+        public int EngineTimeIndex = 1;
+        public bool Thinking { get; private set; }
+        public string ThinkingInfo { get; private set; } = "";
+        /// <summary>Fired after a move is made, undone or redone: (move, the piece that moved, wasUndo).</summary>
+        public event Action<Move, byte, bool> Moved;
+
+        private readonly SearchEngine engine = new SearchEngine();
+        private Board engineBoard;
+        private Thread engineThread;
+        private SearchResult engineResult;
+        private ulong thinkingForHash;
+
         private readonly MoveList fromList = new MoveList(256);
         private bool dragging, scrubbing;
         private Vector3 dragStart, lastMouse;
@@ -56,6 +76,8 @@ namespace Chess4D.Unity
             StartPosition.Setup(Board);
             Game = new Game(Board);
             State = new ViewState(Board);
+            Attacks = new AttackMap(Board);
+            engineBoard = new Board(4, 8);
 
             Camera cam = Camera.main;
             if (cam == null)
@@ -90,6 +112,8 @@ namespace Chess4D.Unity
 
             Hud = new GameObject("HUD").AddComponent<HudUi>();
             Hud.Build(State, this);
+            View.IsThreatened = cell => Attacks.IsPieceAttacked(cell);
+            Moved += OnMovedFeedback;
 
             Debug.Log("Chess4D ready: " + Board.PieceCount(Side.White) + " white and " + Board.PieceCount(Side.Black) + " black pieces, " + State.Describe());
             DemoRunner.StartIfRequested(this);
@@ -98,8 +122,85 @@ namespace Chess4D.Unity
         private void Update()
         {
             State.Update(Time.deltaTime);
+            Attacks.Refresh();
+            View.ShowThreats = ShowThreats;
             HandleKeys();
             HandleMouse();
+            StepEngine();
+        }
+
+        // ------------------------------------------------------------ engine players
+
+        public PlayerKind PlayerFor(Side side) { return Players[(int)side]; }
+
+        public void TogglePlayer(Side side) { Players[(int)side] = Players[(int)side] == PlayerKind.Human ? PlayerKind.Engine : PlayerKind.Human; }
+
+        public void CycleEngineTime() { EngineTimeIndex = (EngineTimeIndex + 1) % EngineTimeChoicesMs.Length; }
+
+        private void StepEngine()
+        {
+            if (Thinking)
+            {
+                bool done = engineThread == null || !engineThread.IsAlive;
+                if (!done) return;
+                Thinking = false;
+                engineThread = null;
+                if (thinkingForHash != Board.Hash || Mode != GameMode.Play) return; // position changed under us: discard
+                SearchResult r = engineResult;
+                ThinkingInfo = "depth " + r.Depth + ", " + r.Nodes + " nodes, " + r.Seconds.ToString("F2") + " s, score " + r.Score;
+                if (r.HasMove) Commit(r.BestMove);
+                return;
+            }
+            if (Mode != GameMode.Play || Game.IsOver || HasPendingPromotion) return;
+            if (Players[(int)Board.SideToMove] != PlayerKind.Engine) return;
+            StartThinking();
+        }
+
+        private void StartThinking()
+        {
+            engineBoard.CopyFrom(Board); // one copy per search; the search itself uses make/unmake on that copy
+            thinkingForHash = Board.Hash;
+            var limits = new SearchLimits { TimeMs = EngineTimeChoicesMs[EngineTimeIndex], MaxDepth = 6 };
+            Thinking = true;
+            ThinkingInfo = "thinking...";
+            Message = Board.SideToMove + " (engine) is thinking";
+#if UNITY_WEBGL
+            engineResult = engine.Search(engineBoard, limits);
+            engineThread = null;
+#else
+            engineThread = new Thread(() => { engineResult = engine.Search(engineBoard, limits); }) { IsBackground = true, Name = "Chess4D search" };
+            engineThread.Start();
+#endif
+        }
+
+        /// <summary>The three animation cases plus history flash and layer marks. Never moves the view.</summary>
+        private void OnMovedFeedback(Move m, byte piece, bool undo)
+        {
+            View.ShowThreats = ShowThreats;
+            View.AnimateMove(m.From, m.To, piece, undo);
+            bool visFrom = State.IsVisibleInVolume(m.From), visTo = State.IsVisibleInVolume(m.To);
+            if (!visFrom && !visTo)
+            {
+                Hud.FlashHistory(1.5f);
+                for (int s = AxisView.VisibleSlots; s < State.View.Dimensions; s++)
+                {
+                    int axis = State.View.AxisAtSlot(s);
+                    Hud.MarkLayers(axis, Board.G.Coord(m.From, axis), Board.G.Coord(m.To, axis), 1.5f);
+                }
+                Message += "   (moved in a hidden layer: see the history flash and the strip marks, or press Jump to last move)";
+            }
+        }
+
+        /// <summary>Pages the view so the last move's destination is visible and selects it. Only ever called by the player.</summary>
+        public void JumpToLastMove()
+        {
+            if (Game.History.Count == 0) { Message = "No move yet"; return; }
+            Move last = Game.History[Game.History.Count - 1];
+            State.PageTo(last.To);
+            State.SelectedCell = last.To;
+            State.MoveTargets.Clear();
+            State.CaptureTargets.Clear();
+            Message = "Last move: " + Game.HistoryLine(Game.History.Count - 1);
         }
 
         // ------------------------------------------------------------ input
@@ -170,6 +271,7 @@ namespace Chess4D.Unity
         {
             if (HasPendingPromotion) return;
             if (Mode == GameMode.Setup) { PlaceBrush(cell); return; }
+            if (Thinking) { Select(cell); return; }
             if (State.SelectedCell >= 0 && State.MoveTargets.Contains(cell)) { MoveTo(cell); return; }
             Select(cell);
         }
@@ -180,9 +282,9 @@ namespace Chess4D.Unity
             State.MoveTargets.Clear();
             State.CaptureTargets.Clear();
             HiddenTargetCount = 0;
-            if (cell < 0 || Mode != GameMode.Play || Game.IsOver) return;
+            if (cell < 0 || Mode != GameMode.Play || Game.IsOver || Thinking) return;
             byte p = Board.GetPiece(cell);
-            if (p == 0 || Piece.ColorOf(p) != Board.SideToMove) return;
+            if (p == 0 || Piece.ColorOf(p) != Board.SideToMove || Players[(int)Board.SideToMove] == PlayerKind.Engine) return;
             Game.LegalFrom(cell, fromList);
             for (int i = 0; i < fromList.Count; i++)
             {
@@ -242,9 +344,11 @@ namespace Chess4D.Unity
 
         private void Commit(in Move m)
         {
+            byte mover = Board.GetPiece(m.From);
             if (!Game.TryMove(m)) { Message = "Illegal move"; return; }
             Message = "Played " + Game.HistoryLine(Game.History.Count - 1) + StatusSuffix();
             Deselect();
+            Moved?.Invoke(m, Piece.WithoutMoved(mover), false);
         }
 
         private string StatusSuffix()
@@ -268,7 +372,9 @@ namespace Chess4D.Unity
                 case GameStatus.Stalemate: return "Stalemate. Draw.";
                 case GameStatus.DrawFiftyMove: return "Draw by the fifty-move rule.";
                 case GameStatus.DrawRepetition: return "Draw by threefold repetition.";
-                default: return Board.SideToMove + " to move" + (Board.InCheck() ? "   CHECK" : "") + "   (" + Game.Legal.Count + " legal moves)";
+                default:
+                    return Board.SideToMove + " (" + Players[(int)Board.SideToMove] + ") to move" + (Board.InCheck() ? "   CHECK" : "") + "   (" + Game.Legal.Count + " legal moves)"
+                        + (Thinking ? "   thinking..." : "");
             }
         }
 
@@ -299,14 +405,27 @@ namespace Chess4D.Unity
 
         public void Undo()
         {
-            if (Mode != GameMode.Play) return;
-            if (Game.Undo()) { Deselect(); Message = "Undid a move"; }
+            if (Mode != GameMode.Play || Thinking) return;
+            if (Game.History.Count == 0) return;
+            Move m = Game.History[Game.History.Count - 1];
+            if (Game.Undo())
+            {
+                Deselect();
+                Message = "Undid a move";
+                Moved?.Invoke(m, Piece.WithoutMoved(Board.GetPiece(m.From)), true);
+            }
         }
 
         public void Redo()
         {
-            if (Mode != GameMode.Play) return;
-            if (Game.Redo()) { Deselect(); Message = "Redid " + Game.HistoryLine(Game.History.Count - 1); }
+            if (Mode != GameMode.Play || Thinking) return;
+            if (Game.Redo())
+            {
+                Move m = Game.History[Game.History.Count - 1];
+                Deselect();
+                Message = "Redid " + Game.HistoryLine(Game.History.Count - 1);
+                Moved?.Invoke(m, Piece.WithoutMoved(Board.GetPiece(m.To)), false);
+            }
         }
 
         public void NewGame()

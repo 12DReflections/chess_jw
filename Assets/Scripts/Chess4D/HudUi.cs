@@ -24,8 +24,17 @@ namespace Chess4D.Unity
             public Image[] Borders;
             public Image[] Cells;
             public RectTransform[] Bars;
+            public Image[] WhiteMarks;
+            public Image[] BlackMarks;
             public Text Footer;
+            public float[] MarkUntil;
         }
+
+        private Button whiteButton, blackButton, timeButton, threatsButton;
+        private float historyFlashUntil;
+        private static readonly Color FlashColor = new Color(1f, 0.85f, 0.3f);
+        private static readonly Color MarkWhite = new Color(1f, 0.95f, 0.6f, 0.95f);
+        private static readonly Color MarkBlack = new Color(1f, 0.3f, 0.25f, 0.95f);
 
         private ViewState state;
         private Chess4DGame game;
@@ -121,6 +130,15 @@ namespace Chess4D.Unity
             UiKit.Button(row, "Redo", () => game.Redo(), 26, 13);
             setupToggle = UiKit.Button(row, "Setup", () => { if (game.Mode == GameMode.Setup) game.ExitSetup(); else game.EnterSetup(); }, 26, 13);
 
+            var playersRow = UiKit.HorizontalGroup(col, "players", 6, 26);
+            whiteButton = UiKit.Button(playersRow, "White: Human", () => game.TogglePlayer(Side.White), 26, 12);
+            blackButton = UiKit.Button(playersRow, "Black: Human", () => game.TogglePlayer(Side.Black), 26, 12);
+            timeButton = UiKit.Button(playersRow, "1.0 s", () => game.CycleEngineTime(), 26, 12);
+            timeButton.GetComponent<LayoutElement>().preferredWidth = 52;
+            var viewRow = UiKit.HorizontalGroup(col, "viewrow", 6, 26);
+            UiKit.Button(viewRow, "Jump to last move", () => game.JumpToLastMove(), 26, 12);
+            threatsButton = UiKit.Button(viewRow, "Threats: on", () => game.ShowThreats = !game.ShowThreats, 26, 12);
+
             UiKit.Label(col, "Move   e.g. 2133-2333, Q3033x0333=Q   (docs/NOTATION.md)", 11, TextAnchor.MiddleLeft, 16);
             var moveRow = UiKit.HorizontalGroup(col, "move", 6, 26);
             moveInput = UiKit.InputField(moveRow, "from-to");
@@ -129,11 +147,11 @@ namespace Chess4D.Unity
             moveBtn.GetComponent<LayoutElement>().preferredWidth = 56;
             moveInput.GetComponent<LayoutElement>().flexibleWidth = 1;
 
-            messageText = UiKit.Label(col, "", 12, TextAnchor.UpperLeft, 34);
+            messageText = UiKit.Label(col, "", 12, TextAnchor.UpperLeft, 52);
             messageText.color = new Color(1f, 0.85f, 0.5f);
 
             UiKit.Label(col, "History", 12, TextAnchor.MiddleLeft, 16);
-            historyText = UiKit.Label(col, "", 12, TextAnchor.UpperLeft, 190);
+            historyText = UiKit.Label(col, "", 12, TextAnchor.UpperLeft, 172);
 
             // Setup editor, shown only in setup mode.
             setupPanel = UiKit.VerticalGroup(col, "setup", 4, new RectOffset(0, 0, 4, 0));
@@ -186,10 +204,10 @@ namespace Chess4D.Unity
         private void BuildPip(Transform root)
         {
             int hidden = state.View.HiddenSlots;
-            float pipHeight = 30 + hidden * 118;
+            float pipHeight = 44 + hidden * 118;
             var pip = UiKit.Panel(root, "pip", new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(-10, 10), new Vector2(310, pipHeight), UiKit.PanelColor);
             var pipCol = UiKit.VerticalGroup(pip, "col", 4, new RectOffset(10, 10, 8, 8));
-            UiKit.Label(pipCol, "Hidden axes   (strip: occupancy through the selected or hovered cell; click to page)", 11, TextAnchor.MiddleLeft, 18);
+            UiKit.Label(pipCol, "Hidden axes   strip through the selected/hovered cell, click to page.\nCorner marks: attacked by White (pale) / by Black (red).", 11, TextAnchor.UpperLeft, 30);
             for (int slot = AxisView.VisibleSlots; slot < state.View.Dimensions; slot++)
                 widgets.Add(BuildWidget(pipCol, slot));
         }
@@ -204,6 +222,9 @@ namespace Chess4D.Unity
             prev.GetComponent<LayoutElement>().preferredWidth = 22;
             w.Borders = new Image[side];
             w.Cells = new Image[side];
+            w.WhiteMarks = new Image[side];
+            w.BlackMarks = new Image[side];
+            w.MarkUntil = new float[side];
             for (int v = 0; v < side; v++)
             {
                 int value = v;
@@ -213,8 +234,18 @@ namespace Chess4D.Unity
                 var inner = UiKit.Box(border.transform, StripEmpty);
                 UiKit.Stretch(inner.GetComponent<RectTransform>(), 2.5f);
                 inner.raycastTarget = false;
+                var wm = UiKit.Box(inner.transform, MarkWhite);
+                var wrt = wm.GetComponent<RectTransform>();
+                wrt.anchorMin = new Vector2(0, 0.65f); wrt.anchorMax = new Vector2(0.35f, 1); wrt.offsetMin = wrt.offsetMax = Vector2.zero;
+                wm.raycastTarget = false;
+                var bm = UiKit.Box(inner.transform, MarkBlack);
+                var brt2 = bm.GetComponent<RectTransform>();
+                brt2.anchorMin = new Vector2(0.65f, 0.65f); brt2.anchorMax = new Vector2(1, 1); brt2.offsetMin = brt2.offsetMax = Vector2.zero;
+                bm.raycastTarget = false;
                 w.Borders[v] = border;
                 w.Cells[v] = inner;
+                w.WhiteMarks[v] = wm;
+                w.BlackMarks[v] = bm;
             }
             var next = UiKit.Button(stripRow, ">", () => state.Page(slot, +1), 30);
             next.GetComponent<LayoutElement>().preferredWidth = 22;
@@ -234,6 +265,22 @@ namespace Chess4D.Unity
             var padR = UiKit.Box(barRow, BorderNone); padR.GetComponent<LayoutElement>().preferredWidth = 22; padR.GetComponent<LayoutElement>().flexibleWidth = 0;
             w.Footer = UiKit.Label(parent, "", 11, TextAnchor.MiddleLeft, 16);
             return w;
+        }
+
+        // ------------------------------------------------------------ move feedback (spec Stage 5)
+
+        /// <summary>Flash the history line; used when a move happened entirely outside the visible volume.</summary>
+        public void FlashHistory(float seconds) { historyFlashUntil = Time.time + seconds; }
+
+        /// <summary>Mark the from and to layers of a hidden axis in its widget for a while.</summary>
+        public void MarkLayers(int axis, int fromValue, int toValue, float seconds)
+        {
+            foreach (var w in widgets)
+            {
+                if (state.View.AxisAtSlot(w.Slot) != axis) continue;
+                w.MarkUntil[fromValue] = Time.time + seconds;
+                w.MarkUntil[toValue] = Time.time + seconds;
+            }
         }
 
         // ------------------------------------------------------------ per-frame refresh
@@ -264,8 +311,16 @@ namespace Chess4D.Unity
 
             gameStatusText.text = game.StatusLine();
             gameStatusText.color = game.Board.InCheck() || game.Game.IsOver ? new Color(1f, 0.55f, 0.35f) : UiKit.TextColor;
-            messageText.text = game.Message;
+            messageText.text = game.Message + (game.ThinkingInfo.Length > 0 ? "\nengine: " + game.ThinkingInfo : "");
             RefreshHistory();
+            float flash = Mathf.Clamp01((historyFlashUntil - Time.time) / 1.2f);
+            historyText.color = Color.Lerp(UiKit.TextColor, FlashColor, flash > 0f ? 0.5f + 0.5f * Mathf.Abs(Mathf.Sin(Time.time * 12f)) * flash : 0f);
+            whiteButton.GetComponentInChildren<Text>().text = "White: " + game.PlayerFor(Side.White);
+            blackButton.GetComponentInChildren<Text>().text = "Black: " + game.PlayerFor(Side.Black);
+            whiteButton.GetComponent<Image>().color = game.PlayerFor(Side.White) == PlayerKind.Engine ? UiKit.ArmedColor : UiKit.ButtonColor;
+            blackButton.GetComponent<Image>().color = game.PlayerFor(Side.Black) == PlayerKind.Engine ? UiKit.ArmedColor : UiKit.ButtonColor;
+            timeButton.GetComponentInChildren<Text>().text = (Chess4DGame.EngineTimeChoicesMs[game.EngineTimeIndex] / 1000f).ToString("0.0") + " s";
+            threatsButton.GetComponentInChildren<Text>().text = "Threats: " + (game.ShowThreats ? "on" : "off");
 
             bool setup = game.Mode == GameMode.Setup;
             if (setupPanel.gameObject.activeSelf != setup) setupPanel.gameObject.SetActive(setup);
@@ -306,7 +361,13 @@ namespace Chess4D.Unity
             if (cell < 0) return label + ": none";
             byte p = state.Board.GetPiece(cell);
             string what = p == 0 ? "empty" : Piece.ColorOf(p) + " " + Piece.TypeOf(p);
-            return label + ": " + state.G.CoordOf(cell) + " " + what;
+            string threats = "";
+            if (game.ShowThreats)
+            {
+                int byW = game.Attacks.Attackers(cell, Side.White), byB = game.Attacks.Attackers(cell, Side.Black);
+                threats = "  attacked by W " + byW + " / B " + byB;
+            }
+            return label + ": " + state.G.CoordOf(cell) + " " + what + threats;
         }
 
         private void RefreshWidget(HiddenAxisWidget w, int focus)
@@ -325,7 +386,12 @@ namespace Chess4D.Unity
                     c = p == 0 ? StripEmpty : Piece.ColorOf(p) == Side.White ? StripWhite : StripBlack;
                 }
                 w.Cells[v].color = c;
-                w.Borders[v].color = v == page ? BorderCurrent : BorderNone;
+                bool marked = w.MarkUntil[v] > Time.time;
+                w.Borders[v].color = marked ? Color.Lerp(BorderCurrent, FlashColor, 0.5f + 0.5f * Mathf.Sin(Time.time * 12f)) : v == page ? BorderCurrent : BorderNone;
+                bool showThreat = game.ShowThreats && focus >= 0;
+                int cellV = focus >= 0 ? state.G.WithCoord(focus, axis, v) : -1;
+                w.WhiteMarks[v].enabled = showThreat && game.Attacks.IsAttacked(cellV, Side.White);
+                w.BlackMarks[v].enabled = showThreat && game.Attacks.IsAttacked(cellV, Side.Black);
             }
             System.Array.Clear(densityCounts, 0, densityCounts.Length);
             int max = 1;

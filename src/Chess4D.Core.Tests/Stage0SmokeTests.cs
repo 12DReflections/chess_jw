@@ -10,7 +10,7 @@ namespace Chess4D.Core.Tests
         [Test]
         public void CoreAndEngineLink()
         {
-            Assert.That(EngineInfo.CoreVersion, Is.EqualTo(CoreInfo.Version));
+            Assert.That(typeof(SearchEngine).Assembly.GetName().Name, Is.EqualTo("Chess4D.Engine"));
             Assert.That(CoreInfo.MaxDimensions, Is.EqualTo(6));
         }
 

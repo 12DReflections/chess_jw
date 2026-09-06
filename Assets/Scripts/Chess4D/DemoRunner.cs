@@ -28,14 +28,14 @@ namespace Chess4D.Unity
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length - 1; i++)
             {
-                if (args[i] == "-chess4d-demo" || args[i] == "-chess4d-demo-game")
+                if (args[i] == "-chess4d-demo" || args[i] == "-chess4d-demo-game" || args[i] == "-chess4d-demo-engine")
                 {
                     var runner = game.gameObject.AddComponent<DemoRunner>();
                     runner.game = game;
                     runner.dir = args[i + 1];
                     Directory.CreateDirectory(runner.dir);
                     Debug.Log("Chess4D demo mode, writing to " + runner.dir);
-                    runner.StartCoroutine(args[i] == "-chess4d-demo" ? runner.RunView() : runner.RunGame());
+                    runner.StartCoroutine(args[i] == "-chess4d-demo" ? runner.RunView() : args[i] == "-chess4d-demo-game" ? runner.RunGame() : runner.RunEngine());
                     return;
                 }
             }
@@ -130,6 +130,92 @@ namespace Chess4D.Unity
             game.Orbit.Drag(220f, -40f);
             game.Orbit.Zoom(2f);
             yield return Shot("orbited-and-zoomed");
+            yield return Finish();
+        }
+
+        // ------------------------------------------------------------ Stage 5 engine, threats and animation walkthrough
+
+        private IEnumerator RunEngine()
+        {
+            var s = game.State;
+            var b = game.Board;
+            var g = b.G;
+            yield return null; yield return null; yield return null;
+
+            // 1. Threats along a hidden axis: a black rook at w=0 attacks a white knight at w=5 through the strip.
+            game.EnterSetup();
+            game.ClearBoard();
+            game.SetupColor = Side.White; game.SetupBrush = PieceType.King; game.OnTyped("4033");
+            game.SetupColor = Side.Black; game.SetupBrush = PieceType.King; game.OnTyped("4733");
+            game.SetupBrush = PieceType.Rook; game.OnTyped("2230");
+            game.SetupColor = Side.White; game.SetupBrush = PieceType.Knight; game.OnTyped("2235");
+            game.SetupBrush = PieceType.Pawn; game.OnTyped("2133");
+            if (b.SideToMove != Side.White) game.ToggleSideToMove();
+            game.ExitSetup();
+            game.OnTyped("2235");
+            yield return Shot("threats-strip-knight-attacked-along-w");
+            Log("knight at 2235 attacked: " + game.Attacks.IsPieceAttacked(g.CellOf(2, 2, 3, 5)) + "; rook at 2230 attacked: " + game.Attacks.IsPieceAttacked(g.CellOf(2, 2, 3, 0)));
+
+            // 2. Animation, case both visible. NewGame never moves the view, so page back to w=3 by hand.
+            game.NewGame();
+            s.SetPage(AxisView.VisibleSlots, 3);
+            yield return null;
+            game.OnTyped("2133-2333");
+            yield return new WaitForSeconds(0.12f);
+            Log("both visible mid: piece animations " + game.View.AnimCount + ", ghosts " + game.View.GhostCount + ", progress of 2333: " + game.View.AnimProgress(g.CellOf(2, 3, 3, 3)).ToString("F2"));
+            yield return Shot("anim-both-visible-mid");
+            yield return new WaitForSeconds(0.5f);
+            yield return Shot("anim-both-visible-done");
+
+            // 3. Case one visible: Black knight leaves the visible layer (w=3 to w=1).
+            game.OnTyped("N1733-1631");
+            yield return new WaitForSeconds(0.15f);
+            Log("from visible mid: piece animations " + game.View.AnimCount + ", ghosts " + game.View.GhostCount);
+            yield return Shot("anim-from-visible-ghost-mid");
+            Log("black knight moved to 1631: " + Piece.TypeOf(b.GetPiece(g.CellOf(1, 6, 3, 1))) + ", visible? " + s.IsVisibleInVolume(g.CellOf(1, 6, 3, 1)));
+            yield return new WaitForSeconds(0.6f);
+
+            // 4. Case neither visible: a white pawn moves entirely inside layer w=2.
+            game.OnTyped("0122-0222");
+            yield return new WaitForSeconds(0.1f);
+            Log("neither visible: piece animations " + game.View.AnimCount + ", ghosts " + game.View.GhostCount + " (expected 0 and 0)");
+            yield return Shot("anim-neither-visible-history-flash-and-strip-mark");
+            Log("history after hidden move: " + game.Game.HistoryLine(game.Game.History.Count - 1) + "; message: " + game.Message);
+            yield return new WaitForSeconds(0.4f);
+
+            // 5. Jump to last move pages the view to w=2.
+            game.JumpToLastMove();
+            yield return Shot("jump-to-last-move");
+            Log("after jump: " + s.Describe());
+
+            // 6. Case to visible only: the black knight comes back into the visible layer (w=2 now visible).
+            game.OnTyped("N1631-1632"); // not a knight move; expect refusal
+            Log("bogus knight move refused: " + game.Message);
+            game.OnTyped("N1631-1432");
+            yield return new WaitForSeconds(0.15f);
+            Log("to visible mid: piece animations " + game.View.AnimCount + ", ghosts " + game.View.GhostCount + ", progress of 1432: " + game.View.AnimProgress(g.CellOf(1, 4, 3, 2)).ToString("F2"));
+            yield return Shot("anim-to-visible-fade-in-mid");
+            yield return new WaitForSeconds(0.6f);
+
+            // 7. Engine plays White with a 300 ms budget.
+            game.EngineTimeIndex = 0;
+            game.TogglePlayer(Side.White);
+            yield return new WaitForSeconds(0.1f);
+            yield return Shot("engine-thinking");
+            float waited = 0f;
+            while ((game.Thinking || game.Board.SideToMove == Side.White) && waited < 10f) { waited += Time.deltaTime; yield return null; }
+            yield return new WaitForSeconds(0.5f);
+            yield return Shot("engine-moved");
+            Log("engine move: " + game.Game.HistoryLine(game.Game.History.Count - 1) + "; info: " + game.ThinkingInfo);
+
+            // 8. Engine vs engine for a few plies.
+            game.TogglePlayer(Side.Black);
+            int target = game.Game.History.Count + 6;
+            waited = 0f;
+            while (game.Game.History.Count < target && waited < 30f) { waited += Time.deltaTime; yield return null; }
+            yield return Shot("engine-vs-engine");
+            Log("engine vs engine reached " + game.Game.History.Count + " plies; last: " + game.Game.HistoryLine(game.Game.History.Count - 1));
+            game.TogglePlayer(Side.White); game.TogglePlayer(Side.Black);
             yield return Finish();
         }
 

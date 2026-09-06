@@ -16,6 +16,34 @@ namespace Chess4D.Unity
     {
         private struct InstanceData { public Matrix4x4 objectToWorld; }
 
+        private sealed class Anim
+        {
+            public int Cell;          // the cell whose piece is animating (arrival / full move)
+            public Vector3 From, To;
+            public float T, Duration;
+            public bool FadeIn;
+        }
+
+        private sealed class Ghost
+        {
+            public GameObject Go;
+            public MeshRenderer Renderer;
+            public Vector3 From, To;
+            public float T, Duration;
+            public Color Tint;
+        }
+
+        public const float MoveSeconds = 0.35f;
+        public const float HalfSeconds = 0.45f;
+        private readonly Dictionary<int, Anim> anims = new Dictionary<int, Anim>();
+        private readonly List<Ghost> ghosts = new List<Ghost>();
+        private readonly List<int> finished = new List<int>();
+        public bool ShowThreats = true;
+        public System.Func<int, bool> IsThreatened;
+        public Color ThreatMarker = new Color(1f, 0.2f, 0.15f, 0.9f);
+        private Material threatMat;
+        private InstanceData[] threatInst = new InstanceData[512];
+
         private sealed class PieceObj
         {
             public GameObject Go;
@@ -69,6 +97,7 @@ namespace Chess4D.Unity
             cellHoverMat = Tinted(cellFade, HoverCell);
             targetMat = Tinted(cellFade, MoveTarget);
             captureMat = Tinted(cellFade, CaptureTarget);
+            threatMat = Tinted(cellFade, ThreatMarker);
             var tmp = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cubeMesh = tmp.GetComponent<MeshFilter>().sharedMesh;
             Destroy(tmp);
@@ -87,8 +116,80 @@ namespace Chess4D.Unity
         private void LateUpdate()
         {
             if (state == null) return;
+            StepAnimations(Time.deltaTime);
             SyncPieces();
             DrawCells();
+        }
+
+        // ------------------------------------------------------------ animation (spec Stage 5, three cases)
+
+        /// <summary>Called after a move (or undo). Decides the case from which cells are in the visible volume.</summary>
+        public void AnimateMove(int from, int to, byte piece, bool reverse)
+        {
+            if (reverse) { int t = from; from = to; to = t; }
+            bool visFrom = state.IsVisibleInVolume(from) && !state.Rotating;
+            bool visTo = state.IsVisibleInVolume(to) && !state.Rotating;
+            Vector3 wFrom = state.WorldOf(from);
+            Vector3 wTo = state.WorldOf(to);
+            Vector3 dv = wTo - wFrom;
+            if (dv.sqrMagnitude < 1e-4f) dv = Vector3.up * 0.8f; // pure hidden-axis move: no visible displacement, lift instead
+            if (visFrom && visTo)
+            {
+                anims[to] = new Anim { Cell = to, From = wFrom, To = wTo, T = 0f, Duration = MoveSeconds, FadeIn = false };
+            }
+            else if (visFrom)
+            {
+                SpawnGhost(piece, wFrom, wFrom + dv * 0.5f);
+            }
+            else if (visTo)
+            {
+                anims[to] = new Anim { Cell = to, From = wTo - dv * 0.5f, To = wTo, T = 0f, Duration = HalfSeconds, FadeIn = true };
+            }
+            // neither visible: nothing to draw here; the HUD flashes the history line and marks the layer.
+        }
+
+        public bool IsAnimating { get { return anims.Count > 0 || ghosts.Count > 0; } }
+        public int AnimCount { get { return anims.Count; } }
+        public int GhostCount { get { return ghosts.Count; } }
+        /// <summary>Progress 0..1 of the animation on <paramref name="cell"/>, or -1.</summary>
+        public float AnimProgress(int cell) { return anims.TryGetValue(cell, out Anim a) ? Mathf.Clamp01(a.T / a.Duration) : -1f; }
+
+        private void SpawnGhost(byte piece, Vector3 from, Vector3 to)
+        {
+            var go = new GameObject("ghost");
+            go.transform.SetParent(transform, false);
+            var mf = go.AddComponent<MeshFilter>();
+            var mr = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshes[(int)Piece.ColorOf(piece)][(int)Piece.TypeOf(piece)];
+            mf.sharedMesh = mesh;
+            mr.sharedMaterial = pieceMaterial;
+            mr.shadowCastingMode = ShadowCastingMode.Off;
+            mr.receiveShadows = false;
+            Bounds bd = mesh.bounds;
+            float horiz = Mathf.Max(bd.size.x, bd.size.z, 1e-4f);
+            float scale = Mathf.Min(0.72f / Mathf.Max(bd.size.y, 1e-4f), 0.55f / horiz);
+            go.transform.localScale = Vector3.one * scale;
+            Vector3 offset = -bd.center * scale;
+            ghosts.Add(new Ghost { Go = go, Renderer = mr, From = from + offset, To = to + offset, T = 0f, Duration = HalfSeconds, Tint = Piece.ColorOf(piece) == Side.White ? WhiteTint : BlackTint });
+        }
+
+        private void StepAnimations(float dt)
+        {
+            finished.Clear();
+            foreach (var kv in anims) { kv.Value.T += dt; if (kv.Value.T >= kv.Value.Duration) finished.Add(kv.Key); }
+            foreach (int c in finished) anims.Remove(c);
+            for (int i = ghosts.Count - 1; i >= 0; i--)
+            {
+                Ghost gh = ghosts[i];
+                gh.T += dt;
+                float u = Mathf.Clamp01(gh.T / gh.Duration);
+                float e = u * u * (3f - 2f * u);
+                gh.Go.transform.position = Vector3.Lerp(gh.From, gh.To, e);
+                Color c = gh.Tint; c.a = 1f - u;
+                mpb.SetColor("_Color", c);
+                gh.Renderer.SetPropertyBlock(mpb);
+                if (u >= 1f) { Destroy(gh.Go); ghosts.RemoveAt(i); }
+            }
         }
 
         /// <summary>Re-submits the instanced cell draws, for a manual camera render in the same frame.</summary>
@@ -157,10 +258,18 @@ namespace Chess4D.Unity
         private void Place(int cell, PieceObj obj)
         {
             Vector3 pos = state.WorldOf(cell) + obj.MeshOffset;
+            float animAlpha = 1f;
+            if (anims.TryGetValue(cell, out Anim anim))
+            {
+                float u = Mathf.Clamp01(anim.T / anim.Duration);
+                float e = u * u * (3f - 2f * u);
+                pos = Vector3.Lerp(anim.From, anim.To, e) + obj.MeshOffset;
+                if (anim.FadeIn) animAlpha = u;
+            }
             obj.Go.transform.position = pos;
 
             float baseAlpha = state.InCurrentLayer(cell) ? 1f : 0f;
-            float alpha = Mathf.Max(baseAlpha, Mathf.Sin(state.Phi * Mathf.Deg2Rad));
+            float alpha = Mathf.Max(baseAlpha, Mathf.Sin(state.Phi * Mathf.Deg2Rad)) * animAlpha;
             if (state.IsolatedAway(cell)) alpha = 0f;
 
             float depth = cam != null ? Vector3.Dot(pos - cam.transform.position, cam.transform.forward) : 0f;
@@ -223,6 +332,20 @@ namespace Chess4D.Unity
                 }
                 Render(targetMat, targetInst, nT);
                 Render(captureMat, captureInst, nC);
+                if (ShowThreats && IsThreatened != null)
+                {
+                    int nTh = 0;
+                    for (int c = 0; c < 2; c++)
+                    {
+                        b.GetPieceCells((Side)c, cellsScratch);
+                        foreach (int cell in cellsScratch)
+                        {
+                            if (!state.IsVisibleInVolume(cell) || state.IsolatedAway(cell) || !IsThreatened(cell)) continue;
+                            threatInst[nTh++].objectToWorld = Matrix4x4.TRS(state.WorldOf(cell) + new Vector3(0.36f, 0.36f, -0.36f), Quaternion.identity, Vector3.one * 0.16f);
+                        }
+                    }
+                    Render(threatMat, threatInst, nTh);
+                }
                 if (state.SelectedCell >= 0 && state.IsVisibleInVolume(state.SelectedCell))
                 {
                     oneInst[0].objectToWorld = Matrix4x4.TRS(state.WorldOf(state.SelectedCell), Quaternion.identity, Vector3.one * 1.0f);

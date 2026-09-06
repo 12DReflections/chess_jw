@@ -76,6 +76,11 @@ namespace Chess4D.Core
 
         public void Clear() { Count = 0; }
 
+        public void Swap(int i, int j)
+        {
+            Move t = items[i]; items[i] = items[j]; items[j] = t;
+        }
+
         public bool Contains(in Move m)
         {
             for (int i = 0; i < Count; i++) if (items[i].Equals(m)) return true;

@@ -1,0 +1,22 @@
+01-threats-strip-knight-attacked-along-w.png  view x y z | w   w=5  |  White (Human) to move   (74 legal moves)  |  47 legal moves for White Knight at (2,2,3,5), 23 in other layers (page or type the target)
+knight at 2235 attacked: True; rook at 2230 attacked: False
+both visible mid: piece animations 1, ghosts 0, progress of 2333: 0.45
+02-anim-both-visible-mid.png  view x y z | w   w=3  |  Black (Human) to move   (196 legal moves)  |  Played 1. W 2133-2333
+03-anim-both-visible-done.png  view x y z | w   w=3  |  Black (Human) to move   (196 legal moves)  |  Played 1. W 2133-2333
+from visible mid: piece animations 0, ghosts 1
+04-anim-from-visible-ghost-mid.png  view x y z | w   w=3  |  White (Human) to move   (198 legal moves)  |  Played 1. B N1733-1631
+black knight moved to 1631: Knight, visible? False
+neither visible: piece animations 0, ghosts 0 (expected 0 and 0)
+05-anim-neither-visible-history-flash-and-strip-mark.png  view x y z | w   w=3  |  Black (Human) to move   (196 legal moves)  |  Played 2. W 0122-0222   (moved in a hidden layer: see the history flash and the strip marks, or press Jump to last move)
+history after hidden move: 2. W 0122-0222; message: Played 2. W 0122-0222   (moved in a hidden layer: see the history flash and the strip marks, or press Jump to last move)
+06-jump-to-last-move.png  view x y z | w   w=2  |  Black (Human) to move   (196 legal moves)  |  Last move: 2. W 0122-0222
+after jump: view x y z | w   w=2
+bogus knight move refused: Illegal move: N1631-1632
+to visible mid: piece animations 1, ghosts 0, progress of 1432: 0.35
+07-anim-to-visible-fade-in-mid.png  view x y z | w   w=2  |  White (Human) to move   (198 legal moves)  |  Played 2. B N1631-1432
+08-engine-thinking.png  view x y z | w   w=2  |  White (Engine) to move   (198 legal moves)   thinking...  |  White (engine) is thinking
+09-engine-moved.png  view x y z | w   w=2  |  Black (Human) to move   (205 legal moves)  |  Played 3. W Q3033-0333   (moved in a hidden layer: see the history flash and the strip marks, or press Jump to last move)
+engine move: 3. W Q3033-0333; info: depth 2, 19456 nodes, 0.30 s, score 104
+10-engine-vs-engine.png  view x y z | w   w=2  |  Black (Engine) to move   (233 legal moves)   thinking...  |  Black (engine) is thinking
+engine vs engine reached 11 plies; last: 6. W Q3336-4335
+done

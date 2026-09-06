@@ -178,6 +178,28 @@ namespace Chess4D.Core
             history[0] = Hash;
         }
 
+        /// <summary>Copies another board's position (cells, side to move, en passant, halfmove clock) into this one. History is reset. One copy per search is fine; copying per node is not.</summary>
+        public void CopyFrom(Board other)
+        {
+            if (other.G.Dimensions != G.Dimensions || other.G.Side != G.Side) throw new ArgumentException("Geometry mismatch", nameof(other));
+            Array.Clear(cells, 0, cells.Length);
+            pieceCount[0] = pieceCount[1] = 0;
+            kingCell[0] = kingCell[1] = -1;
+            for (int cell = 0; cell < cells.Length; cell++)
+            {
+                byte p = other.cells[cell];
+                if (p == 0) continue;
+                cells[cell] = p;
+                AddToList(cell, Piece.ColorOf(p));
+                if (Piece.TypeOf(p) == PieceType.King) kingCell[(int)Piece.ColorOf(p)] = cell;
+            }
+            SideToMove = other.SideToMove;
+            EnPassantCell = other.EnPassantCell;
+            HalfmoveClock = other.HalfmoveClock;
+            Hash = other.Hash;
+            ResetHistory();
+        }
+
         /// <summary>Full recomputation, for setup and for verifying the incremental hash in tests.</summary>
         public ulong ComputeHash()
         {
@@ -414,10 +436,12 @@ namespace Chess4D.Core
         // ---------------------------------------------------------------- move generation
 
         /// <summary>All pseudo-legal moves for the side to move. Castling already respects the attack conditions; king safety after the move is not checked here.</summary>
-        public void GeneratePseudoLegal(MoveList list)
+        public void GeneratePseudoLegal(MoveList list) { GeneratePseudoLegalFor(SideToMove, list); }
+
+        /// <summary>Pseudo-legal moves for either colour, for mobility evaluation. En passant is only offered to the side to move.</summary>
+        public void GeneratePseudoLegalFor(Color us, MoveList list)
         {
             list.Clear();
-            Color us = SideToMove;
             Color them = Piece.Opposite(us);
             int n = pieceCount[(int)us];
             int[] pcs = pieceCells[(int)us];
@@ -526,7 +550,7 @@ namespace Chess4D.Core
                 {
                     if (Piece.ColorOf(q) == them) AddPawnMove(from, to, us, MoveFlags.Capture, list);
                 }
-                else if (to == EnPassantCell)
+                else if (to == EnPassantCell && us == SideToMove)
                 {
                     int capturedCell = G.Step(to, G.PawnForward[(int)them]);
                     if (capturedCell >= 0 && Piece.Is(cells[capturedCell], PieceType.Pawn, them))

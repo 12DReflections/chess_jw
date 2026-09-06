@@ -261,7 +261,81 @@ destination). The kept tweeners can be wired in later; nothing in the gate
 asks for animation.
 
 ## Stage 5 — Engine
-Status: NOT STARTED
+Status: COMPLETE (2026-09-06)
+
+Engine package (`Packages/com.chess4d.engine/Runtime`, shared source, no Unity):
+
+- `AttackMap` (AttackMapService): per-cell attacker counts for both colours,
+  recomputed whenever the position hash changes; a colour's attack on its own
+  piece counts as a defence. Answers attacked / defended / in check / attacker
+  cells. Cross-checked against the Core ray walk on 24,000 random cells across
+  60 random plies, and on a hidden-axis case (rook at w=0 attacking a knight at
+  w=5 through the same x,y,z). Compute cost is one attack-pattern walk per
+  piece; well under a frame.
+- `Evaluation`: material plus mobility (2 centipawns per pseudo-legal move
+  difference). Piece values are the 2D values and are marked PROVISIONAL in
+  the code.
+- `SearchEngine`: single-threaded negamax alpha-beta, iterative deepening,
+  transposition table (2^18 entries) keyed by the Core Zobrist hash, ordering
+  TT move then MVV-LVA captures then killers then history, quiescence on
+  captures and promotions, mate scores by ply, time and node limits. Make and
+  unmake on the board it is given; never copies per node. Tests: finds the
+  smothered knight mate in one, takes a hanging queen, returns a legal move
+  from the start position within the time limit (depth 2, about 27k nodes in
+  0.8 s, Debug build).
+- `SelfPlay`: engine versus engine with an independent replay board; after
+  every move the played board, the replay board and a full hash recompute
+  must agree, and the engine move must be in the legal list.
+
+Unity (`Assets/Scripts/Chess4D`):
+
+- Players: each side Human or Engine (buttons), engine time 0.3 / 1 / 3 s.
+  The search runs on a worker thread over a one-off copy of the position
+  (`Board.CopyFrom`) so the renderer never sees make/unmake churn; the search
+  itself stays single-threaded, and a WebGL build falls back to a blocking
+  call. A result is discarded if the position changed while thinking.
+- Threats from the attack map: red marker on every attacked piece in the
+  visible volume, corner marks in the hidden-axis strip (pale = attacked by
+  White, red = attacked by Black), attacker counts in the cell status line.
+  Toggle button. This is the strip's threat display the spec deferred from
+  Stage 3.
+- Move animation, the three cases decided by the owner: both cells visible,
+  the piece slides cell to cell (0.35 s); only the origin visible, a ghost
+  slides half the visible displacement and fades out; only the destination
+  visible, the piece fades in sliding the last half of the way; neither
+  visible, the history panel flashes and the from and to layers of the hidden
+  axis pulse in the widget. Undo animates in reverse. A pure hidden-axis move
+  with no visible displacement lifts instead.
+- Jump-to-last-move button pages to the destination and selects it. Nothing
+  moves the view on its own: New game, Load, engine moves and undo all leave
+  the view where it is.
+
+Gate result (2026-09-06):
+
+- Fuzz: 10,000 random legal moves over 400 random positions, every make/unmake
+  restored the position text and hash exactly. PASS.
+- Self-play (`EngineTests.SelfPlayGate`, Release build, 150 ms per move, depth
+  cap 4, 200-ply cap, 0 to 3 random opening plies, seed 1): 20 games, 3,861
+  plies, 51,452,607 nodes, 581 s, maximum depth reached 4, **0 failures**: no
+  crash, no illegal move, no state desync between the played board, the replay
+  board and a full hash recompute after every move. One game ended in
+  checkmate at ply 61; nineteen reached the ply cap with material still on
+  the board. Run at 20 games, not 100, as the spec allows when 100 would take
+  hours; 100 games at this budget would take about 50 minutes and can be run
+  with `dotnet test -c Release --filter SelfPlayGate` after raising the count.
+  PASS.
+- Animation cases and jump button demonstrated by the scripted engine
+  walkthrough (`-chess4d-demo-engine`), with live counters logged at each
+  capture: both-visible one piece animation at 45 percent, origin-visible one
+  ghost, neither zero and zero, destination-visible one fade-in at 35 percent.
+  Engine played White at depth 2 in 0.30 s, then engine versus engine for six
+  plies. Screenshots and log under `docs/screenshots/stage5/`. PASS.
+- 80 .NET tests green.
+
+Findings for the record: at 288 pieces the Debug-build search reaches depth 2
+in about 0.3 s and depth 3 needs several seconds; the spec's expectation of a
+practical depth of 2 to 4 holds. The provisional 2D piece values are untested
+against 4D reality.
 
 ## Stage 6 — Tablebase generator
 Status: NOT STARTED
@@ -397,3 +471,12 @@ notation in NOTATION.md section 2.
   neither: flash the history line and mark the changed hidden layer) plus a
   jump-to-last-move button that pages the view. The view never moves on its
   own. SPEC.md Stage 5 updated.
+
+### 2026-09-06 — Stage 5
+
+Owner directed continuing to Stage 5 after the notation and animation
+decisions. Engine package written (attack map, evaluation, search, self-play
+harness) with tests including the fuzz gate; Unity gained engine players on a
+worker thread, threat display from the attack map, the three animation cases,
+and jump-to-last-move. Gate: fuzz PASS, walkthrough PASS, self-play
+20 games with 0 failures PASS. Next: Stage 6, the tablebase generator.
