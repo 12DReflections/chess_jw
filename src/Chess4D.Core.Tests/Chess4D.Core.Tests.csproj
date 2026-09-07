@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="../Chess4D.Core/Chess4D.Core.csproj" />
     <ProjectReference Include="../Chess4D.Engine/Chess4D.Engine.csproj" />
+    <ProjectReference Include="../Chess4D.Tablebase/Chess4D.Tablebase.csproj" />
   </ItemGroup>
 </Project>

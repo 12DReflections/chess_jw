@@ -3,9 +3,12 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Chess4D.Tablebase</RootNamespace>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <TieredPGO>true</TieredPGO>
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Chess4D.Core/Chess4D.Core.csproj" />
+    <ProjectReference Include="../Chess4D.Engine/Chess4D.Engine.csproj" />
   </ItemGroup>
 </Project>
