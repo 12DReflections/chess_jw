@@ -1,0 +1,20 @@
+07:56:47  table KQvK-4d8: 428933120 entries (818 MB), 12 threads
+07:57:10  init: 428933120 entries, duplicate slots 62388368, legal WTM 178112508, legal BTM 181847414, checkmates 1, stalemates 1 in 22.4 s
+07:57:10  pass 0: solved 18 positions with distance 1 in 0.0 s
+07:57:10  checkpoint written after pass 0
+07:57:10  pass 1: solved 0 positions with distance 2 in 0.0 s
+07:57:10  checkpoint written after pass 1
+07:57:10  pass 2: solved 0 positions with distance 3 in 0.0 s
+07:57:11  checkpoint written after pass 2
+07:57:11  done after 3 passes: WTM wins 18 of 178112508 legal, BTM losses 1 of 181847414 legal (1 checkmates, 1 stalemates), longest WTM distance 1 plies, longest BTM distance -1 plies
+07:57:11  table written to Builds/tablebase/KQvK-4d8.tb
+K+Q vs K, 4 dimensions, side 8
+symmetry group order 384, king classes 35, canonical (king, piece) pairs 52360, table entries 428933120 of which 62388368 are duplicate slots (unreduced black king under the pair stabiliser)
+legal positions: white to move 178112508, black to move 181847414
+checkmates 1, stalemates 1
+white-to-move wins 18 (0.00%), black-to-move losses 1
+longest forced mate: white to move 1 plies (1 moves), black to move -1 plies
+passes 3
+white-to-move distance histogram (plies: positions): 1:18
+
+07:57:12  consistency: checked 2000 sampled positions, 0 failures

@@ -338,7 +338,58 @@ practical depth of 2 to 4 holds. The provisional 2D piece values are untested
 against 4D reality.
 
 ## Stage 6 — Tablebase generator
-Status: NOT STARTED
+Status: COMPLETE (2026-09-08)
+
+`src/Chess4D.Tablebase`, console only, never in the game build:
+
+- `Symmetry`: the hyperoctahedral group generated as every axis permutation
+  times every reflection set (384 elements at n=4, 8 at n=2, dimension
+  generic). Canonical form: white king into the fundamental domain
+  (coordinates non-decreasing, at most side/2-1: 35 cells at n=4), then the
+  king's stabiliser minimises the white piece's cell, then the black king's.
+  Index = (king class, piece representative, black king cell, side to move).
+  The black king is left unreduced under the pair stabiliser for a simple
+  index; slots that are not their own canonical index are marked illegal in
+  the init pass (62,388,368 of 428,933,120 at n=4). Unit tested before any
+  generation: group order and bijectivity, invariance of the index under every
+  transform, decode round trip and orbit membership.
+- `ThreePiece`: allocation-free attack tests for K+X vs K, checked against the
+  Core ray walk on 12,000 random positions for all four piece types.
+- `Generator`: parallel init pass (legality, mates, stalemates, per-position
+  count of distinct canonical black successors, escape marking when the piece
+  can be captured), then retrograde passes by predecessor generation: a lost
+  black-to-move position marks every legal white predecessor won; a won
+  white-to-move position decrements the counters of its distinct canonical
+  black predecessors, and a counter reaching zero is a loss. Passes are
+  parallel over index ranges; writes within a pass are idempotent and counters
+  use atomic decrements. Two-byte distance to mate with overflow assert.
+  Checkpoint after every pass, resume on restart. Binary table plus summary.
+- `Verify`: one-ply consistency sampling with the full Core rules, and engine
+  spot checks. `Program`: `generate`, `list`, `verify`.
+
+Validation at two dimensions (the reason to make it dimension generic): the
+2D tables reproduce the published results exactly, K+Q vs K longest mate 19
+plies white to move (10 moves) and 20 black to move, K+R vs K 31 and 32 (16
+moves), K+B and K+N no wins, all white-to-move K+Q positions won; 1,500
+consistency samples per table with zero failures; the engine agrees on every
+sampled short mate. One bug was found and fixed by this validation: duplicate
+index slots were being treated as positions.
+
+Gate result (2026-09-08): PASS. All four 4D three-piece tables generated
+(about 30 s each on 12 threads, 1.7 GB), 5,000 consistency samples per table
+with zero failures, the unique K+Q mate confirmed by the engine's search, and
+the findings written to `docs/FINDINGS.md`: **K+Q cannot force mate in 4D**
+(one mate position class, 18 mate-in-one positions, nothing longer), and
+**K+R, K+B and K+N have no checkmate positions at all**. Minimum mating
+material is therefore at least two pieces beyond the king, which is the
+deferred four-piece question. Table summaries under `docs/tablebase/`; the
+858 MB binaries under `Builds/tablebase/` are not committed. Reproducible via
+the explicit test `TablebaseFourDimensionsGate`.
+
+Note on the spec's estimate: 358 million positions assumed no symmetric
+positions; the exact orbit count is higher, and with the black king
+unreduced the table is 429 million entries (818 MB at two bytes). Memory per
+run is about 1.7 GB with the counters.
 
 ---
 
@@ -480,3 +531,13 @@ harness) with tests including the fuzz gate; Unity gained engine players on a
 worker thread, threat display from the attack map, the three animation cases,
 and jump-to-last-move. Gate: fuzz PASS, walkthrough PASS, self-play
 20 games with 0 failures PASS. Next: Stage 6, the tablebase generator.
+
+### 2026-09-08 — Stage 6
+
+Owner directed continuing. Generator written dimension generic and validated
+at n=2 against the published 2D results before any 4D run; the validation
+caught the duplicate-slot bug. All four 4D tables generated and verified;
+findings recorded. Gate result: PASS. All six stages are complete. Remaining
+open items for the owner: the four-piece tablebases (deferred by the spec),
+six dimensions (deferred), the WebGL build (deferred), and the orientation
+rule for perspectives raised at Stage 3.

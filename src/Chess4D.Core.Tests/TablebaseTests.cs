@@ -118,6 +118,33 @@ namespace Chess4D.Core.Tests
             else Assert.That(gen.Wins, Is.EqualTo(0));
         }
 
+        /// <summary>The engine's own search agrees with the table on the unique 4D K+Q vs K mate: mate in one from the 18 positions, and the mated position itself.</summary>
+        [Test]
+        public void EngineConfirmsTheUniqueFourDimensionalQueenMate()
+        {
+            var g = new BoardGeometry(4, 8);
+            var b = new Board(g);
+            b.Clear();
+            b.PlacePiece(g.CellOf(0, 1, 1, 1), Piece.Make(PieceType.King, Color.White, true));
+            b.PlacePiece(g.CellOf(2, 1, 0, 0), Piece.Make(PieceType.Queen, Color.White, true));
+            b.PlacePiece(g.CellOf(0, 0, 0, 0), Piece.Make(PieceType.King, Color.Black, true));
+            b.SetSideToMove(Color.White);
+            var engine = new Chess4D.Engine.SearchEngine();
+            var r = engine.Search(b, new Chess4D.Engine.SearchLimits { MaxDepth = 3, TimeMs = 20000 });
+            Assert.That(r.Score, Is.EqualTo(Chess4D.Engine.Evaluation.MateScore - 1), r.Line);
+            Assert.That(r.BestMove.To, Is.EqualTo(g.CellOf(2, 0, 0, 0)), "Q2100-2000#");
+            b.Make(r.BestMove);
+            Assert.That(b.GetStatus(), Is.EqualTo(GameStatus.Checkmate));
+            // With the queen on 2210 (legal: three axes from the corner, so no check) it cannot reach 2000 in one move,
+            // and since no forced mate exists at all, the engine must find no mate at depth 3.
+            b.Unmake();
+            b.RemovePiece(g.CellOf(2, 1, 0, 0));
+            b.PlacePiece(g.CellOf(2, 2, 1, 0), Piece.Make(PieceType.Queen, Color.White, true));
+            b.SetSideToMove(Color.White);
+            r = engine.Search(b, new Chess4D.Engine.SearchLimits { MaxDepth = 3, TimeMs = 20000 });
+            Assert.That(Chess4D.Engine.Evaluation.IsMateScore(r.Score), Is.False, r.Line + " " + r.Score);
+        }
+
         [Test]
         public void KnownTwoDimensionalPositionsProbeCorrectly()
         {
@@ -131,6 +158,37 @@ namespace Chess4D.Core.Tests
             Assert.That(gen.Probe(g.CellOf(1, 5), g.CellOf(2, 6), g.CellOf(0, 7), 1), Is.EqualTo(Generator.Stalemate));
             // Black king a8, White king c7, White queen b7: Black is checkmated.
             Assert.That(gen.Probe(g.CellOf(2, 6), g.CellOf(1, 6), g.CellOf(0, 7), 1), Is.EqualTo(0));
+        }
+    }
+}
+
+namespace Chess4D.Core.Tests
+{
+    /// <summary>Stage 6 findings, reproducible: regenerates the four 4D three-piece tables (about 1.7 GB of memory each, run one at a time) and asserts what docs/FINDINGS.md records.</summary>
+    public class TablebaseFourDimensionsGate
+    {
+        [Test, Explicit("Regenerates the 4D tables; several minutes and 1.7 GB")]
+        [TestCase(PieceType.Queen, 1, 18, 1)]
+        [TestCase(PieceType.Rook, -1, 0, 0)]
+        [TestCase(PieceType.Bishop, -1, 0, 0)]
+        [TestCase(PieceType.Knight, -1, 0, 0)]
+        public void FourDimensionalThreePieceTables(PieceType piece, int longestWtm, long wins, long mates)
+        {
+            var gen = new Generator(new BoardGeometry(4, 8), piece) { Log = s => TestContext.Out.WriteLine(s), Threads = Environment.ProcessorCount };
+            gen.Initialise();
+            gen.Solve();
+            TestContext.Out.WriteLine(gen.Summary());
+            Assert.That(gen.MaxWtmDistance, Is.EqualTo(longestWtm));
+            Assert.That(gen.Wins, Is.EqualTo(wins));
+            Assert.That(gen.Mates, Is.EqualTo(mates));
+            var failures = Verify.ConsistencySample(gen, 3000, 7, s => TestContext.Out.WriteLine(s));
+            Assert.That(failures, Is.Empty, string.Join("\n", failures));
+            if (piece == PieceType.Queen)
+            {
+                var g = gen.G;
+                Assert.That(gen.Probe(g.CellOf(0, 1, 1, 1), g.CellOf(2, 0, 0, 0), g.CellOf(0, 0, 0, 0), 1), Is.EqualTo(0), "the unique 4D K+Q vs K checkmate");
+                Assert.That(gen.Probe(g.CellOf(0, 1, 1, 1), g.CellOf(2, 1, 0, 0), g.CellOf(0, 0, 0, 0), 0), Is.EqualTo(1), "mate in one from Q2100");
+            }
         }
     }
 }
