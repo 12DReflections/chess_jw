@@ -49,6 +49,10 @@ namespace Chess4D.Unity
         /// <summary>Always-on attack map for both sides; the UI reads threats from it.</summary>
         public AttackMap Attacks { get; private set; }
         public bool ShowThreats = true;
+        /// <summary>Board orientation, the third view behaviour: turn the board so the side to move has its pieces nearest the camera. Off keeps a fixed orientation.</summary>
+        public bool AutoFlip = true;
+        public string OrientationNote { get; private set; } = "";
+        private bool flipPending;
         public readonly PlayerKind[] Players = { PlayerKind.Human, PlayerKind.Human };
         public static readonly int[] EngineTimeChoicesMs = { 300, 1000, 3000 };
         public int EngineTimeIndex = 1;
@@ -114,6 +118,8 @@ namespace Chess4D.Unity
             Hud.Build(State, this);
             View.IsThreatened = cell => Attacks.IsPieceAttacked(cell);
             Moved += OnMovedFeedback;
+            State.ViewChanged += () => UpdateOrientation(true);
+            UpdateOrientation(false);
 
             Debug.Log("Chess4D ready: " + Board.PieceCount(Side.White) + " white and " + Board.PieceCount(Side.Black) + " black pieces, " + State.Describe());
             DemoRunner.StartIfRequested(this);
@@ -124,6 +130,7 @@ namespace Chess4D.Unity
             State.Update(Time.deltaTime);
             Attacks.Refresh();
             View.ShowThreats = ShowThreats;
+            if (flipPending && !View.IsAnimating) { flipPending = false; UpdateOrientation(true); }
             HandleKeys();
             HandleMouse();
             StepEngine();
@@ -173,9 +180,36 @@ namespace Chess4D.Unity
 #endif
         }
 
+        // ------------------------------------------------------------ board orientation
+
+        /// <summary>
+        /// Rule 1: the side to move sees its pieces near, with y advancing away. Rule 3: suppressed when y is
+        /// hidden or vertical, since there is no forwards to face. Rule 5: camera only, never a move.
+        /// </summary>
+        public void UpdateOrientation(bool animate)
+        {
+            int slot = State.View.SlotOfAxis(BoardGeometry.AdvanceAxis);
+            if (slot >= AxisView.VisibleSlots) { OrientationNote = "auto-flip suppressed: y hidden, no forwards to face"; return; }
+            if (slot == 2) { OrientationNote = "auto-flip suppressed: y vertical, no forwards to face"; return; }
+            OrientationNote = AutoFlip ? "" : "auto-flip off: fixed orientation";
+            if (!AutoFlip) return;
+            int sign = State.View.SignAtSlot(slot);
+            // Slot 1 is depth: +y away from the camera needs yaw 0. Slot 0 is screen X: +X away needs yaw 90.
+            float yaw = slot == 1 ? (sign > 0 ? 0f : 180f) : (sign > 0 ? 90f : 270f);
+            if (Board.SideToMove == Side.Black) yaw += 180f;
+            Orbit.SetOrientation(yaw, animate);
+        }
+
+        public void ToggleAutoFlip()
+        {
+            AutoFlip = !AutoFlip;
+            UpdateOrientation(true);
+        }
+
         /// <summary>The three animation cases plus history flash and layer marks. Never moves the view.</summary>
         private void OnMovedFeedback(Move m, byte piece, bool undo)
         {
+            flipPending = true; // rule 2: after the move animation finishes, not during
             View.ShowThreats = ShowThreats;
             View.AnimateMove(m.From, m.To, piece, undo);
             bool visFrom = State.IsVisibleInVolume(m.From), visTo = State.IsVisibleInVolume(m.To);
@@ -435,6 +469,7 @@ namespace Chess4D.Unity
             Deselect();
             Mode = GameMode.Play;
             Message = "New game";
+            UpdateOrientation(true);
         }
 
         // ------------------------------------------------------------ setup mode
@@ -451,6 +486,7 @@ namespace Chess4D.Unity
             Mode = GameMode.Play;
             Game.ResetHistory();
             Deselect();
+            UpdateOrientation(true);
             Message = "Playing from the edited position" + (Board.KingCell(Side.White) < 0 || Board.KingCell(Side.Black) < 0 ? " (a side has no king)" : "");
         }
 
@@ -474,7 +510,7 @@ namespace Chess4D.Unity
 
         public void ClearBoard() { Board.Clear(); Game.ResetHistory(); Deselect(); Message = "Board cleared"; }
         public void StandardStart() { StartPosition.Setup(Board); Game.ResetHistory(); Deselect(); Message = "Standard start placed"; }
-        public void ToggleSideToMove() { Board.SetSideToMove(Piece.Opposite(Board.SideToMove)); Game.ResetHistory(); }
+        public void ToggleSideToMove() { Board.SetSideToMove(Piece.Opposite(Board.SideToMove)); Game.ResetHistory(); UpdateOrientation(true); }
 
         // ------------------------------------------------------------ save / load
 
@@ -513,6 +549,7 @@ namespace Chess4D.Unity
             Deselect();
             Mode = GameMode.Play;
             Message = "Loaded " + source;
+            UpdateOrientation(true);
             return true;
         }
 

@@ -298,7 +298,7 @@ namespace Chess4D.Unity
                 for (int j = 0; j < side; j++)
                     for (int k = 0; k < side; k++)
                     {
-                        Vector3 pos = new Vector3(i - ctr, j - ctr, k - ctr) * ViewState.CellSize;
+                        Vector3 pos = state.LatticeToWorld(i, j, k);
                         byte p = 0;
                         int cell = -1;
                         if (onLattice)
@@ -386,7 +386,7 @@ namespace Chess4D.Unity
                 for (int j = 0; j < side; j++)
                     for (int k = 0; k < side; k++)
                     {
-                        Vector3 centre = new Vector3(i - ctr, j - ctr, k - ctr) * ViewState.CellSize;
+                        Vector3 centre = state.LatticeToWorld(i, j, k);
                         var bounds = new Bounds(centre, half * 2f);
                         if (!bounds.IntersectRay(ray, out float dist) || dist >= best) continue;
                         int cell = state.CellAtLattice(i, j, k);

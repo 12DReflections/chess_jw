@@ -260,6 +260,42 @@ Not done, by design: piece movement is not animated (pieces re-appear at the
 destination). The kept tweeners can be wired in later; nothing in the gate
 asks for animation.
 
+### Stage 4 correction, found in playtest (2026-09-08)
+
+The board orientation was wrong. The advance axis y was mapped to screen
+height, so White advanced up the screen and Black down it, and the camera
+never turned: Black played backwards. Chess is played forwards and backwards
+with your own pieces nearest you, and the board turns between players.
+
+Fixed as follows:
+
+- Projection: visible slot 1 is now depth (away from the camera) and slot 2
+  is up; slot 0 stays screen X. With the identity view y is depth, z is up.
+  Coordinates are untouched; only the slot-to-world mapping changed.
+- Board orientation added as the third view behaviour beside perspective
+  rotation and camera orbit. It is a yaw offset on the orbit camera and
+  nothing else.
+  1. The side to move sees its pieces near, with y advancing away: yaw 0 for
+     White when +y is depth, 180 for Black; 90 and 270 when y sits on screen X
+     after a perspective rotation, with reflected views handled by the sign.
+  2. After a move completes, the board turns 180 degrees about the screen's
+     vertical axis in 0.5 s, always the same way, starting only when the move
+     animation has finished. Undo and redo turn it back the same way.
+  3. Suppressed when the perspective does not include y, or when y is the
+     vertical axis, since there is no forwards to face; the camera stays and
+     the status line says why.
+  4. Auto-flip toggle in the game panel, default on. Off keeps a fixed
+     orientation for playing an engine as one colour or analysing.
+  5. Never a move: it lives on the camera, not in the game, and is not in the
+     history or reachable by undo.
+- Verified by the game walkthrough: yaw 0 with White to move, a mid-flip frame
+  at 69 degrees with the flip flagged as running, 180 after White's move with
+  the history still at one move, the suppression note in the (x,z,w)
+  perspective, and an unchanged orientation across Black's move with
+  auto-flip off. Frames under `docs/screenshots/stage4-orientation/`.
+  Playtest also confirmed the new depth mapping reads as a chess board seen
+  from behind one's own pieces.
+
 ## Stage 5 — Engine
 Status: COMPLETE (2026-09-06)
 
@@ -541,3 +577,12 @@ findings recorded. Gate result: PASS. All six stages are complete. Remaining
 open items for the owner: the four-piece tablebases (deferred by the spec),
 six dimensions (deferred), the WebGL build (deferred), and the orientation
 rule for perspectives raised at Stage 3.
+
+### 2026-09-08 — Playtest correction to Stage 4
+
+Owner playtested and found the board orientation wrong: y was vertical and
+the camera fixed, so Black played backwards. Owner specified the fix (y as
+depth; board turns to face the side to move after each move; suppressed when
+y is not on screen; auto-flip toggle; never a move). Implemented as a
+camera-only orientation behaviour and a slot-to-world remap, verified by
+walkthrough frames, recorded above under Stage 4.

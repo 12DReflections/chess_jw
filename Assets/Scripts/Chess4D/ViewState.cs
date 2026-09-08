@@ -202,10 +202,18 @@ namespace Chess4D.Unity
             return SlotsToWorld(slotValues[0], slotValues[1], slotValues[2]);
         }
 
+        /// <summary>Slot 0 is screen X, slot 1 is depth (away from the camera), slot 2 is up. Chess advances forwards, not upwards: with the identity view y is depth.</summary>
         public Vector3 SlotsToWorld(double s0, double s1, double s2)
         {
             double ctr = View.Center;
-            return new Vector3((float)(s0 - ctr), (float)(s1 - ctr), (float)(s2 - ctr)) * CellSize;
+            return new Vector3((float)(s0 - ctr), (float)(s2 - ctr), (float)(s1 - ctr)) * CellSize;
+        }
+
+        /// <summary>World position of visible lattice coordinates (i, j, k) = slots (0, 1, 2).</summary>
+        public Vector3 LatticeToWorld(int i, int j, int k)
+        {
+            float ctr = Center;
+            return new Vector3(i - ctr, k - ctr, j - ctr) * CellSize;
         }
 
         /// <summary>The board cell shown at visible lattice position (i, j, k) with the hidden axes at their pages. Only meaningful when not rotating.</summary>

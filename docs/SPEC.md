@@ -452,6 +452,16 @@ Two distinct operations, and they must not be conflated in the UI:
   not which axes are in view. It is a third, entirely separate control. Never
   conflate it with Rotate. Confusing the two makes the interface incomprehensible
   and it is the single easiest way to ruin this stage.
+- **Board orientation** (added by the owner after a Stage 4 playtest) — a
+  camera transform only, never a coordinate change. The side to move sees its
+  own pieces nearest the camera with y advancing away; y is therefore mapped
+  to screen depth, not height. After a move completes the board turns 180
+  degrees about the screen's vertical axis in about 0.5 s, after the move
+  animation, not during it. Suppressed, with a note in the status line, when
+  the current perspective does not include y, since there is no forwards to
+  face. An auto-flip toggle, default on, turns it off for playing an engine as
+  one colour or for analysis. It is not a move: it never enters history or
+  undo, like every other view operation.
 
 UI requirements:
 

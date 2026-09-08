@@ -30,7 +30,7 @@ namespace Chess4D.Unity
             public float[] MarkUntil;
         }
 
-        private Button whiteButton, blackButton, timeButton, threatsButton;
+        private Button whiteButton, blackButton, timeButton, threatsButton, flipButton;
         private float historyFlashUntil;
         private static readonly Color FlashColor = new Color(1f, 0.85f, 0.3f);
         private static readonly Color MarkWhite = new Color(1f, 0.95f, 0.6f, 0.95f);
@@ -122,7 +122,7 @@ namespace Chess4D.Unity
         {
             var right = UiKit.Panel(root, "right", new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(-10, -10), new Vector2(310, 600), UiKit.PanelColor);
             var col = UiKit.VerticalGroup(right, "col", 6, new RectOffset(10, 10, 10, 10));
-            gameStatusText = UiKit.Label(col, "", 14, TextAnchor.MiddleLeft, 22);
+            gameStatusText = UiKit.Label(col, "", 13, TextAnchor.UpperLeft, 40);
 
             var row = UiKit.HorizontalGroup(col, "game", 6, 26);
             UiKit.Button(row, "New game", () => game.NewGame(), 26, 13);
@@ -138,6 +138,7 @@ namespace Chess4D.Unity
             var viewRow = UiKit.HorizontalGroup(col, "viewrow", 6, 26);
             UiKit.Button(viewRow, "Jump to last move", () => game.JumpToLastMove(), 26, 12);
             threatsButton = UiKit.Button(viewRow, "Threats: on", () => game.ShowThreats = !game.ShowThreats, 26, 12);
+            flipButton = UiKit.Button(viewRow, "Auto-flip: on", () => game.ToggleAutoFlip(), 26, 12);
 
             UiKit.Label(col, "Move   e.g. 2133-2333, Q3033x0333=Q   (docs/NOTATION.md)", 11, TextAnchor.MiddleLeft, 16);
             var moveRow = UiKit.HorizontalGroup(col, "move", 6, 26);
@@ -309,7 +310,7 @@ namespace Chess4D.Unity
             statusText.text = DescribeCell("selected", state.SelectedCell) + "\n" + DescribeCell("hover", state.HoverCell)
                 + (state.PickingEnabled ? "" : "\npicking disabled while rotating");
 
-            gameStatusText.text = game.StatusLine();
+            gameStatusText.text = game.StatusLine() + (game.OrientationNote.Length > 0 ? "\n" + game.OrientationNote : "");
             gameStatusText.color = game.Board.InCheck() || game.Game.IsOver ? new Color(1f, 0.55f, 0.35f) : UiKit.TextColor;
             messageText.text = game.Message + (game.ThinkingInfo.Length > 0 ? "\nengine: " + game.ThinkingInfo : "");
             RefreshHistory();
@@ -321,6 +322,8 @@ namespace Chess4D.Unity
             blackButton.GetComponent<Image>().color = game.PlayerFor(Side.Black) == PlayerKind.Engine ? UiKit.ArmedColor : UiKit.ButtonColor;
             timeButton.GetComponentInChildren<Text>().text = (Chess4DGame.EngineTimeChoicesMs[game.EngineTimeIndex] / 1000f).ToString("0.0") + " s";
             threatsButton.GetComponentInChildren<Text>().text = "Threats: " + (game.ShowThreats ? "on" : "off");
+            flipButton.GetComponentInChildren<Text>().text = "Auto-flip: " + (game.AutoFlip ? "on" : "off");
+            flipButton.GetComponent<Image>().color = game.AutoFlip ? UiKit.ActiveColor : UiKit.ButtonColor;
 
             bool setup = game.Mode == GameMode.Setup;
             if (setupPanel.gameObject.activeSelf != setup) setupPanel.gameObject.SetActive(setup);
@@ -354,7 +357,7 @@ namespace Chess4D.Unity
             historyText.text = sb.ToString();
         }
 
-        private static string SlotName(int slot) { return slot == 0 ? "X" : slot == 1 ? "Y (up)" : slot == 2 ? "Z" : "?"; }
+        private static string SlotName(int slot) { return slot == 0 ? "X (across)" : slot == 1 ? "depth" : slot == 2 ? "up" : "?"; }
 
         private string DescribeCell(string label, int cell)
         {

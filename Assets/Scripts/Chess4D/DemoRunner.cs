@@ -228,6 +228,35 @@ namespace Chess4D.Unity
             var g = b.G;
             yield return null; yield return null; yield return null;
 
+            // 0. Board orientation: White to move sees White near; after a move the board turns to face Black.
+            yield return Shot("orientation-white-to-move-white-near");
+            Log("orientation yaw at start: " + game.Orbit.OrientationYaw + " (White to move, expected 0)");
+            game.OnTyped("2133-2333");
+            yield return new WaitForSeconds(0.55f);
+            yield return Shot("orientation-flip-mid");
+            Log("flipping mid: " + game.Orbit.Flipping + ", yaw " + game.Orbit.OrientationYaw.ToString("F0"));
+            yield return new WaitForSeconds(0.5f);
+            yield return Shot("orientation-black-to-move-black-near");
+            Log("orientation yaw after White's move: " + game.Orbit.OrientationYaw.ToString("F0") + " (expected 180); history " + game.Game.History.Count + " move, flip is not a move");
+            s.SweepTo(Chess4DGame.Perspectives[2]);
+            while (s.Armed) yield return null;
+            yield return null;
+            yield return Shot("orientation-suppressed-y-hidden");
+            Log("perspective without y: note = " + game.OrientationNote);
+            s.SweepTo(Chess4DGame.Perspectives[0]);
+            while (s.Armed) yield return null;
+            while (game.Orbit.Flipping) yield return null; // the orientation adjusts to the new view; let it settle
+            game.ToggleAutoFlip();
+            Log("auto-flip off; yaw before Black's move: " + game.Orbit.OrientationYaw.ToString("F0"));
+            game.OnTyped("3633-3433");
+            yield return new WaitForSeconds(1.1f);
+            yield return Shot("orientation-autoflip-off-stays");
+            Log("auto-flip off after Black's move: yaw " + game.Orbit.OrientationYaw.ToString("F0") + " (expected unchanged from before the move: 0, since y is reflected in this view), note = " + game.OrientationNote);
+            game.ToggleAutoFlip();
+            yield return new WaitForSeconds(0.6f);
+            game.NewGame();
+            yield return new WaitForSeconds(0.6f);
+
             // 1. Click-driven play: select a pawn, see targets, move; the ply-3 check line.
             game.OnCellClicked(g.CellOf(2, 1, 3, 3));
             yield return Shot("play-pawn-selected-targets");
