@@ -586,3 +586,36 @@ depth; board turns to face the side to move after each move; suppressed when
 y is not on screen; auto-flip toggle; never a move). Implemented as a
 camera-only orientation behaviour and a slot-to-world remap, verified by
 walkthrough frames, recorded above under Stage 4.
+
+### 2026-09-19 — Four-piece question answered (owner asked: can K+Q+R force mate?)
+
+Beyond the six stages; the spec had deferred this as a 1.5 TB cloud job. Owner
+asked for it directly. Answer: **no, and neither can any other two pieces.**
+All ten K+A+B vs K endings were solved exactly on the 8x8x8x8 board. K+Q+R has
+51,625 won white-to-move positions up to symmetry out of roughly 6 x 10^11,
+every one with the black king already on an edge, longest mate 7 plies;
+K+Q+Q 106,000 and 9 plies; the rest fewer. Minimum mating material is more
+than two pieces beyond the king. Full write-up in `docs/FINDINGS.md`.
+
+Added to `src/Chess4D.Tablebase` (console only, nothing in the game build):
+
+- `FourPieceGenerator` and the `generate4` command: dense K+A+B vs K with
+  black-king captures resolved against the three-piece tables. Validated at
+  2D against published results (K+B+N 33 moves, K+B+B 19 moves, K+N+N mates in
+  one only, K+Q+R all won). Run in 4D at sides 4 and 5.
+- `SparseSolver` and the `sparse` command: exact solve storing only decided
+  positions, rules taken from `Board`. Reproduces the dense tables exactly at
+  2D and at 4D sides 4 and 5, then solves side 8 in about a minute. Every
+  stored position of all ten endings re-verified one ply deep: 0 failures.
+- `SafeRegion` and the `safe` command: table-free drawing certificate. Proves
+  the K+Q draw again (3,792 safe cells); inconclusive for K+Q+R.
+- `Symmetry`: fundamental domain now handles odd sides ((side-1)/2; identical
+  for even sides), and `RepId` made public. Existing tablebase tests still pass.
+- `FourPieceTablebaseTests`: 8 tests. All 19 tablebase tests green
+  (`dotnet test -c Release --filter FullyQualifiedName~Tablebase`, 18 s). The
+  full suite was not re-run this session.
+
+Not done: three extra pieces (K+Q+Q+R and similar). An attempt was stopped:
+the decided set stops being sparse once an idle third piece can stand
+anywhere, so it needs a different method. The 13 September HUD changes are
+still uncommitted alongside this work.

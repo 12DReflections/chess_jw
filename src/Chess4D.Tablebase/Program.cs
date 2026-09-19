@@ -16,6 +16,9 @@ namespace Chess4D.Tablebase
         {
             if (args.Length == 0) { Console.WriteLine("usage: generate Q|R|B|N [--dims n] [--side s] [--out dir] [--threads n] [--no-checkpoint] [--verify wins draws]"); return 1; }
             string cmd = args[0];
+            if (cmd == "safe") return Safe(args);
+            if (cmd == "generate4") return Generate4(args);
+            if (cmd == "sparse") return Sparse(args);
             PieceType piece = ParsePiece(args.Length > 1 ? args[1] : "Q");
             int dims = 4, side = 8, threads = Environment.ProcessorCount, verifyWins = 40, verifyDraws = 40;
             string outDir = Path.Combine("Builds", "tablebase");
@@ -76,6 +79,98 @@ namespace Chess4D.Tablebase
             log("total time " + total.Elapsed.TotalMinutes.ToString("F1") + " min, verification failures " + failures.Count);
             if (checkpoint && File.Exists(gen.CheckpointPath)) File.Delete(gen.CheckpointPath);
             return failures.Count == 0 ? 0 : 2;
+        }
+
+        /// <summary>generate4 QR [--dims 4] [--side 4] [--out dir] [--threads n]: K+A+B vs K, held in memory, summary written to the output directory.</summary>
+        private static int Generate4(string[] args)
+        {
+            if (args.Length < 2 || args[1].Length != 2) { Console.WriteLine("usage: generate4 <two letters from QRBN> [--dims n] [--side s] [--out dir] [--threads n]"); return 1; }
+            int dims = 4, side = 4, threads = Environment.ProcessorCount;
+            string outDir = Path.Combine("Builds", "tablebase");
+            for (int i = 2; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--dims": dims = int.Parse(args[++i]); break;
+                    case "--side": side = int.Parse(args[++i]); break;
+                    case "--out": outDir = args[++i]; break;
+                    case "--threads": threads = int.Parse(args[++i]); break;
+                }
+            }
+            Directory.CreateDirectory(outDir);
+            var total = Stopwatch.StartNew();
+            PieceType[] m = SafeRegion.ParseMaterial(args[1]);
+            Action<string> log = s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s);
+            var gen = new FourPieceGenerator(new BoardGeometry(dims, side), m[0], m[1], log) { Threads = threads };
+            log("table " + gen.Name + ": " + gen.EntryCount + " entries");
+            gen.Initialise();
+            gen.Solve();
+            string summary = gen.Summary();
+            Console.Write(summary);
+            var failures = gen.ConsistencySample(5000, 1);
+            foreach (string f in failures) log("FAIL " + f);
+            summary += "one-ply consistency against the full rules: 5000 sampled positions, " + failures.Count + " failures\n";
+            File.WriteAllText(Path.Combine(outDir, gen.Name + ".txt"), summary);
+            log("total time " + total.Elapsed.TotalMinutes.ToString("F1") + " min, verification failures " + failures.Count);
+            return failures.Count == 0 ? 0 : 2;
+        }
+
+        /// <summary>sparse QR [--dims 4] [--side 8] [--out dir]: exact solve that stores only decided positions; for boards where almost nothing is won.</summary>
+        private static int Sparse(string[] args)
+        {
+            if (args.Length < 2) { Console.WriteLine("usage: sparse <material, letters from QRBN> [--dims n] [--side s] [--out dir]"); return 1; }
+            int dims = 4, side = 8;
+            string outDir = null;
+            for (int i = 2; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--dims": dims = int.Parse(args[++i]); break;
+                    case "--side": side = int.Parse(args[++i]); break;
+                    case "--out": outDir = args[++i]; break;
+                }
+            }
+            Action<string> log = s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s);
+            var solver = SparseSolver.For(new BoardGeometry(dims, side), SafeRegion.ParseMaterial(args[1]), log);
+            var sb = new System.Text.StringBuilder(solver.Summary());
+            foreach (string line in solver.Deepest(12)) sb.Append(line).Append('\n');
+            var failures = solver.VerifyOnePly();
+            foreach (string f in failures) sb.Append("FAIL ").Append(f).Append('\n');
+            sb.Append("one-ply verification of every stored position against the full rules: ").Append(failures.Count).Append(" failures\n");
+            Console.Write(sb.ToString());
+            if (outDir != null)
+            {
+                Directory.CreateDirectory(outDir);
+                File.WriteAllText(Path.Combine(outDir, "sparse-" + solver.Name + ".txt"), sb.ToString());
+            }
+            return failures.Count == 0 ? 0 : 2;
+        }
+
+        /// <summary>safe QR [--dims 4] [--side 8] [--out dir]: the table-free one-ply drawing certificate for K + material vs K.</summary>
+        private static int Safe(string[] args)
+        {
+            if (args.Length < 2) { Console.WriteLine("usage: safe <material, letters from QRBN> [--dims n] [--side s] [--out dir]"); return 1; }
+            int dims = 4, side = 8;
+            string outDir = null;
+            for (int i = 2; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--dims": dims = int.Parse(args[++i]); break;
+                    case "--side": side = int.Parse(args[++i]); break;
+                    case "--out": outDir = args[++i]; break;
+                }
+            }
+            var sw = Stopwatch.StartNew();
+            var result = SafeRegion.Compute(new BoardGeometry(dims, side), SafeRegion.ParseMaterial(args[1]), Console.WriteLine);
+            Console.Write(result.Report);
+            Console.WriteLine("time " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
+            if (outDir != null)
+            {
+                Directory.CreateDirectory(outDir);
+                File.WriteAllText(Path.Combine(outDir, "safe-K" + args[1].ToUpperInvariant() + "vK-" + dims + "d" + side + ".txt"), result.Report);
+            }
+            return 0;
         }
 
         private static PieceType ParsePiece(string s)

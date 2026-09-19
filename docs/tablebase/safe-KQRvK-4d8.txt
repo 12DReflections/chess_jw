@@ -1,0 +1,4 @@
+K+Q+R vs K, 4 dimensions, side 8
+most White can cover of a central king's 32 moves: 25
+safe region after 8 erosion passes: 0 of 4096 cells
+RESULT: inconclusive. The one-ply certificate fails; this does not show a forced mate.

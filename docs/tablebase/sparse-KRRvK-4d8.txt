@@ -1,0 +1,18 @@
+KRR vs K, 4 dimensions, side 8 (sparse exact solve; counts are positions up to symmetry)
+checkmates 16, white-to-move wins 49, black-to-move losses 16, every other legal position is a draw
+longest forced mate: white to move 1 plies, black to move 0 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 49  1: 0  2: 0  3: 0
+white-to-move distance histogram (plies: classes): 1:49
+WTM mate in 1 plies  K1110 R1001 R0101 k0000
+WTM mate in 1 plies  K1110 R1001 R0201 k0000
+WTM mate in 1 plies  K1110 R1001 R0301 k0000
+WTM mate in 1 plies  K1110 R1001 R0401 k0000
+WTM mate in 1 plies  K1110 R1001 R0501 k0000
+WTM mate in 1 plies  K1110 R1001 R0601 k0000
+WTM mate in 1 plies  K1110 R1001 R0701 k0000
+WTM mate in 1 plies  K1110 R1001 R4001 k0000
+WTM mate in 1 plies  K1110 R2001 R4001 k0000
+WTM mate in 1 plies  K1110 R3001 R4001 k0000
+WTM mate in 1 plies  K1110 R2001 R0401 k0000
+WTM mate in 1 plies  K1110 R3001 R0401 k0000
+one-ply verification of every stored position against the full rules: 0 failures

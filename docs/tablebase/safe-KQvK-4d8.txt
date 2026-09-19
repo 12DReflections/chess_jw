@@ -1,0 +1,5 @@
+K+Q vs K, 4 dimensions, side 8
+most White can cover of a central king's 32 moves: 20
+safe region after 3 erosion passes: 3792 of 4096 cells
+safe king classes (domain cell: moves that stay inside): 0111:19 1111:26 0012:15 0112:22 1112:32 0022:18 0122:25 1122:32 0222:25 1222:32 2222:32 0013:16 0113:24 1113:32 0023:19 0123:25 1123:32 0223:25 1223:32 2223:32 0033:19 0133:25 1133:32 0233:25 1233:32 2233:32 0333:25 1333:32 2333:32 3333:32
+RESULT: White cannot force mate against a black king inside the safe region.

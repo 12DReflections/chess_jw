@@ -9,7 +9,7 @@ namespace Chess4D.Tablebase
     /// combined with every set of axis reflections, n! * 2^n elements (384 at n=4,
     /// 8 at n=2). Pawnless positions are invariant under all of it. Canonical
     /// form: the white king is mapped into the fundamental domain (coordinates
-    /// non-decreasing and at most side/2-1), then the remaining freedom (the
+    /// non-decreasing and at most (side-1)/2), then the remaining freedom (the
     /// stabiliser of that cell) is used to minimise the white piece's cell, then
     /// the black king's cell, lexicographically.
     /// </summary>
@@ -124,7 +124,7 @@ namespace Chess4D.Tablebase
 
         private bool InDomain(int cell)
         {
-            int half = G.Side / 2 - 1;
+            int half = (G.Side - 1) / 2; // odd sides keep the centre coordinate, which reflection fixes
             int prev = -1;
             for (int i = 0; i < G.Dimensions; i++)
             {
@@ -137,6 +137,7 @@ namespace Chess4D.Tablebase
 
         public int Apply(int transform, int cell) { return map[transform][cell]; }
         public int ClassOf(int cell) { return classOfCell[cell]; }
+        public int RepId(int cls, int cell) { return repId[cls][cell]; }
         public int[] Coset(int cell) { return cosets[cell]; }
 
         /// <summary>Canonical table index of a position. Side to move is the low bit.</summary>

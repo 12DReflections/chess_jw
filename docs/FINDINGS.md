@@ -41,8 +41,155 @@ piece. K+R vs K, K+B vs K and K+N vs K have **no checkmate positions at all**
 on the 4D board, not even unforced ones: zero mates, zero stalemates, zero
 wins. K+Q vs K has mates but none can be forced. Forcing mate in 4D therefore
 needs at least two pieces beyond the king; which two, and whether any
-combination suffices, is the four-piece question the spec defers (about 1.5 TB
-per table at this indexing, cloud compute).
+combination suffices, was the four-piece question the spec deferred; it is
+answered below without the 1.5 TB table: no two pieces suffice.
+
+## Four pieces: can King, Queen and Rook force mate? (2026-09-19)
+
+**No.** On the full 8x8x8x8 board K+Q+R vs K is a draw from every position
+except a thin set in which the black king already stands on an edge of the
+board, and the same holds for every other pair of pieces: all ten
+combinations of two pieces from Q, R, B, N were solved exactly, not sampled.
+
+| Ending (4D, side 8) | Checkmates | WTM wins | BTM losses | Longest forced mate | Wins with the black king off the edge |
+|---|---|---|---|---|---|
+| K+Q+R vs K | 1,282 | 51,625 | 1,331 | 7 plies (4 moves) | 0 |
+| K+Q+Q vs K | 2,888 | 106,000 | 3,069 | 9 plies (5 moves) | 0 |
+| K+Q+B vs K | 1,364 | 56,040 | 1,416 | 5 plies | 0 |
+| K+Q+N vs K | 1,102 | 46,588 | 1,109 | 3 plies | 0 |
+| K+R+R vs K | 16 | 49 | 16 | 1 ply | 0 |
+| K+R+B vs K | 32 | 400 | 32 | 1 ply | 0 |
+| K+R+N vs K | 5 | 70 | 5 | 1 ply | 0 |
+| K+B+B, K+B+N, K+N+N vs K | 0 | 0 | 0 | none | 0 |
+
+Counts are positions up to the 384 board symmetries. For scale, K+Q+R vs K
+has roughly 6 x 10^11 such positions with White to move, so the won
+fraction is below one in ten million. About 95% of the K+Q+R wins are mates in
+one; the deepest, for example K2111 Q1110 R1003 against k0000, take four
+moves and all happen in a corner. No position is won with the black king one
+step or more away from every edge. Since the black king starts centralised in
+any real game and cannot be driven to an edge (the three-piece result already
+showed why: lines do not wall off a 4D board), these endings are drawn in
+practice and in theory.
+
+The longest mate does not grow with the board: K+Q+R gives 7 plies on sides 4,
+5 and 8. The wins are local corner patterns, not a technique.
+
+| K+Q+R vs K, 4D | Side 4 | Side 5 | Side 8 |
+|---|---|---|---|
+| Checkmates | 154 | 296 | 1,282 |
+| WTM wins | 1,692 of 8,680,855 (0.02%) | 5,256 of 350,660,967 (0.0015%) | 51,625 |
+| Longest forced mate | 7 plies | 7 plies | 7 plies |
+| Wins with the black king off the edge | 0 | 0 | 0 |
+
+Even the side-4 board, where every cell is at most one step from an edge, is
+drawn; so is K+Q+Q there (9,539 of 7,919,398, longest 11 plies).
+
+Minimum mating material in 4D is therefore more than two pieces beyond the
+king. Three pieces (K+Q+Q+R and the like) is the next open question, and it
+needs a new idea: with a third piece every two-piece win reappears with the
+extra piece standing anywhere, so the decided set is no longer small (about
+2 x 10^8 classes before anything new is found) and the sparse method below
+stops being cheap.
+
+### How it was computed
+
+Three tools in `src/Chess4D.Tablebase`, each checked against the others:
+
+1. `generate4` (`FourPieceGenerator`): the dense retrograde generator extended
+   to K+A+B vs K, with captures by the black king resolved against the
+   three-piece tables. Validated at two dimensions against the published
+   results before use: K+B+N longest mate 33 moves (65 plies) with 99.51% of
+   white-to-move positions won, K+B+B 19 moves (37 plies), K+N+N nothing
+   beyond mates in one, K+Q+R every white-to-move position won. Zero failures
+   in 5,000 sampled one-ply consistency checks per table. It fits in memory up
+   to side 5 in 4D (1.4 billion entries); side 8 would be about 1.5 TB.
+2. `sparse` (`SparseSolver`): an exact solver that stores only decided
+   positions, which is what makes side 8 possible when almost nothing is won.
+   It enumerates every checkmate (black king over the fundamental domain,
+   White's cells searched with a cover bound, each hit confirmed by the Core
+   rules), then closes the won set by retrograde steps in distance order;
+   a black-to-move position is lost only when every legal move, captures
+   included, lands in a won position. Everything outside the two sets is a
+   draw because every predecessor of every decided position was examined.
+   It takes its rules from `Board`, not from the generator's fast geometry,
+   and reproduces the dense tables exactly: 2D K+Q (18,081 wins, 19 plies),
+   4D side 4 (154 / 1,692 / 166 / 7) and side 5 (296 / 5,256 / 318 / 7).
+   Every stored position of all ten side-8 endings (for K+Q+R, 51,625 wins
+   and 1,331 losses) was then re-checked one ply deep against the full
+   rules: zero failures. The engine
+   finds the same mate on sampled three-ply wins; seven plies is beyond its
+   search at this branching.
+3. `safe` (`SafeRegion`): a table-free drawing certificate. A set S of cells
+   is safe if, for every placement of White's pieces, a black king in S has
+   an unattacked move that stays in S (attacks computed without blockers,
+   occupied cells counted as covered, so every approximation favours White).
+   For K+Q the greatest safe set is 3,792 of the 4,096 cells, which proves
+   the three-piece result again without a table: White can cover at most 20
+   of a central king's 32 moves. For K+Q+R the certificate is inconclusive
+   (White could cover 25 of 32 if its pieces could teleport between moves),
+   which is why the exact solve above was needed.
+
+Reproduce: `Chess4D.Tablebase sparse QR` (about a minute), `generate4 QR
+--side 5` (about 90 seconds, 6 GB), `safe Q`. Tests: `FourPieceTablebaseTests`.
+Summaries are under `docs/tablebase/`.
+
+## Formal statement and the counting bound (2026-09-19)
+
+Recorded from the owner's questions on what is proved and what generalises.
+Status is marked on each item.
+
+**Existence versus forcing.** Let P be the legal positions, split into P_W
+(White to move) and P_B (Black to move), with an edge for each legal move,
+and let M in P_B be the checkmates.
+
+- "A mate exists" is reachability: M is not empty. All quantifiers are
+  existential (a helpmate).
+- "Mate can be forced" is an attractor. W_0 = M; W_{i+1} adds each p in P_W
+  with some move into W_i, and each p in P_B with at least one legal move and
+  every move into W_i. W is the union. White forces mate from p exactly when
+  p is in W, and the distance is the least i. Quantifiers alternate (a
+  directmate).
+- K+Q vs K in 4D: M is one orbit under the hyperoctahedral group of order
+  384 (k0000, K0111, Q2000); W_1 \ W_0 has 18 positions; W_2 = W_1. The
+  complement is closed in Black's favour, so Black stays in it forever.
+  The 2D analogue is K+N+N vs K. *Status: computed exhaustively; a
+  computer-assisted proof conditional on the generator, which is validated
+  at 2D and cross-checked by the table-free safe-region certificate.*
+
+**King mobility.** Pieces change at most two coordinates per move. An
+interior king has 2d + 4 C(d,2) = 2d^2 moves (32 at d = 4, 8 at d = 2); a
+corner king has d + C(d,2) (10 at d = 4, 3 at d = 2).
+
+**Counting bound, tight at d = 4.** A corner king has d + C(d,2) flight
+cells. A white king that is not adjacent covers at most 6 of them (from a
+cell like 0111), independent of d. A queen checking from a safe distance
+(a cell like 2000) covers d of them. Mate needs d + C(d,2) <= 6 + d, that
+is C(d,2) <= 6, so d <= 4, with equality at d = 4 (10 = 6 + 4), which is why
+exactly one mate class exists there. *Status: derived by hand, not checked
+exhaustively. Gap: a queen adjacent to the black king and defended by the
+white king covers more and needs its own bound; at d = 4 the table shows it
+yields no mate.* Conjecture: for d >= 5, K+Q vs K has no checkmate position
+at all. Testable: d = 3 should have slack (6 flight cells), and d = 5 at
+side 6 is about 2.4 x 10^8 entries.
+
+**Why lines are not walls.** In 2D a rook's line has codimension 1 and cuts
+the board; in 4D a line has codimension 3 and separates nothing, so the
+union of lines White attacks never confines the king. *Status: heuristic.
+The safe-region certificate makes it rigorous for K+Q (White covers at most
+20 of a central king's 32 moves); for two pieces the exact solve stands in
+for it (teleporting K+Q+R could cover 25 of 32, so the one-ply argument
+fails there).*
+
+**A programme.** Define the mating number m(d, n, k): the least material
+that forces mate on the side-n board in d dimensions with pieces changing
+at most k coordinates. Known here: m > two pieces at (4, 8, 2); 2D chess has
+m = one rook. Related established work, cited from memory and to be checked
+before use: cops and robbers on graphs (cop number of a product of d paths
+grows like (d+1)/2), Conway's angel problem (evader wins; 3D settled before
+2D), Hamkins and co-authors on infinite and 3D chess, and queens domination
+in higher dimensions. No literature search has been done for prior 4D
+mating-material results.
 
 ## Why the 4D lone king is so hard to mate
 
