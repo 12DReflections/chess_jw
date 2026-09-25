@@ -24,16 +24,57 @@ namespace Chess4D.Unity
         public static readonly Color ArmedColor = new Color(0.3f, 0.7f, 1f, 1f);
         public static readonly Color TextColor = new Color(0.92f, 0.92f, 0.92f, 1f);
 
+        /// <summary>One colour per board axis, used wherever an axis letter appears: x red, y green, z blue, w orange.</summary>
+        public static readonly string[] AxisHex = { "ff7070", "7ee07e", "78b0ff", "ffb84d", "e08cff", "8cf0f0" };
+
+        /// <summary>Rich-text axis letter in its colour, with a leading minus when reflected.</summary>
+        public static string AxisRich(int axis, bool negative)
+        {
+            return "<color=#" + AxisHex[axis] + ">" + (negative ? "-" : "") + Chess4D.Core.AxisView.AxisNames[axis] + "</color>";
+        }
+
+        /// <summary>Rich-text form of a signed axis name such as "-w".</summary>
+        public static string AxisRich(string signedName)
+        {
+            bool neg = signedName.StartsWith("-");
+            int axis = System.Array.IndexOf(Chess4D.Core.AxisView.AxisNames, neg ? signedName.Substring(1) : signedName);
+            return axis < 0 ? signedName : AxisRich(axis, neg);
+        }
+
         public static Canvas Canvas(string name)
         {
             var go = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = go.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.pixelPerfect = true;
             var scaler = go.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1280, 800);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            go.AddComponent<HudScaler>();
             return canvas;
+        }
+
+        /// <summary>
+        /// Keeps the HUD at a whole-ish pixel scale that follows display DPI, so text is
+        /// rasterised at its final size instead of being shrunk from a virtual 1280x800.
+        /// Scale is min(DPI scale, width / 1280), never below 1 and never above 2.
+        /// </summary>
+        public sealed class HudScaler : MonoBehaviour
+        {
+            private CanvasScaler scaler;
+            private int lastW, lastH;
+
+            private void Awake() { scaler = GetComponent<CanvasScaler>(); Apply(); }
+            private void Update() { if (Screen.width != lastW || Screen.height != lastH) Apply(); }
+
+            private void Apply()
+            {
+                lastW = Screen.width; lastH = Screen.height;
+                float dpiScale = Screen.dpi > 0 ? Screen.dpi / 96f : 1f;
+                float fitScale = Screen.width / 1280f;
+                float scale = Mathf.Clamp(Mathf.Min(dpiScale, fitScale), 1f, 2f);
+                scale = Mathf.Round(scale * 4f) / 4f;
+                scaler.scaleFactor = scale;
+            }
         }
 
         public static RectTransform Panel(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPos, Vector2 size, Color color)
@@ -95,6 +136,8 @@ namespace Chess4D.Unity
             b.onClick.AddListener(onClick);
             go.GetComponent<LayoutElement>().preferredHeight = height;
             var t = Label(go.transform, label, fontSize, TextAnchor.MiddleCenter, height);
+            t.horizontalOverflow = HorizontalWrapMode.Overflow;
+            t.resizeTextForBestFit = true; t.resizeTextMaxSize = fontSize; t.resizeTextMinSize = 9;
             var rt = t.GetComponent<RectTransform>();
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
             return b;

@@ -587,6 +587,20 @@ y is not on screen; auto-flip toggle; never a move). Implemented as a
 camera-only orientation behaviour and a slot-to-world remap, verified by
 walkthrough frames, recorded above under Stage 4.
 
+### 2026-09-13 — Playtest corrections to the HUD
+
+Owner playtested on a Retina Mac and found the HUD pixelated, the perspective
+and phi controls unclear, and no way back to the opening view. Fixes: the
+canvas now uses constant pixel scaling that follows display DPI (1x to 2x,
+pixel perfect) instead of shrinking from a virtual 1280x800; MSAA 4x on the
+upper quality levels; the view line reads "across x  depth y  up z / hidden w
+at layer 3"; the perspective section is labelled "Axes on screen" with a
+one-line explanation of click versus shift+click; the slider is labelled with
+the turn in progress ("Turn z out, w in: 37°") or "no turn armed"; and a Reset
+view button (Home or 0) returns to the identity view, the opening orbit and
+zoom, starting pages and isolation off, then re-applies the orientation rule.
+Reset is a view operation and never enters history.
+
 ### 2026-09-19 — Four-piece question answered (owner asked: can K+Q+R force mate?)
 
 Beyond the six stages; the spec had deferred this as a 1.5 TB cloud job. Owner

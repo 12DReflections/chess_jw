@@ -119,6 +119,8 @@ namespace Chess4D.Unity
             View.IsThreatened = cell => Attacks.IsPieceAttacked(cell);
             Moved += OnMovedFeedback;
             State.ViewChanged += () => UpdateOrientation(true);
+            State.TurnCompleted += note => Message = "Turn complete (" + note + "): now showing " + State.View + ", hidden axis paged at " + State.PageOfSlot(AxisView.VisibleSlots);
+            gameObject.AddComponent<AxisLabels>().Init(State);
             UpdateOrientation(false);
 
             Debug.Log("Chess4D ready: " + Board.PieceCount(Side.White) + " white and " + Board.PieceCount(Side.Black) + " black pieces, " + State.Describe());
@@ -250,6 +252,7 @@ namespace Chess4D.Unity
             if (Input.GetKeyDown(KeyCode.LeftBracket) || Input.GetKeyDown(KeyCode.PageDown)) State.Page(AxisView.VisibleSlots, -1);
             if (Input.GetKeyDown(KeyCode.RightBracket) || Input.GetKeyDown(KeyCode.PageUp)) State.Page(AxisView.VisibleSlots, +1);
             if (Input.GetKeyDown(KeyCode.Escape)) Deselect();
+            if (Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.Alpha0)) ResetView();
             if (Input.GetKeyDown(KeyCode.I)) CycleIsolateMode();
             if (Input.GetKeyDown(KeyCode.O)) CycleIsolateSlot();
             if (Input.GetKeyDown(KeyCode.Z)) Undo();
@@ -290,6 +293,15 @@ namespace Chess4D.Unity
             if (!overUi && Mathf.Abs(Input.mouseScrollDelta.y) > 0f) Orbit.Zoom(Input.mouseScrollDelta.y);
 
             State.HoverCell = (!dragging && !overUi && State.PickingEnabled) ? View.Pick(Camera.main.ScreenPointToRay(mouse)) : -1;
+        }
+
+        /// <summary>Opening view, opening orbit, then the orientation rule for the side to move. Never a move.</summary>
+        public void ResetView()
+        {
+            State.ResetView();
+            Orbit.ResetOrbit();
+            UpdateOrientation(false);
+            Message = "View reset: x y z on screen, w hidden";
         }
 
         public void OnPerspectiveButton(int index)

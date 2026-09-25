@@ -20,7 +20,17 @@ namespace Chess4D.Unity
         private float flipFrom, flipT = 1f;
         public bool Flipping { get { return flipT < 1f; } }
 
+        private float homeYaw, homePitch, homeDistance;
+
+        private void Awake() { homeYaw = Yaw; homePitch = Pitch; homeDistance = Distance; }
         private void Start() { Apply(); }
+
+        /// <summary>Back to the opening orbit and zoom. Orientation is set separately by the game.</summary>
+        public void ResetOrbit()
+        {
+            Yaw = homeYaw; Pitch = homePitch; Distance = homeDistance;
+            Apply();
+        }
 
         /// <summary>Sets the orientation target. A 180 degree change always turns the same way; smaller changes take the short arc.</summary>
         public void SetOrientation(float targetYaw, bool animate)

@@ -41,6 +41,8 @@ namespace Chess4D.Unity
         public IsolateMode IsolateMode = IsolateMode.Off;
 
         public event Action ViewChanged;
+        /// <summary>Raised when a turn reaches 90 and the view swaps axes. The string names the outgoing and incoming axes.</summary>
+        public event Action<string> TurnCompleted;
 
         private readonly double[] slotValues;
         private readonly int[] coordScratch;
@@ -89,6 +91,27 @@ namespace Chess4D.Unity
             Sweeping = false;
             return true;
         }
+
+        /// <summary>The visible slot the slider turns out when nothing is armed: up, so the default turn swaps the up axis for the hidden one.</summary>
+        public const int DefaultTurnSlot = 2;
+
+        /// <summary>Arms the turn that takes <paramref name="visibleSlot"/> off screen and brings the first hidden axis in. Used by the slider when nothing is armed.</summary>
+        public bool ArmSlot(int visibleSlot)
+        {
+            if (Armed || visibleSlot < 0 || visibleSlot >= AxisView.VisibleSlots || View.HiddenSlots == 0) return false;
+            RotatingSlot = visibleSlot;
+            HiddenSlot = AxisView.VisibleSlots;
+            Target = View.AfterQuarterTurn(RotatingSlot, HiddenSlot);
+            Armed = true;
+            Phi = 0f;
+            Sweeping = false;
+            return true;
+        }
+
+        /// <summary>Axis the default slider turn would take off screen.</summary>
+        public string DefaultOutgoingAxisName { get { return AxisView.AxisNames[View.AxisAtSlot(DefaultTurnSlot)]; } }
+        /// <summary>Axis the default slider turn would bring on screen.</summary>
+        public string DefaultIncomingAxisName { get { return AxisView.AxisNames[View.AxisAtSlot(AxisView.VisibleSlots)]; } }
 
         /// <summary>Button or keyboard: arm and run the timed sweep.</summary>
         public bool SweepTo(int[] targetAxes)
@@ -139,8 +162,10 @@ namespace Chess4D.Unity
 
         private void Commit()
         {
+            string note = AxisView.AxisNames[View.AxisAtSlot(RotatingSlot)] + " out, " + AxisView.AxisNames[View.AxisAtSlot(HiddenSlot)] + " in";
             View = Target;
             Disarm();
+            TurnCompleted?.Invoke(note);
         }
 
         private void Disarm()
@@ -150,6 +175,27 @@ namespace Chess4D.Unity
             Phi = 0f;
             RotatingSlot = HiddenSlot = -1;
             Target = null;
+            ViewChanged?.Invoke();
+        }
+
+        /// <summary>Axis leaving the screen in the armed turn, or null.</summary>
+        public string OutgoingAxisName { get { return Armed ? AxisView.AxisNames[View.AxisAtSlot(RotatingSlot)] : null; } }
+        /// <summary>Axis arriving on screen in the armed turn, or null.</summary>
+        public string IncomingAxisName { get { return Armed ? AxisView.AxisNames[View.AxisAtSlot(HiddenSlot)] : null; } }
+
+        /// <summary>
+        /// Back to the opening view: x y z on screen, w hidden at its starting page,
+        /// no turn armed, no isolation. A view operation, never a move.
+        /// </summary>
+        public void ResetView()
+        {
+            Armed = false; Sweeping = false; Phi = 0f;
+            RotatingSlot = HiddenSlot = -1; Target = null;
+            View = new AxisView(G.Dimensions, G.Side);
+            for (int a = 0; a < Pages.Length; a++) Pages[a] = StartPosition.CenterCoordinate(G);
+            Pages[0] = G.Side / 2;
+            Pages[BoardGeometry.AdvanceAxis] = 0;
+            IsolateSlot = -1; IsolateMode = IsolateMode.Off;
             ViewChanged?.Invoke();
         }
 

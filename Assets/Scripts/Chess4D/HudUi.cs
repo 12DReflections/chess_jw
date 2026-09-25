@@ -40,7 +40,7 @@ namespace Chess4D.Unity
         private Chess4DGame game;
         private Button[] perspectiveButtons;
         private Slider phiSlider;
-        private Text viewText, statusText, isolateText, gameStatusText, historyText, messageText;
+        private Text viewText, turnText, statusText, isolateText, gameStatusText, historyText, messageText;
         private InputField coordInput, moveInput, fileInput;
         private RectTransform setupPanel, promotionPanel;
         private Button[] brushButtons;
@@ -50,6 +50,8 @@ namespace Chess4D.Unity
         private readonly List<int> cellsScratch = new List<int>(300);
         private readonly StringBuilder sb = new StringBuilder();
         private bool suppressSlider;
+        /// <summary>Set when a slider drag completes a turn; ignores further drag events until the pointer is released so the new view cannot arm and commit a second turn in the same drag.</summary>
+        private bool sliderLatched;
         public Canvas Canvas { get; private set; }
 
         private static readonly Color StripEmpty = new Color(0.28f, 0.28f, 0.32f);
@@ -78,12 +80,12 @@ namespace Chess4D.Unity
 
         private void BuildLeft(Transform root)
         {
-            var left = UiKit.Panel(root, "left", new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1), new Vector2(10, -10), new Vector2(270, 520), UiKit.PanelColor);
+            var left = UiKit.Panel(root, "left", new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1), new Vector2(10, -10), new Vector2(270, 600), UiKit.PanelColor);
             var col = UiKit.VerticalGroup(left, "col", 6, new RectOffset(10, 10, 10, 10));
             UiKit.Label(col, "4D Chess", 20, TextAnchor.MiddleLeft, 26);
-            viewText = UiKit.Label(col, "", 13, TextAnchor.MiddleLeft, 20);
+            viewText = UiKit.Label(col, "", 13, TextAnchor.MiddleLeft, 36);
 
-            UiKit.Label(col, "Perspective   (1-4: sweep, shift+click: arm)", 12, TextAnchor.MiddleLeft, 18);
+            UiKit.Label(col, "Axes on screen   (the fourth is hidden)", 12, TextAnchor.MiddleLeft, 18);
             perspectiveButtons = new Button[Chess4DGame.Perspectives.Length];
             var row1 = UiKit.HorizontalGroup(col, "row1", 6, 28);
             var row2 = UiKit.HorizontalGroup(col, "row2", 6, 28);
@@ -91,12 +93,15 @@ namespace Chess4D.Unity
             {
                 int idx = i;
                 int[] axes = Chess4DGame.Perspectives[i];
-                string label = AxisView.AxisNames[axes[0]] + " " + AxisView.AxisNames[axes[1]] + " " + AxisView.AxisNames[axes[2]];
+                string label = UiKit.AxisRich(axes[0], false) + " " + UiKit.AxisRich(axes[1], false) + " " + UiKit.AxisRich(axes[2], false);
                 perspectiveButtons[i] = UiKit.Button(i < 2 ? row1 : row2, label, () => game.OnPerspectiveButton(idx), 28);
             }
+            UiKit.Label(col, "Click or keys 1-4: turn to that view.  Shift+click: pick\nthe view the slider below turns toward.", 11, TextAnchor.UpperLeft, 30);
 
-            UiKit.Label(col, "Rotation phi   (shift+drag scrubs when armed)", 12, TextAnchor.MiddleLeft, 18);
-            phiSlider = UiKit.Slider(col, 0f, 90f, v => { if (!suppressSlider) state.Scrub(v); }, () => state.Release());
+            turnText = UiKit.Label(col, "", 12, TextAnchor.MiddleLeft, 18);
+            phiSlider = UiKit.Slider(col, 0f, 90f, OnSliderChanged, OnSliderReleased);
+
+            UiKit.Button(col, "Reset view   (Home or 0)", () => game.ResetView(), 26);
 
             UiKit.Label(col, "Layer isolation   (I: mode, O: axis)", 12, TextAnchor.MiddleLeft, 18);
             var isoRow = UiKit.HorizontalGroup(col, "iso", 6, 26);
@@ -114,6 +119,21 @@ namespace Chess4D.Unity
 
             UiKit.Label(col, "Left-drag: orbit   Scroll: zoom   Click: select / move\n[ ]: page hidden axis   Esc: clear   Z / Y: undo / redo", 11, TextAnchor.UpperLeft, 34);
             statusText = UiKit.Label(col, "", 12, TextAnchor.UpperLeft, 60);
+        }
+
+        /// <summary>The slider is always live: dragging it with nothing armed arms the default turn first.</summary>
+        private void OnSliderChanged(float v)
+        {
+            if (suppressSlider || sliderLatched || state.Sweeping) return;
+            if (!state.Armed && !state.ArmSlot(ViewState.DefaultTurnSlot)) return;
+            state.Scrub(v);
+            if (!state.Armed) sliderLatched = true; // reached 90: the turn committed under the pointer
+        }
+
+        private void OnSliderReleased()
+        {
+            sliderLatched = false;
+            state.Release();
         }
 
         // ------------------------------------------------------------ right: game and editor
@@ -289,7 +309,11 @@ namespace Chess4D.Unity
         private void Update()
         {
             if (state == null) return;
-            viewText.text = state.Describe();
+            viewText.text = DescribeView();
+            turnText.text = state.Armed
+                ? "Turning " + UiKit.AxisRich(state.OutgoingAxisName) + " out, " + UiKit.AxisRich(state.IncomingAxisName) + " in:  " + state.Phi.ToString("F0") + "\u00B0   (past 45\u00B0 completes)"
+                : "Drag to turn " + UiKit.AxisRich(state.DefaultOutgoingAxisName) + " out, " + UiKit.AxisRich(state.DefaultIncomingAxisName) + " in";
+            turnText.color = state.Armed ? UiKit.ArmedColor : UiKit.TextColor;
             for (int i = 0; i < perspectiveButtons.Length; i++)
             {
                 int[] axes = Chess4DGame.Perspectives[i];
@@ -299,7 +323,7 @@ namespace Chess4D.Unity
             }
             suppressSlider = true;
             phiSlider.SetValueWithoutNotify(state.Phi);
-            phiSlider.interactable = state.Armed && !state.Sweeping;
+            phiSlider.interactable = !state.Sweeping;
             suppressSlider = false;
 
             isolateText.text = state.IsolateMode == IsolateMode.Off
@@ -357,6 +381,19 @@ namespace Chess4D.Unity
             historyText.text = sb.ToString();
         }
 
+        /// <summary>Plain-language view line: which axis is across, deep, up, and which is hidden at what layer.</summary>
+        private string DescribeView()
+        {
+            var v = state.View;
+            sb.Length = 0;
+            sb.Append("across ").Append(SignedAxis(v, 0)).Append("   depth ").Append(SignedAxis(v, 1)).Append("   up ").Append(SignedAxis(v, 2)).Append('\n');
+            for (int s = AxisView.VisibleSlots; s < v.Dimensions; s++)
+                sb.Append("hidden ").Append(UiKit.AxisRich(v.AxisAtSlot(s), false)).Append(" at layer ").Append(state.PageOfSlot(s)).Append("   ");
+            return sb.ToString().TrimEnd();
+        }
+
+        private static string SignedAxis(AxisView v, int slot) { return UiKit.AxisRich(v.AxisAtSlot(slot), v.SignAtSlot(slot) < 0); }
+
         private static string SlotName(int slot) { return slot == 0 ? "X (across)" : slot == 1 ? "depth" : slot == 2 ? "up" : "?"; }
 
         private string DescribeCell(string label, int cell)
@@ -378,7 +415,7 @@ namespace Chess4D.Unity
             int axis = state.View.AxisAtSlot(w.Slot);
             int page = state.Pages[axis];
             int side = state.G.Side;
-            w.Title.text = "hidden " + AxisView.AxisNames[axis] + "   page " + page + (focus >= 0 ? "   strip through " + state.G.CoordOf(focus) : "   (no cell)");
+            w.Title.text = "hidden " + UiKit.AxisRich(axis, false) + "   page " + page + (focus >= 0 ? "   strip through " + state.G.CoordOf(focus) : "   (no cell)");
             for (int v = 0; v < side; v++)
             {
                 Color c = StripNone;
