@@ -67,7 +67,7 @@ namespace Chess4D.Tablebase
                     int cls = Sym.ClassOfPair(pair);
                     int wk = Sym.DomainCells[cls];
                     int wx = Sym.RepCells[cls][pair - Sym.PairOffset[cls]];
-                    var succ = new long[64];
+                    var succ = new long[G.King.Length];
                     for (int bk = 0; bk < cells; bk++)
                     {
                         long wtm = ((pair * cells) + bk) * 2;
@@ -376,7 +376,7 @@ namespace Chess4D.Tablebase
         {
             var sb = new System.Text.StringBuilder();
             sb.Append("K+").Append(Piece.ToChar(Piece.Make(Geo.WhitePiece, Color.White))).Append(" vs K, ")
-              .Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append('\n');
+              .Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append(RuleText(G)).Append('\n');
             sb.Append("symmetry group order ").Append(Sym.TransformCount).Append(", king classes ").Append(Sym.DomainCells.Length)
               .Append(", canonical (king, piece) pairs ").Append(Sym.PairCount).Append(", table entries ").Append(Values.Length)
               .Append(" of which ").Append(DeadSlots * 2).Append(" are duplicate slots (unreduced black king under the pair stabiliser)\n");
@@ -393,6 +393,11 @@ namespace Chess4D.Tablebase
             foreach (var kv in hist) sb.Append(' ').Append(kv.Key).Append(':').Append(kv.Value);
             sb.Append('\n');
             return sb.ToString();
+        }
+
+        internal static string RuleText(BoardGeometry g)
+        {
+            return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }
     }
 }

@@ -129,7 +129,7 @@ namespace Chess4D.Tablebase
                     DecodePair(pair, out int wk, out int wa);
                     ushort[] vals = Values[pair];
                     int[] ctr = counters[pair];
-                    var succ = new long[64];
+                    var succ = new long[G.King.Length];
                     for (int wb = 0; wb < cells; wb++)
                     {
                         for (int bk = 0; bk < cells; bk++)
@@ -234,7 +234,7 @@ namespace Chess4D.Tablebase
                     for (int slot = 0; slot < vals.Length; slot++)
                     {
                         if (vals[slot] != n) continue;
-                        if (preds == null) { preds = new long[64]; DecodePair(pair, out wk, out wa); }
+                        if (preds == null) { preds = new long[G.King.Length]; DecodePair(pair, out wk, out wa); }
                         int stm = slot & 1, rest = slot >> 1;
                         int bk = rest % cells, wb = rest / cells;
                         if (stm == 1) acc += WhitePredecessors(wk, wa, wb, bk, (ushort)(n + 1));
@@ -357,13 +357,13 @@ namespace Chess4D.Tablebase
             return m;
         }
 
-        public string Name { get { return "K" + Piece.ToChar(Piece.Make(A, Color.White)) + Piece.ToChar(Piece.Make(B, Color.White)) + "vK-" + G.Dimensions + "d" + G.Side; } }
+        public string Name { get { return "K" + Piece.ToChar(Piece.Make(A, Color.White)) + Piece.ToChar(Piece.Make(B, Color.White)) + "vK-" + G.Dimensions + "d" + G.Side + Program.Variant(G); } }
 
         public string Summary()
         {
             var sb = new StringBuilder();
             sb.Append("K+").Append(Piece.ToChar(Piece.Make(A, Color.White))).Append('+').Append(Piece.ToChar(Piece.Make(B, Color.White)))
-              .Append(" vs K, ").Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append('\n');
+              .Append(" vs K, ").Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append(RuleText(G)).Append('\n');
             sb.Append("table entries ").Append(EntryCount).Append(", duplicate slots ").Append(DeadSlots * 2).Append('\n');
             sb.Append("legal positions: white to move ").Append(LegalWtm).Append(", black to move ").Append(LegalBtm).Append('\n');
             sb.Append("checkmates ").Append(Mates).Append(", stalemates ").Append(Stalemates).Append(", black-to-move positions drawn at once by capturing a piece ").Append(CaptureEscapes).Append('\n');
@@ -473,6 +473,11 @@ namespace Chess4D.Tablebase
             }
             Log("consistency: checked " + checkedCount + " sampled positions against the full rules, " + failures.Count + " failures");
             return failures;
+        }
+
+        internal static string RuleText(BoardGeometry g)
+        {
+            return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }
     }
 }

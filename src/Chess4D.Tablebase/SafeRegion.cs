@@ -37,6 +37,7 @@ namespace Chess4D.Tablebase
 
         public static Result Compute(BoardGeometry g, PieceType[] material, Action<string> log = null)
         {
+            if (g.King.Length > 64) throw new ArgumentException("the safe-region certificate uses 64-bit masks; this King has " + g.King.Length + " moves");
             var sym = new Symmetry(g);
             var geo = new ThreePiece(g, PieceType.Queen);
             int classes = sym.DomainCells.Length;
@@ -46,27 +47,27 @@ namespace Chess4D.Tablebase
 
             // Per class: neighbour cells of the domain cell, and the raw cover masks of each piece type over them.
             var neighbours = new int[classes][];
-            var masks = new uint[classes][][];
+            var masks = new ulong[classes][][];
             Parallel.For(0, classes, c =>
             {
                 int b = sym.DomainCells[c];
                 var nb = new List<int>();
                 foreach (var d in g.King) { int t = g.Step(b, d); if (t >= 0) nb.Add(t); }
                 neighbours[c] = nb.ToArray();
-                masks[c] = new uint[types.Length][];
+                masks[c] = new ulong[types.Length][];
                 for (int k = 0; k < types.Length; k++)
                 {
-                    var set = new HashSet<uint>();
+                    var set = new HashSet<ulong>();
                     for (int p = 0; p < g.CellCount; p++)
                     {
                         if (p == b) continue;
                         if (k == 0 && geo.Attacks(PieceType.King, p, b, -1)) continue; // kings never touch
-                        uint m = 0;
+                        ulong m = 0;
                         for (int i = 0; i < nb.Count; i++)
-                            if (nb[i] == p || geo.Attacks(types[k], p, nb[i], -1)) m |= 1u << i;
+                            if (nb[i] == p || geo.Attacks(types[k], p, nb[i], -1)) m |= 1UL << i;
                         if (m != 0) set.Add(m);
                     }
-                    masks[c][k] = new uint[set.Count];
+                    masks[c][k] = new ulong[set.Count];
                     set.CopyTo(masks[c][k]);
                 }
             });
@@ -80,8 +81,8 @@ namespace Chess4D.Tablebase
                 Parallel.For(0, classes, c =>
                 {
                     if (!safe[c]) return;
-                    uint target = 0;
-                    for (int i = 0; i < neighbours[c].Length; i++) if (safe[sym.ClassOf(neighbours[c][i])]) target |= 1u << i;
+                    ulong target = 0;
+                    for (int i = 0; i < neighbours[c].Length; i++) if (safe[sym.ClassOf(neighbours[c][i])]) target |= 1UL << i;
                     if (target == 0 || Coverable(masks[c], target)) next[c] = false;
                 });
                 iterations++;
@@ -96,13 +97,13 @@ namespace Chess4D.Tablebase
             int centre = classes - 1; // the domain cell with the largest coordinates
             for (int c = 0; c < classes; c++) if (neighbours[c].Length > neighbours[centre].Length) centre = c;
             r.CentreMoves = neighbours[centre].Length;
-            uint all = r.CentreMoves == 32 ? uint.MaxValue : (1u << r.CentreMoves) - 1;
+            ulong all = r.CentreMoves >= 64 ? ulong.MaxValue : (1UL << r.CentreMoves) - 1;
             r.CentreMaxCovered = MaxCover(masks[centre], all);
 
             var sb = new StringBuilder();
             sb.Append("K");
             foreach (var t in material) sb.Append('+').Append(Piece.ToChar(Piece.Make(t, Color.White)));
-            sb.Append(" vs K, ").Append(g.Dimensions).Append(" dimensions, side ").Append(g.Side).Append('\n');
+            sb.Append(" vs K, ").Append(g.Dimensions).Append(" dimensions, side ").Append(g.Side).Append(RuleText(g)).Append('\n');
             sb.Append("most White can cover of a central king's ").Append(r.CentreMoves).Append(" moves: ").Append(r.CentreMaxCovered).Append('\n');
             sb.Append("safe region after ").Append(iterations).Append(" erosion passes: ").Append(r.SafeCells).Append(" of ").Append(g.CellCount).Append(" cells\n");
             if (r.SafeCells > 0)
@@ -130,21 +131,21 @@ namespace Chess4D.Tablebase
         }
 
         /// <summary>Masks restricted to the target, duplicates and dominated masks removed, largest first.</summary>
-        private static uint[][] Reduce(uint[][] raw, uint target)
+        private static ulong[][] Reduce(ulong[][] raw, ulong target)
         {
-            var lists = new uint[raw.Length][];
+            var lists = new ulong[raw.Length][];
             for (int k = 0; k < raw.Length; k++)
             {
-                var set = new HashSet<uint>();
-                foreach (uint m in raw[k]) if ((m & target) != 0) set.Add(m & target);
-                var arr = new uint[set.Count];
+                var set = new HashSet<ulong>();
+                foreach (ulong m in raw[k]) if ((m & target) != 0) set.Add(m & target);
+                var arr = new ulong[set.Count];
                 set.CopyTo(arr);
                 Array.Sort(arr, (x, y) => BitOperations.PopCount(y).CompareTo(BitOperations.PopCount(x)));
-                var keep = new List<uint>();
-                foreach (uint m in arr)
+                var keep = new List<ulong>();
+                foreach (ulong m in arr)
                 {
                     bool dominated = false;
-                    foreach (uint q in keep) if ((m & ~q) == 0) { dominated = true; break; }
+                    foreach (ulong q in keep) if ((m & ~q) == 0) { dominated = true; break; }
                     if (!dominated) keep.Add(m);
                 }
                 lists[k] = keep.ToArray();
@@ -153,7 +154,7 @@ namespace Chess4D.Tablebase
         }
 
         /// <summary>Can one mask per piece cover every bit of the target?</summary>
-        private static bool Coverable(uint[][] raw, uint target)
+        private static bool Coverable(ulong[][] raw, ulong target)
         {
             var lists = Reduce(raw, target);
             Array.Sort(lists, (x, y) => MaxPop(y).CompareTo(MaxPop(x)));
@@ -162,19 +163,19 @@ namespace Chess4D.Tablebase
             return Cover(lists, suffix, 0, target);
         }
 
-        private static bool Cover(uint[][] lists, int[] suffix, int level, uint remaining)
+        private static bool Cover(ulong[][] lists, int[] suffix, int level, ulong remaining)
         {
             if (remaining == 0) return true;
             if (level == lists.Length || BitOperations.PopCount(remaining) > suffix[level]) return false;
-            foreach (uint m in lists[level])
+            foreach (ulong m in lists[level])
                 if ((m & remaining) != 0 && Cover(lists, suffix, level + 1, remaining & ~m)) return true;
             return Cover(lists, suffix, level + 1, remaining); // this piece contributes nothing
         }
 
-        private static int MaxPop(uint[] list) { return list.Length == 0 ? 0 : BitOperations.PopCount(list[0]); }
+        private static int MaxPop(ulong[] list) { return list.Length == 0 ? 0 : BitOperations.PopCount(list[0]); }
 
         /// <summary>The largest number of target bits one mask per piece can cover.</summary>
-        private static int MaxCover(uint[][] raw, uint target)
+        private static int MaxCover(ulong[][] raw, ulong target)
         {
             var lists = Reduce(raw, target);
             Array.Sort(lists, (x, y) => MaxPop(y).CompareTo(MaxPop(x)));
@@ -185,12 +186,12 @@ namespace Chess4D.Tablebase
             return best;
         }
 
-        private static void Best(uint[][] lists, int[] suffix, int level, uint covered, uint target, ref int best)
+        private static void Best(ulong[][] lists, int[] suffix, int level, ulong covered, ulong target, ref int best)
         {
             int have = BitOperations.PopCount(covered);
             if (have > best) best = have;
             if (level == lists.Length || have + suffix[level] <= best) return;
-            foreach (uint m in lists[level]) Best(lists, suffix, level + 1, covered | m, target, ref best);
+            foreach (ulong m in lists[level]) Best(lists, suffix, level + 1, covered | m, target, ref best);
         }
 
         public static PieceType[] ParseMaterial(string s)
@@ -208,6 +209,11 @@ namespace Chess4D.Tablebase
                 }
             }
             return list.ToArray();
+        }
+
+        internal static string RuleText(BoardGeometry g)
+        {
+            return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }
     }
 }

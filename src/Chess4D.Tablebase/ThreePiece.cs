@@ -22,20 +22,22 @@ namespace Chess4D.Tablebase
         public bool Attacks(PieceType type, int from, int to, int blocker)
         {
             if (from == to) return false;
-            int nonzero = 0, maxAbs = 0, axisA = -1, axisB = -1;
+            int nonzero = 0, maxAbs = 0, minAbs = int.MaxValue, axisA = -1, axisB = -1;
             for (int i = 0; i < n; i++)
             {
                 int d = G.Coord(to, i) - G.Coord(from, i);
                 if (d == 0) continue;
                 int a = d < 0 ? -d : d;
                 if (a > maxAbs) maxAbs = a;
+                if (a < minAbs) minAbs = a;
                 if (nonzero == 0) axisA = i; else if (nonzero == 1) axisB = i;
                 nonzero++;
             }
+            bool diagonal = nonzero >= 2 && nonzero <= G.DiagonalAxes && minAbs == maxAbs;
             switch (type)
             {
                 case PieceType.King:
-                    return maxAbs == 1 && nonzero <= 2;
+                    return maxAbs == 1 && nonzero <= G.KingAxes;
                 case PieceType.Knight:
                     {
                         if (nonzero != 2 || maxAbs != 2) return false;
@@ -46,17 +48,12 @@ namespace Chess4D.Tablebase
                 case PieceType.Rook:
                     return nonzero == 1 && Clear(from, to, maxAbs, blocker);
                 case PieceType.Bishop:
-                    return nonzero == 2 && Diagonal(from, to, axisA, axisB) && Clear(from, to, maxAbs, blocker);
+                    return diagonal && Clear(from, to, maxAbs, blocker);
                 case PieceType.Queen:
                     if (nonzero == 1) return Clear(from, to, maxAbs, blocker);
-                    return nonzero == 2 && Diagonal(from, to, axisA, axisB) && Clear(from, to, maxAbs, blocker);
+                    return diagonal && Clear(from, to, maxAbs, blocker);
             }
             return false;
-        }
-
-        private bool Diagonal(int from, int to, int a, int b)
-        {
-            return Math.Abs(G.Coord(to, a) - G.Coord(from, a)) == Math.Abs(G.Coord(to, b) - G.Coord(from, b));
         }
 
         private bool Clear(int from, int to, int steps, int blocker)

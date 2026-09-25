@@ -53,7 +53,7 @@ namespace Chess4D.Tablebase
         {
             var sorted = (PieceType[])pieces.Clone();
             Array.Sort(sorted, (x, y) => ((int)y).CompareTo((int)x));
-            string key = g.Dimensions + ":" + g.Side + ":" + Material(sorted);
+            string key = g.Dimensions + ":" + g.Side + ":" + g.DiagonalAxes + ":" + g.KingAxes + ":" + Material(sorted);
             if (cache.TryGetValue(key, out var s)) return s;
             s = new SparseSolver(g, sorted, log);
             cache[key] = s;
@@ -68,7 +68,7 @@ namespace Chess4D.Tablebase
             return sb.ToString();
         }
 
-        public string Name { get { return Material(Pieces) + "vK-" + G.Dimensions + "d" + G.Side; } }
+        public string Name { get { return Material(Pieces) + "vK-" + G.Dimensions + "d" + G.Side + Program.Variant(G); } }
 
         private SparseSolver(BoardGeometry g, PieceType[] sortedPieces, Action<string> log)
         {
@@ -427,7 +427,7 @@ namespace Chess4D.Tablebase
         public string Summary()
         {
             var sb = new StringBuilder();
-            sb.Append(Material(Pieces)).Append(" vs K, ").Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append(" (sparse exact solve; counts are positions up to symmetry)\n");
+            sb.Append(Material(Pieces)).Append(" vs K, ").Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append(RuleText(G)).Append(" (sparse exact solve; counts are positions up to symmetry)\n");
             sb.Append("checkmates ").Append(Mates).Append(", white-to-move wins ").Append(Won.Count).Append(", black-to-move losses ").Append(Lost.Count).Append(", every other legal position is a draw\n");
             sb.Append("longest forced mate: white to move ").Append(MaxWtmDistance).Append(" plies, black to move ").Append(MaxBtmDistance).Append(" plies\n");
             var byLevel = new long[(G.Side + 1) / 2];
@@ -462,6 +462,11 @@ namespace Chess4D.Tablebase
                 sb.Append(" k").Append(G.CoordOf(bk).ToCompact());
                 yield return sb.ToString();
             }
+        }
+
+        internal static string RuleText(BoardGeometry g)
+        {
+            return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }
     }
 }

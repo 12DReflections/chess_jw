@@ -1,0 +1,4 @@
+K+Q vs K, 4 dimensions, side 8, rule variant: diagonals up to 3 axes, king up to 2 axes
+most White can cover of a central king's 32 moves: 32
+safe region after 2 erosion passes: 0 of 4096 cells
+RESULT: inconclusive. The one-ply certificate fails; this does not show a forced mate.

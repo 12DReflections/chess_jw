@@ -633,3 +633,32 @@ Not done: three extra pieces (K+Q+Q+R and similar). An attempt was stopped:
 the decided set stops being sparse once an idle third piece can stand
 anywhere, so it needs a different method. The 13 September HUD changes are
 still uncommitted alongside this work.
+
+### 2026-09-26 — Rule variants that restore the K+Q mate (owner's question)
+
+Owner asked what rule changes would make K+Q vs K winnable in 4D while
+staying believable and balanced. `BoardGeometry` gained two optional
+parameters, `diagonalAxes` (default 2) and `kingAxes` (default = diagonal),
+threaded through `Board.IsAttacked`/`Attackers`, `ThreePiece`, and the three
+console tools as `--diag n --king n`; defaults reproduce the settled rules
+exactly (perft and all tablebase tests unchanged). Queen directions are now
+ordered by axis count so the King's are a prefix (`KingDirectionCount`).
+
+Result, exact tables on the 8x8x8x8 board: widening the Queen alone does
+almost nothing (80 directions: 0.43% won); slowing the King alone does little
+(orthogonal King, settled Queen: 0.02%); both together, **orthogonal King
+plus 3-axis diagonals, make K+Q vs K a forced win from every position in at
+most 8 moves**. Under that variant a lone Bishop also mates (80 moves at
+3-axis, 14 at 4-axis) while Rook, Knight and two Rooks do not, so piece
+values invert. 3D checked for comparison (settled: drawn; either change
+alone: won). Full tables in `docs/FINDINGS.md`, summaries under
+`docs/tablebase/variants/`.
+
+Also: `SafeRegion` masks widened to 64 bits (rejects Kings with more moves);
+successor buffers in both dense generators sized by `G.King.Length` (the
+80-move King overflowed a fixed 64); the engine spot check is skipped for
+variants (`--verify 0 0`) because search with 80-direction pieces does not
+finish. `RuleVariantTests`: direction counts, Board versus fast geometry
+agreement under five variants, the 3D variant results, and an explicit 4D
+gate. Not done: a separate diagonal rule for the Bishop (the balance repair
+suggested in FINDINGS), and self-play under the variant.

@@ -134,6 +134,112 @@ Reproduce: `Chess4D.Tablebase sparse QR` (about a minute), `generate4 QR
 --side 5` (about 90 seconds, 6 GB), `safe Q`. Tests: `FourPieceTablebaseTests`.
 Summaries are under `docs/tablebase/`.
 
+## Rule variants: what makes King and Queen mate again (2026-09-26)
+
+The owner asked whether the rules could change so that K+Q vs K is a win,
+believably and without wrecking balance. The move rules were parametrised
+(`BoardGeometry(dims, side, diagonalAxes, kingAxes)`: how many axes a
+diagonal slide may change, 2 in the settled rules, and how many a King step
+may change, 2 in the settled rules) and the three-piece tables regenerated
+for each variant. All exact; 5,000-sample one-ply consistency with the full
+rules, zero failures, on every table. SPEC section 6 lists the 80-direction
+Queen and 72-direction Bishop as open items; those are `diagonalAxes = 4`.
+
+### The finding: it is the King, not the Queen
+
+K+Q vs K on the 8x8x8x8 board, white-to-move positions won:
+
+| Queen diagonals | King step | Queen dirs / King moves | Won | Longest mate |
+|---|---|---|---|---|
+| 2 axes (settled) | 2 axes (settled) | 32 / 32 | 18 (0.00001%) | 1 ply |
+| 3 axes | 2 axes | 64 / 32 | 22,479 (0.01%) | 9 moves |
+| 4 axes (SPEC 6) | 2 axes | 80 / 32 | 757,000 (0.43%) | 17 moves |
+| 3 axes | 3 axes | 64 / 64 | 783 (0.0004%) | 3 moves |
+| 4 axes | 3 axes | 80 / 64 | 142,052 (0.08%) | 4 moves |
+| 4 axes | 4 axes | 80 / 80 | 182,388 (0.11%) | 4 moves |
+| 2 axes | **1 axis** | 32 / 8 | 36,224 (0.02%) | 22 moves |
+| 3 axes | **1 axis** | 64 / 8 | **100%** | **8 moves** |
+| 4 axes | **1 axis** | 80 / 8 | **100%** | **8 moves** |
+
+- Giving the Queen more directions while the King keeps 32 moves does
+  almost nothing: even the 80-direction Queen wins from 0.43% of positions.
+  The "natural" generalisation, 80 directions for both, is no better than
+  the settled rules (0.11%, four-move corner tricks only).
+- Restricting the King to orthogonal steps (8 moves, the wazir of fairy
+  chess) with the settled 32-direction Queen gives real technique (22-move
+  mates exist) but still only 0.02% won: the Queen's lines cannot pin down
+  even a slow King.
+- Both together, an orthogonal King and a Queen with at least 3-axis
+  diagonals, make K+Q vs K a forced win from **every** legal position,
+  longest mate 8 moves (15 plies), shorter than 2D's 10. The 4-axis
+  diagonals add nothing to this (same 8 moves), so the smaller change,
+  3-axis diagonals (64 Queen directions), suffices. On the 6x6x6x6 board
+  the same variant mates in at most 6 moves.
+
+Why: a checkmate must cover every King move plus the King's cell. An
+orthogonal King in the open has 8 moves on 4 lines through its cell; a
+Queen with 3-axis diagonals standing at Chebyshev distance 1 attacks every
+cell of the 3x3x3x3 cube around itself that differs from it on at most 3
+axes, which is all 8 of those neighbours at once. Coverage stops being a
+counting problem, and the (K, Q) pair can herd the King exactly as in 2D.
+With 32 King moves no single piece covers a neighbourhood, so nothing herds.
+
+### The other pieces under the winning variant (orthogonal King)
+
+| Ending, 4D side 8, King 1 axis | Won | Longest mate |
+|---|---|---|
+| K+R vs K (any diagonal rule; Rook unaffected) | 0, no checkmate exists | none |
+| K+N vs K | 0, no checkmate exists | none |
+| K+R+R vs K | 8,416 classes, all with the King on an edge | 1 ply |
+| K+B vs K, Bishop 3-axis (56 directions) | **100%** | **80 moves** |
+| K+B vs K, Bishop 4-axis (72 directions) | **100%** | **14 moves** |
+
+This inverts 2D: a lone Bishop mates and a lone Rook does not, nor do two
+Rooks. If Bishop and Queen share the diagonal rule, the Bishop is the
+second-strongest piece by a wide margin (56 or 72 directions against the
+Rook's 8) and every 2D piece value is wrong. The 3-axis Bishop's 80-move
+mates would also fall to a fifty-move rule. Two sensible repairs, both
+untested: keep the Bishop at 2-axis diagonals (24) while only the Queen
+gains 3-axis lines, or accept the Bishop's strength and retune values by
+self-play. Testing the first needs the Bishop's diagonal rule split from
+the Queen's in `BoardGeometry`.
+
+### Three dimensions for comparison (8x8x8)
+
+| Ending | Rules | Won | Longest mate |
+|---|---|---|---|
+| K+Q vs K | settled (Queen 18 dirs, King 18 moves) | 609 (0.02%) | 3 moves |
+| K+R, K+B, K+N vs K | settled | mates in one only (28, 24, 11) | 1 ply |
+| K+Q+R vs K | settled | 3.65 million classes, none with the King 2+ from an edge | 31 moves |
+| K+Q vs K | King 1 axis (6 moves) | **100%** | **20 moves** |
+| K+Q vs K | Queen 3-axis (26 dirs), King 2 axes (18) | **100%** | **36 moves** |
+| K+Q vs K | Queen 3-axis, King 1 axis | **100%** | **8 moves** |
+
+Three dimensions with the settled rules are drawn like four. In 3D either
+change alone suffices, because 3-axis diagonals are the full 26-direction
+neighbourhood there; in 4D both are needed.
+
+### Variants that need no table
+
+- **Bare king loses** (shatranj). Any material advantage then wins, the
+  whole minimum-mating-material problem disappears, and it is historically
+  grounded. Cheapest fix by far; changes the game's character (trading down
+  becomes decisive).
+- **Stalemate is a win** for the side delivering it. Untested here; the
+  settled tables show very few stalemates (1 class for K+Q), so it is
+  unlikely to help on its own.
+- **Smaller boards** do not help: the settled K+Q on 4x4x4x4 has 6 wins.
+
+### Recommendation
+
+If the aim is a game that ends, the smallest believable change is:
+**King steps along one axis only; Queen (and possibly Bishop) slide on
+diagonals of up to three axes.** It yields a 4D K+Q ending with the same
+shape as 2D and a shorter mate. Its cost is the piece-value inversion above,
+which self-play can measure. The tables for the variant are reproducible
+with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
+summaries for every variant tried are under `docs/tablebase/variants/`.
+
 ## Formal statement and the counting bound (2026-09-19)
 
 Recorded from the owner's questions on what is proved and what generalises.
