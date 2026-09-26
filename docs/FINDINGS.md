@@ -177,12 +177,15 @@ K+Q vs K on the 8x8x8x8 board, white-to-move positions won:
   the same variant mates in at most 6 moves.
 
 Why: a checkmate must cover every King move plus the King's cell. An
-orthogonal King in the open has 8 moves on 4 lines through its cell; a
-Queen with 3-axis diagonals standing at Chebyshev distance 1 attacks every
-cell of the 3x3x3x3 cube around itself that differs from it on at most 3
-axes, which is all 8 of those neighbours at once. Coverage stops being a
-counting problem, and the (K, Q) pair can herd the King exactly as in 2D.
-With 32 King moves no single piece covers a neighbourhood, so nothing herds.
+orthogonal King in the open has 8 moves. A Queen with 3-axis diagonals
+standing one step from it along an axis attacks 6 of the 8 (every escape
+that is not on the Queen's own line: those differ from the Queen on 2 or 3
+axes); the remaining two are the Queen's own cell, which the white King
+defends, and the cell behind the King on that line, which the King itself
+blocks and the white King or the edge covers. That is the 2D queen-and-king
+pattern, cell for cell. With the settled 2-axis Queen the adjacent Queen
+covers only the 3 escapes that differ from it on 2 axes, and with the
+settled 32-move King no piece covers a neighbourhood, so nothing herds.
 
 ### The other pieces under the winning variant (orthogonal King)
 
