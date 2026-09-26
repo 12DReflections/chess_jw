@@ -25,15 +25,38 @@ namespace Chess4D.Core.Tests
             for (int i = 1; i < g.Queen.Length; i++) Assert.That(g.Queen[i].Axes, Is.GreaterThanOrEqualTo(g.Queen[i - 1].Axes), "queen directions ordered by axis count");
         }
 
-        [TestCase(2, 0)]
-        [TestCase(4, 2)]
-        [TestCase(4, 0)]
-        [TestCase(3, 1)]
-        [TestCase(2, 1)]
-        public void BoardAndFastGeometryAgreeOnAttacks(int diag, int king)
+        [Test]
+        public void BoardKingHasTwelveMovesAndAReducedSymmetryGroup()
+        {
+            var g = new BoardGeometry(4, 8, 2, 0, true);
+            Assert.That(g.King.Length, Is.EqualTo(12));
+            Assert.That(g.Queen.Length, Is.EqualTo(32));
+            foreach (var d in g.King) Assert.That(d.Axes == 1 || (d.Vec[0] != 0 && d.Vec[1] != 0), Is.True, d.ToString());
+            var sym = new Symmetry(g);
+            Assert.That(sym.TransformCount, Is.EqualTo(64));      // 2! x 2! x 2^4
+            Assert.That(sym.DomainCells.Length, Is.EqualTo(100)); // 10 non-decreasing pairs from {0..3}, squared
+            var rng = new Random(5);
+            for (int s = 0; s < 200; s++)
+            {
+                int wk = rng.Next(g.CellCount), wx = rng.Next(g.CellCount), bk = rng.Next(g.CellCount);
+                if (wk == wx || wk == bk || wx == bk) continue;
+                long idx = sym.Index(wk, wx, bk, 1);
+                for (int t = 0; t < sym.TransformCount; t++)
+                    Assert.That(sym.Index(sym.Apply(t, wk), sym.Apply(t, wx), sym.Apply(t, bk), 1), Is.EqualTo(idx));
+            }
+        }
+
+        [TestCase(2, 0, false)]
+        [TestCase(4, 2, false)]
+        [TestCase(4, 0, false)]
+        [TestCase(3, 1, false)]
+        [TestCase(2, 1, false)]
+        [TestCase(2, 0, true)]
+        [TestCase(3, 0, true)]
+        public void BoardAndFastGeometryAgreeOnAttacks(int diag, int king, bool boardKing)
         {
             // Board.IsAttacked walks direction lists; ThreePiece.Attacks reasons from coordinate differences. Both were changed for variants.
-            var g = new BoardGeometry(4, 6, diag, king);
+            var g = new BoardGeometry(4, 6, diag, king, boardKing);
             var geo = new ThreePiece(g, PieceType.Queen);
             var rng = new Random(21);
             var b = new Board(g);

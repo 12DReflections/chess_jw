@@ -662,3 +662,27 @@ finish. `RuleVariantTests`: direction counts, Board versus fast geometry
 agreement under five variants, the 3D variant results, and an explicit 4D
 gate. Not done: a separate diagonal rule for the Bishop (the balance repair
 suggested in FINDINGS), and self-play under the variant.
+
+### 2026-09-27 — The owner's King variant tested
+
+Owner clarified the variant they had in mind: the King keeps a 2D king's 8
+moves within its own x-y board and steps straight to the neighbouring board
+along z or w, never diagonally across boards (12 moves in the open). Added
+as `BoardGeometry(..., boardKing: true)` / `--boardking`, with
+`QueenIsKing[]` replacing the prefix scheme in `Board.IsAttacked`, and the
+`Symmetry` group and fundamental domain reduced to the 64 transforms that
+respect the x-y board (tested: order, class count, index invariance).
+
+Results, exact: with the settled Queen this King is still a draw on the
+8x8x8x8 board (14,358 won classes, all on an edge, longest 9 moves); with
+the 3-axis Queen K+Q wins every position at sides 6 and 7 (7 and 8 moves).
+Unlike the orthogonal King, a lone 3-axis Bishop does not mate this King,
+and the Rook still has no checkmate at all. K+Q+R with the settled Queen
+wins every position at side 4 (19 moves) and exceeds 20 million won classes
+at side 8 (exact count out of reach on this machine). Recorded in `docs/FINDINGS.md` with the comparison table;
+summaries under `docs/tablebase/variants/`. 118 tests green.
+
+Limitation found: the dense three-piece generator overflows the array
+length at side 8 under the 64-element group (2^31 entries); the winning
+side-8 figure is inferred from sides 6 and 7. Splitting `Generator.Values`
+per (king, piece) pair as `FourPieceGenerator` does would remove it.

@@ -466,6 +466,7 @@ namespace Chess4D.Tablebase
 
         internal static string RuleText(BoardGeometry g)
         {
+            if (g.BoardKing) return ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, board-king (2D king on the x-y board, straight steps across z and w)";
             return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }
     }

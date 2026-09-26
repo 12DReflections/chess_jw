@@ -211,6 +211,55 @@ gains 3-axis lines, or accept the Bishop's strength and retune values by
 self-play. Testing the first needs the Bishop's diagonal rule split from
 the Queen's in `BoardGeometry`.
 
+### The owner's King: 2D king on its board, straight steps between boards (2026-09-27)
+
+The owner proposed a King that keeps the ordinary chess king's 8 moves
+within its own x-y board (diagonals included) and steps straight along z
+or w to a neighbouring board, but never diagonally across boards: 12 moves
+in the open instead of 32 (7 on a face, 4 in a corner). Nothing else
+changes: the board is still 8x8x8x8 and every other piece keeps its rule.
+This is the `boardKing` option of `BoardGeometry` (`--boardking`). It
+distinguishes the x-y board from the other axes, so the symmetry group
+drops from 384 to 64 elements (the generator's fundamental domain was
+generalised accordingly and re-tested). Exact results:
+
+| Ending | Queen rule | Board | Won | Longest mate |
+|---|---|---|---|---|
+| K+Q vs K | settled (32 dirs) | 8x8x8x8 | 14,358 classes, all with the King on an edge | 9 moves |
+| K+Q vs K | settled | 6^4 / 7^4 | 0.01% / 0.00% | 9 moves |
+| K+Q vs K | 3-axis (64 dirs) | 6^4 | **100%** | 7 moves |
+| K+Q vs K | 3-axis | 7^4 | **100%** | **8 moves** |
+| K+B vs K | Bishop 3-axis (56 dirs) | 7^4 | 5,751 (0.00%) | 7 moves |
+| K+R vs K | settled | 7^4 | 0, no checkmate exists | none |
+| K+Q+R vs K | settled | 4^4 | **100%** (53,261,721 of 53,261,721) | 19 moves |
+| K+Q+R vs K | settled | 8x8x8x8 | more than 20 million won classes (sparse solver's cap); exact count not computed | unknown |
+
+(The dense generator overflows its array limit at side 8 under the 64-element
+group, so the side-8 K+Q table with the settled Queen was solved with the
+sparse solver instead, which is exact when little is won; the 3-axis Queen
+is a full win at sides 6 and 7 with the mate length growing by one move per
+side, and the sparse solver cannot hold a full-board win set. The side-8
+figure for the winning combination is therefore inferred, not tabulated.)
+
+Comparison with the earlier King variants:
+
+| King | Moves in the open | K+Q, settled Queen | K+Q, 3-axis Queen | Lone Bishop (3-axis) mates? |
+|---|---|---|---|---|
+| settled (any 2 axes) | 32 | draw (18 wins) | draw (0.01%) | no |
+| orthogonal only | 8 | draw (0.02%) | **win, 8 moves** | **yes, 80 moves** |
+| owner's board-King | 12 | draw (14,358 wins) | **win, 8 moves at side 7** | **no** |
+
+So the owner's King does what the orthogonal King does for the Queen, and
+does not hand the Bishop a forced mate: the best balance of the three. The
+extra 3-axis Queen lines are still required for K+Q alone; with the settled
+Queen every King tried is a draw. The Rook remains mate-less against every
+King tried. K+Q+R with the settled Queen, however, does win against this
+King: every position on the 4x4x4x4 board (the settled King's figure there
+is 0.02%), and on the full board the won set passed 20 million classes,
+sixty times the settled rules' total, before the sparse solver stopped. A
+full-board four-piece table under the 64-element group is about 9 billion
+entries, beyond this machine.
+
 ### Three dimensions for comparison (8x8x8)
 
 | Ending | Rules | Won | Longest mate |
@@ -240,10 +289,12 @@ neighbourhood there; in 4D both are needed.
 ### Recommendation
 
 If the aim is a game that ends, the smallest believable change is:
-**King steps along one axis only; Queen (and possibly Bishop) slide on
-diagonals of up to three axes.** It yields a 4D K+Q ending with the same
-shape as 2D and a shorter mate. Its cost is the piece-value inversion above,
-which self-play can measure. The tables for the variant are reproducible
+**the owner's board-King (2D king on its board, straight steps between
+boards) with a Queen that also slides on 3-axis diagonals.** It yields a
+4D K+Q ending with the same shape as 2D and an 8-move longest mate, keeps
+the Bishop unable to mate alone, and leaves the Rook, Knight and pawns
+untouched. Whether the Bishop should share the 3-axis lines is a balance
+choice for self-play, not a mating question. The tables for the variant are reproducible
 with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
 summaries for every variant tried are under `docs/tablebase/variants/`.
 

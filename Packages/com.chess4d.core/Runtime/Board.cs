@@ -351,7 +351,8 @@ namespace Chess4D.Core
         public bool IsAttacked(int cell, Color by)
         {
             Direction[] q = G.Queen;
-            int rookCount = G.Rook.Length, kingCount = G.KingDirectionCount;
+            int rookCount = G.Rook.Length;
+            bool[] kingDir = G.QueenIsKing;
             for (int i = 0; i < q.Length; i++)
             {
                 Direction d = q[i];
@@ -367,7 +368,7 @@ namespace Chess4D.Core
                             PieceType t = Piece.TypeOf(p);
                             if (t == PieceType.Queen) return true;
                             if (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop) return true;
-                            if (first && i < kingCount && t == PieceType.King) return true;
+                            if (first && kingDir[i] && t == PieceType.King) return true;
                         }
                         break;
                     }
@@ -396,7 +397,8 @@ namespace Chess4D.Core
         public void Attackers(int cell, Color by, List<int> output)
         {
             Direction[] q = G.Queen;
-            int rookCount = G.Rook.Length, kingCount = G.KingDirectionCount;
+            int rookCount = G.Rook.Length;
+            bool[] kingDir = G.QueenIsKing;
             for (int i = 0; i < q.Length; i++)
             {
                 Direction d = q[i];
@@ -410,7 +412,7 @@ namespace Chess4D.Core
                         if (Piece.ColorOf(p) == by)
                         {
                             PieceType t = Piece.TypeOf(p);
-                            if (t == PieceType.Queen || (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop) || (first && i < kingCount && t == PieceType.King))
+                            if (t == PieceType.Queen || (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop) || (first && kingDir[i] && t == PieceType.King))
                                 output.Add(c);
                         }
                         break;

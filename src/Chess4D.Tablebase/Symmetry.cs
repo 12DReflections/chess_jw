@@ -37,6 +37,8 @@ namespace Chess4D.Tablebase
             // All transforms.
             var perms = new List<int[]>();
             Permute(new int[n], new bool[n], 0, perms);
+            // A board-King distinguishes the x-y board from the other axes: keep only permutations that map {0,1} onto itself.
+            if (g.BoardKing) perms.RemoveAll(perm => (perm[0] > 1) || (perm[1] > 1));
             TransformCount = perms.Count << n;
             map = new int[TransformCount][];
             int t = 0;
@@ -129,7 +131,9 @@ namespace Chess4D.Tablebase
             for (int i = 0; i < G.Dimensions; i++)
             {
                 int v = G.Coord(cell, i);
-                if (v > half || v < prev) return false;
+                if (v > half) return false;
+                if (G.BoardKing && i == 2) prev = -1; // axes are only interchangeable within {x,y} and within the rest
+                if (v < prev) return false;
                 prev = v;
             }
             return true;

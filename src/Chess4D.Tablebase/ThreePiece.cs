@@ -37,7 +37,7 @@ namespace Chess4D.Tablebase
             switch (type)
             {
                 case PieceType.King:
-                    return maxAbs == 1 && nonzero <= G.KingAxes;
+                    return maxAbs == 1 && (nonzero <= G.KingAxes || (G.BoardKing && nonzero == 2 && axisA == 0 && axisB == 1));
                 case PieceType.Knight:
                     {
                         if (nonzero != 2 || maxAbs != 2) return false;
