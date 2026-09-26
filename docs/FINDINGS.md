@@ -176,16 +176,20 @@ K+Q vs K on the 8x8x8x8 board, white-to-move positions won:
   3-axis diagonals (64 Queen directions), suffices. On the 6x6x6x6 board
   the same variant mates in at most 6 moves.
 
-Why: a checkmate must cover every King move plus the King's cell. An
-orthogonal King in the open has 8 moves. A Queen with 3-axis diagonals
-standing one step from it along an axis attacks 6 of the 8 (every escape
-that is not on the Queen's own line: those differ from the Queen on 2 or 3
-axes); the remaining two are the Queen's own cell, which the white King
-defends, and the cell behind the King on that line, which the King itself
-blocks and the white King or the edge covers. That is the 2D queen-and-king
-pattern, cell for cell. With the settled 2-axis Queen the adjacent Queen
-covers only the 3 escapes that differ from it on 2 axes, and with the
-settled 32-move King no piece covers a neighbourhood, so nothing herds.
+Why, as far as it is understood: a checkmate must cover every King move
+plus the King's cell. Against an orthogonal King in the open (8 escapes), a
+Queen one step away along an axis covers 6 of the 8 whether or not it has
+3-axis lines (the six escapes off the Queen's line all differ from it on
+exactly two axes); the other two are the Queen's own cell, defended by the
+white King, and the cell behind the black King, which an edge or the white
+King covers. So the final mate pattern exists under both Queens, and the
+tables agree (611 checkmate classes with the settled Queen, 24,398 with the
+80-direction one). The difference is in the forcing, not the mate: the
+settled Queen cannot drive an orthogonal King to an edge (0.02% won,
+though 22-move mates exist), and the 3-axis Queen can (100%). A hand
+explanation of why the extra lines restore the herding technique is not yet
+written; treat "it is the King" as the empirical finding and the mechanism
+as open.
 
 ### The other pieces under the winning variant (orthogonal King)
 
