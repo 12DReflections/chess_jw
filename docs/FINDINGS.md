@@ -260,6 +260,56 @@ sixty times the settled rules' total, before the sparse solver stopped. A
 full-board four-piece table under the 64-element group is about 9 billion
 entries, beyond this machine.
 
+### The cover inequality: why this King cannot be mated away from an edge
+
+A general rule, stated for any King rule and any attacking material M, on
+any board:
+
+> Let E(b) be the cells the black King may step to from b. A checkmate at b
+> needs every cell of E(b) attacked or safely occupied, and b attacked. Let
+> cover(M, b) be the largest number of cells of E(b) that M can attack or
+> safely occupy over all legal placements (a piece standing on an escape
+> cell counts only if defended; the white King may not stand next to the
+> black one). If cover(M, b) < |E(b)|, no checkmate exists at b, by any
+> play. If that holds for every cell b off the edge, every checkmate has
+> the black King on an edge.
+
+For the owner's King and the settled Queen on 8x8x8x8: |E(b)| = 12 for
+every interior b, and **cover(K+Q, b) = 11**. Checked exhaustively over all
+16.7 million (Queen, King) placements against a central King, with the
+Queen blocked only by the black King (an over-count in White's favour), in
+`docs/cover_bound.py`. No placement covers all 12, with or without check.
+The interior is uniform for this purpose (every escape of an interior King
+is on the board and blocking geometry does not change), so the central
+King is the worst case and the bound holds at every interior cell.
+
+By hand, the 11 comes from three facts: a Queen one step from the King
+along an axis covers 8 escapes (the 6 straight ones off its line and the 2
+board diagonals on its side) plus its own cell; the white King covers at
+most 3 (the three cells on the far side, from two steps away on the axis);
+and the Queen's own cell counts only if the white King defends it, which
+puts him next to the Queen and away from the far side. So 8 + 3 = 11 with
+the Queen undefended, or 9 + at most 2 with it defended. Every other Queen
+placement covers fewer (6 from the z or w side, 4 from a board diagonal, 4
+from a non-capturable 3-axis neighbour, 3 from two steps away).
+
+The same inequality is what proves the settled-rules results: |E| = 32 and
+cover is 20 for K+Q and 25 for K+Q+R (the `safe` tool computes it), so
+neither can mate an interior King. It is also where the orthogonal King
+fails Black: |E| = 8 and a 3-axis Queen alone covers 6 with the white King
+supplying the rest, so interior mates exist and, as the table shows, are
+forced. For the owner's King with the 3-axis Queen the inequality is not
+the mechanism: the win comes from herding to an edge, not from interior
+mates.
+
+What the inequality does not prove is that Black can stay off the edge. A
+forcing sequence could in principle drive the King to an edge and mate it
+there. For the owner's King with the settled Queen the full table answers
+that part: every one of the 14,358 won positions already has the black
+King on an edge, so from any position with the King off the edge Black
+holds the draw. The inequality is the hand-checkable half; the table is
+the other half.
+
 ### Three dimensions for comparison (8x8x8)
 
 | Ending | Rules | Won | Longest mate |
