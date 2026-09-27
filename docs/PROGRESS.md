@@ -699,4 +699,5 @@ K+Q+R run showed interior mates in one exist under the owner's King.
 Diagnostic runs for K+Q+B, K+R+B and K+B+N were stopped after an hour
 without result to save compute. Table in `docs/FINDINGS.md`; a Word copy
 was given to the owner. The full-board four-piece table under the owner's
-King (~36 GB) is the remaining gap.
+King is the remaining gap: about 9 trillion entries at the current indexing
+(an earlier note said 36 GB; that was an arithmetic slip).

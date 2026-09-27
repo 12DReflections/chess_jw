@@ -257,8 +257,9 @@ King tried. K+Q+R with the settled Queen, however, does win against this
 King: every position on the 4x4x4x4 board (the settled King's figure there
 is 0.02%), and on the full board the won set passed 20 million classes,
 sixty times the settled rules' total, before the sparse solver stopped. A
-full-board four-piece table under the 64-element group is about 9 billion
-entries, beyond this machine.
+full-board four-piece table under the 64-element group is about 9 trillion
+entries at the current indexing (white King in the domain, one piece
+canonical, the rest unreduced), some 18 TB, beyond any single machine.
 
 ### Endgame table: which material forces mate (2026-09-27)
 
@@ -269,7 +270,7 @@ stated. The owner's King is the 12-move board-King above.
 | White vs lone King | Settled King (32), 8^4 | Owner's King (12) | 2D chess |
 |---|---|---|---|
 | K+Q | not possible | not possible (8^4 exact); win in 8 moves with a 3-axis Queen | 10 moves |
-| K+Q+R | not possible | win on 4^4 in 19 moves; on 8^4 over 2 million mates in one exist, about 950 of them with the King 2-3 cells from every edge, but the forced length is not computable here (a table under the 64-element group is ~36 GB) | 6 moves |
+| K+Q+R | not possible | win on 4^4 in 19 moves; on 8^4 over 2 million mates in one exist, about 950 of them with the King 2-3 cells from every edge, but the forced length is not computable here (a table under the 64-element group is about 9 trillion entries at the current indexing) | 6 moves |
 | K+R+R | not possible | not possible (8^4 exact: 5,764 mates in one, edge only) | 7 moves |
 | K+R+B | not possible | not forced on 4^4 (0.04%); 8^4 unresolved (won set passed 2 million) | 16 moves |
 | K+Q+B | not possible | win on 4^4 in 11 moves; 8^4 not computable here, likely win | 8 moves |
