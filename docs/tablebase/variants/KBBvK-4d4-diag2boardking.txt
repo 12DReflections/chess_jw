@@ -1,0 +1,9 @@
+K+B+B vs K, 4 dimensions, side 4, rule variant: diagonals up to 2 axes, board-king (2D king on the x-y board, straight steps across z and w)
+table entries 169869312, duplicate slots 32404320
+legal positions: white to move 54130750, black to move 64308366
+checkmates 812, stalemates 7057, black-to-move positions drawn at once by capturing a piece 3755466
+white-to-move wins 26938032 (49.76%), black-to-move losses 30234460 (47.01%)
+longest forced mate: white to move 49 plies, black to move 50 plies; passes 52
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 25401328/51012028 (49.79%)  1: 1536704/3118722 (49.27%)
+white-to-move distance histogram (plies: positions): 1:5598 3:10260 5:10890 7:6244 9:6860 11:5574 13:5086 15:9992 17:12038 19:17674 21:24688 23:43560 25:84620 27:160300 29:314202 31:591144 33:1109196 35:1909478 37:2822732 39:3720776 41:4753130 43:5303302 45:4127676 47:1691176 49:191836
+one-ply consistency against the full rules: 5000 sampled positions, 0 failures

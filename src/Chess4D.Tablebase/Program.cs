@@ -130,6 +130,7 @@ namespace Chess4D.Tablebase
             if (args.Length < 2) { Console.WriteLine("usage: sparse <material, letters from QRBN> [--dims n] [--side s] [--out dir]"); return 1; }
             int dims = 4, side = 8, diag = 2, king = 0;
             bool boardKing = false;
+            long cap = 20_000_000;
             string outDir = null;
             for (int i = 2; i < args.Length; i++)
             {
@@ -140,10 +141,12 @@ namespace Chess4D.Tablebase
                     case "--diag": diag = int.Parse(args[++i]); break;
                     case "--king": king = int.Parse(args[++i]); break;
                     case "--boardking": boardKing = true; break;
+                    case "--cap": cap = long.Parse(args[++i]); break;
                     case "--out": outDir = args[++i]; break;
                 }
             }
             Action<string> log = s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s);
+            SparseSolver.WonLimitDefault = cap;
             var solver = SparseSolver.For(new BoardGeometry(dims, side, diag, king, boardKing), SafeRegion.ParseMaterial(args[1]), log);
             var sb = new System.Text.StringBuilder(solver.Summary());
             foreach (string line in solver.Deepest(12)) sb.Append(line).Append('\n');

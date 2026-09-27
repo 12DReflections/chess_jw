@@ -1,0 +1,18 @@
+KNN vs K, 4 dimensions, side 8, rule variant: diagonals up to 2 axes, board-king (2D king on the x-y board, straight steps across z and w) (sparse exact solve; counts are positions up to symmetry)
+checkmates 1253, white-to-move wins 53425, black-to-move losses 1889, every other legal position is a draw
+longest forced mate: white to move 9 plies, black to move 8 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 53425  1: 0  2: 0  3: 0
+white-to-move distance histogram (plies: classes): 1:25690 3:550 5:10246 7:16318 9:621
+WTM mate in 9 plies  K2110 N2300 N0020 k0000
+WTM mate in 9 plies  K3210 N3200 N0020 k0000
+WTM mate in 9 plies  K2110 N3200 N0020 k0000
+WTM mate in 9 plies  K3210 N2300 N0020 k0000
+WTM mate in 9 plies  K2200 N3200 N0020 k0000
+WTM mate in 9 plies  K2220 N3200 N0020 k0000
+WTM mate in 9 plies  K2211 N3200 N0020 k0000
+WTM mate in 9 plies  K3310 N3200 N0020 k0000
+WTM mate in 9 plies  K3110 N2300 N0020 k0000
+WTM mate in 9 plies  K3110 N3200 N0020 k0000
+WTM mate in 9 plies  K1110 N3200 N0020 k0000
+WTM mate in 9 plies  K2210 N1100 N0020 k0000
+one-ply verification of every stored position against the full rules: 0 failures

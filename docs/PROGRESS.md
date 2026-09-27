@@ -686,3 +686,17 @@ Limitation found: the dense three-piece generator overflows the array
 length at side 8 under the 64-element group (2^31 entries); the winning
 side-8 figure is inferred from sides 6 and 7. Splitting `Generator.Values`
 per (king, piece) pair as `FourPieceGenerator` does would remove it.
+
+### 2026-09-27 — Endgame table for the owner (settled King, owner's King, 2D)
+
+Owner asked for a table of forced mates across eight material sets in three
+rule worlds. 2D and the settled King were already exact; for the owner's
+King every four-piece ending was solved exactly on 4^4 and attempted on 8^4
+with the sparse solver (exact where the result is a draw: K+R+R, K+B+B,
+K+N+N; capped where it is not: K+Q+R, K+Q+B, K+R+B, K+B+N). Added `--cap` to
+`sparse` and a won-set-by-edge-distance report when the cap is hit; the
+K+Q+R run showed interior mates in one exist under the owner's King.
+Diagnostic runs for K+Q+B, K+R+B and K+B+N were stopped after an hour
+without result to save compute. Table in `docs/FINDINGS.md`; a Word copy
+was given to the owner. The full-board four-piece table under the owner's
+King (~36 GB) is the remaining gap.

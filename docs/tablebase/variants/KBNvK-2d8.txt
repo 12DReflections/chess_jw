@@ -1,0 +1,9 @@
+K+B+N vs K, 2 dimensions, side 8
+table entries 4325376, duplicate slots 105056
+legal positions: white to move 1359578, black to move 1707888
+checkmates 58, stalemates 1611, black-to-move positions drawn at once by capturing a piece 291360
+white-to-move wins 1352913 (99.51%), black-to-move losses 1398741 (81.90%)
+longest forced mate: white to move 65 plies, black to move 66 plies; passes 68
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 650712/652570 (99.72%)  1: 405025/408223 (99.22%)  2: 224900/226137 (99.45%)  3: 72276/72648 (99.49%)
+white-to-move distance histogram (plies: positions): 1:230 3:150 5:402 7:1995 9:4974 11:5649 13:6059 15:5053 17:5345 19:7034 21:11903 23:17764 25:23702 27:23793 29:17463 31:14754 33:14278 35:14975 37:15937 39:27070 41:43776 43:60617 45:72112 47:73059 49:91133 51:118729 53:159805 55:191450 57:179298 59:107435 61:32633 63:4198 65:138
+one-ply consistency against the full rules: 5000 sampled positions, 0 failures

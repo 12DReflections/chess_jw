@@ -38,7 +38,8 @@ namespace Chess4D.Tablebase
         public long Mates;
         public int MaxWtmDistance = -1, MaxBtmDistance = -1;
         public Action<string> Log = s => { };
-        public long WonLimit = 20_000_000;
+        public static long WonLimitDefault = 20_000_000;
+        public long WonLimit = WonLimitDefault;
 
         private readonly Symmetry sym;
         private readonly ThreePiece geo;
@@ -294,7 +295,11 @@ namespace Chess4D.Tablebase
                                     if (!Won.ContainsKey(wkey))
                                     {
                                         Won[wkey] = n + 1;
-                                        if (Won.Count > WonLimit) throw new InvalidOperationException("won set exceeds " + WonLimit + " positions; this material is not a sparse case");
+                                        if (Won.Count > WonLimit)
+                                        {
+                                            Log(Name + ": cap reached at distance " + (n + 1) + " plies; partial won set by the black king's distance from the nearest edge: " + LevelHistogram());
+                                            throw new InvalidOperationException("won set exceeds " + WonLimit + " positions; this material is not a sparse case");
+                                        }
                                         NewWon(pwk, pw, bk, scratch, AddLost);
                                     }
                                 }
@@ -413,6 +418,17 @@ namespace Chess4D.Tablebase
             });
             Log(Name + ": one-ply verification of all " + wonKeys.Count + " wins and " + lostKeys.Count + " losses against the full rules, " + failures.Count + " failures");
             return new List<string>(failures);
+        }
+
+
+        private string LevelHistogram()
+        {
+            var byLevel = new long[(G.Side + 1) / 2];
+            var w = new int[k];
+            foreach (var kv in Won) { Decode(kv.Key, out int wk, w, out int bk); byLevel[Centrality(bk)]++; }
+            var sb = new StringBuilder();
+            for (int l = 0; l < byLevel.Length; l++) sb.Append(l).Append(':').Append(byLevel[l]).Append(' ');
+            return sb.ToString().TrimEnd();
         }
 
         // ------------------------------------------------------------ report
