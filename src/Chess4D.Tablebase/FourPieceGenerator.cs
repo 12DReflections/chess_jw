@@ -20,21 +20,24 @@ namespace Chess4D.Tablebase
     ///
     /// The black king may capture an undefended piece, which leaves a
     /// three-piece position with White to move. Those values come from the
-    /// three-piece tables of the same geometry, solved first: a drawn one is an
-    /// escape, a won one sets a floor on the loss distance (packed above the
-    /// successor count in the counter).
+    /// three-piece tables of the same geometry, solved first.
+    ///
+    /// Storage is one byte per position and nothing else: a black-to-move
+    /// position is re-examined (all of its king moves looked up) whenever one
+    /// of its successors is solved, instead of keeping a successor counter.
+    /// That costs index computations but halves memory three times over, which
+    /// is what lets the side-5 tables fit under a reduced symmetry group.
     /// </summary>
     public sealed class FourPieceGenerator
     {
-        private const int Escape = (1 << 30) | 0x80; // the low byte never reaches zero within 32 decrements
+        public const byte Unknown = 0xFF, Illegal = 0xFE, Stalemate = 0xFD, MaxDistance = 0xF0;
 
         public readonly BoardGeometry G;
         public readonly Symmetry Sym;
         public readonly ThreePiece Geo;
         public readonly PieceType A, B;
         public readonly Generator SubA, SubB; // K+A vs K (B was captured), K+B vs K (A was captured)
-        public readonly ushort[][] Values;
-        private readonly int[][] counters;
+        public readonly byte[][] Values;
         private readonly int cells;
         private readonly int slotsPerPair;
         private int maxAssigned;
@@ -57,13 +60,11 @@ namespace Chess4D.Tablebase
             slotsPerPair = checked(cells * cells * 2);
             SubA = SolveSub(a);
             SubB = a == b ? SubA : SolveSub(b);
-            Values = new ushort[Sym.PairCount][];
-            counters = new int[Sym.PairCount][];
+            Values = new byte[Sym.PairCount][];
             for (long p = 0; p < Sym.PairCount; p++)
             {
-                Values[p] = new ushort[slotsPerPair];
-                Array.Fill(Values[p], Generator.Unknown);
-                counters[p] = new int[slotsPerPair / 2];
+                Values[p] = new byte[slotsPerPair];
+                Array.Fill(Values[p], Unknown);
             }
         }
 
@@ -102,10 +103,19 @@ namespace Chess4D.Tablebase
             slot = ((bb * cells) + bkk) * 2 + stm;
         }
 
+        /// <summary>Value in the three-piece generator's marker space (Generator.Unknown etc.), for shared verification code.</summary>
         public ushort Probe(int wk, int wa, int wb, int bk, int stm)
         {
             Index(wk, wa, wb, bk, stm, out long pair, out int slot);
-            return Values[pair][slot];
+            return Widen(Values[pair][slot]);
+        }
+
+        public static ushort Widen(byte v)
+        {
+            if (v == Unknown) return Generator.Unknown;
+            if (v == Illegal) return Generator.Illegal;
+            if (v == Stalemate) return Generator.Stalemate;
+            return v;
         }
 
         private void DecodePair(long pair, out int wk, out int wa)
@@ -127,22 +137,20 @@ namespace Chess4D.Tablebase
                 (pair, state, acc) =>
                 {
                     DecodePair(pair, out int wk, out int wa);
-                    ushort[] vals = Values[pair];
-                    int[] ctr = counters[pair];
-                    var succ = new long[G.King.Length];
+                    byte[] vals = Values[pair];
                     for (int wb = 0; wb < cells; wb++)
                     {
                         for (int bk = 0; bk < cells; bk++)
                         {
                             int wtm = ((wb * cells) + bk) * 2, btm = wtm + 1;
-                            if (wa == wk || wb == wk || wb == wa || bk == wk || bk == wa || bk == wb) { vals[wtm] = Generator.Illegal; vals[btm] = Generator.Illegal; continue; }
+                            if (wa == wk || wb == wk || wb == wa || bk == wk || bk == wa || bk == wb) { vals[wtm] = Illegal; vals[btm] = Illegal; continue; }
                             Index(wk, wa, wb, bk, 0, out long cp, out int cs);
-                            if (cp != pair || cs != wtm) { vals[wtm] = Generator.Illegal; vals[btm] = Generator.Illegal; acc[4]++; continue; }
+                            if (cp != pair || cs != wtm) { vals[wtm] = Illegal; vals[btm] = Illegal; acc[4]++; continue; }
                             bool inCheck = Attacked(wk, wa, wb, bk);
-                            if (inCheck) vals[wtm] = Generator.Illegal; else acc[0]++;
-                            if (Geo.KingsAdjacent(wk, bk)) { vals[btm] = Generator.Illegal; continue; }
+                            if (inCheck) vals[wtm] = Illegal; else acc[0]++;
+                            if (Geo.KingsAdjacent(wk, bk)) { vals[btm] = Illegal; continue; }
                             acc[1]++;
-                            int count = 0, floor = 0;
+                            int moves = 0, floor = 0;
                             bool escape = false;
                             foreach (var d in G.King)
                             {
@@ -150,31 +158,21 @@ namespace Chess4D.Tablebase
                                 if (t < 0 || t == wk) continue;
                                 if (t == wa || t == wb)
                                 {
-                                    // Capture. The line through the cell the king leaves is open, so only the white king can block the defender.
-                                    bool defended = t == wa
-                                        ? Geo.KingsAdjacent(wk, wa) || Geo.Attacks(B, wb, wa, wk)
-                                        : Geo.KingsAdjacent(wk, wb) || Geo.Attacks(A, wa, wb, wk);
-                                    if (defended) continue;
-                                    ushort sv = t == wa ? SubB.Probe(wk, wb, t, 0) : SubA.Probe(wk, wa, t, 0);
-                                    if (sv == Generator.Illegal) throw new InvalidOperationException("capture leads to an illegal three-piece position");
+                                    ushort sv = CaptureValue(wk, wa, wb, t);
+                                    if (sv == Generator.Illegal) continue; // defended: not a legal capture
+                                    moves++;
                                     if (sv >= Generator.Stalemate) { escape = true; acc[5]++; break; }
                                     if (sv + 1 > floor) floor = sv + 1;
                                     continue;
                                 }
                                 if (Attacked(wk, wa, wb, t)) continue;
-                                Index(wk, wa, wb, t, 0, out long sp, out int ss);
-                                succ[count++] = sp * slotsPerPair + ss;
+                                floor = -1; // a non-capturing legal move exists; the value waits for the passes
+                                break;
                             }
-                            if (escape) { ctr[btm >> 1] = Escape; continue; }
-                            int distinct = Distinct(succ, count);
-                            if (distinct == 0)
-                            {
-                                ctr[btm >> 1] = Escape;
-                                if (floor > 0) { vals[btm] = (ushort)floor; RaiseMax(floor); }
-                                else if (inCheck) { vals[btm] = 0; acc[2]++; }
-                                else { vals[btm] = Generator.Stalemate; acc[3]++; }
-                            }
-                            else ctr[btm >> 1] = distinct | (floor << 8);
+                            if (escape || floor < 0) continue;
+                            // No non-capturing move. Either every legal move is a winning capture for White, or there is no move at all.
+                            if (moves == 0) { if (inCheck) { vals[btm] = 0; acc[2]++; } else { vals[btm] = Stalemate; acc[3]++; } }
+                            else { if (floor > MaxDistance) throw new OverflowException("distance exceeds one byte"); vals[btm] = (byte)floor; RaiseMax(floor); }
                         }
                     }
                     return acc;
@@ -186,22 +184,26 @@ namespace Chess4D.Tablebase
                 });
             LegalWtm = legalW; LegalBtm = legalB; Mates = mates; Stalemates = stalemates; DeadSlots = dead; CaptureEscapes = capEsc;
             Iteration = 0;
-            Log("init: " + EntryCount + " entries, legal WTM " + legalW + ", legal BTM " + legalB + ", checkmates " + mates + ", stalemates " + stalemates + ", BTM positions saved by a capture " + capEsc + " in " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
+            Log("init: " + EntryCount + " entries (" + (EntryCount / 1048576) + " MB), legal WTM " + legalW + ", legal BTM " + legalB + ", checkmates " + mates + ", stalemates " + stalemates + ", BTM positions with an immediately drawing capture " + capEsc + " in " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
+        }
+
+        /// <summary>Value of the three-piece position after the black king captures the piece on <paramref name="t"/>, or Generator.Illegal if the piece is defended.</summary>
+        private ushort CaptureValue(int wk, int wa, int wb, int t)
+        {
+            // The line through the cell the king leaves is open, so only the white king can block the defender.
+            bool defended = t == wa
+                ? Geo.KingsAdjacent(wk, wa) || Geo.Attacks(B, wb, wa, wk)
+                : Geo.KingsAdjacent(wk, wb) || Geo.Attacks(A, wa, wb, wk);
+            if (defended) return Generator.Illegal;
+            ushort sv = t == wa ? SubB.Probe(wk, wb, t, 0) : SubA.Probe(wk, wa, t, 0);
+            if (sv == Generator.Illegal) throw new InvalidOperationException("capture leads to an illegal three-piece position");
+            return sv;
         }
 
         private void RaiseMax(int v)
         {
             int cur;
             while (v > (cur = Volatile.Read(ref maxAssigned)) && Interlocked.CompareExchange(ref maxAssigned, v, cur) != cur) { }
-        }
-
-        private static int Distinct(long[] a, int count)
-        {
-            if (count <= 1) return count;
-            Array.Sort(a, 0, count);
-            int d = 1;
-            for (int i = 1; i < count; i++) if (a[i] != a[i - 1]) d++;
-            return d;
         }
 
         // ------------------------------------------------------------ retrograde passes
@@ -221,35 +223,34 @@ namespace Chess4D.Tablebase
         private long Pass(int nValue)
         {
             var sw = Stopwatch.StartNew();
-            ushort n = (ushort)nValue;
+            byte n = (byte)nValue;
             long solved = 0;
             var opts = new ParallelOptions { MaxDegreeOfParallelism = Threads };
             Parallel.For(0L, Sym.PairCount, opts,
                 () => 0L,
                 (pair, state, acc) =>
                 {
-                    ushort[] vals = Values[pair];
-                    long[] preds = null;
+                    byte[] vals = Values[pair];
                     int wk = -1, wa = -1;
                     for (int slot = 0; slot < vals.Length; slot++)
                     {
                         if (vals[slot] != n) continue;
-                        if (preds == null) { preds = new long[G.King.Length]; DecodePair(pair, out wk, out wa); }
+                        if (wk < 0) DecodePair(pair, out wk, out wa);
                         int stm = slot & 1, rest = slot >> 1;
                         int bk = rest % cells, wb = rest / cells;
-                        if (stm == 1) acc += WhitePredecessors(wk, wa, wb, bk, (ushort)(n + 1));
-                        else acc += BlackPredecessors(wk, wa, wb, bk, n + 1, preds);
+                        if (stm == 1) acc += WhitePredecessors(wk, wa, wb, bk, (byte)(n + 1));
+                        else acc += BlackPredecessors(wk, wa, wb, bk);
                     }
                     return acc;
                 },
                 acc => Interlocked.Add(ref solved, acc));
-            if (solved > 0 || nValue % 10 == 0) Log("pass " + nValue + ": solved " + solved + " positions with distance " + (nValue + 1) + " in " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
-            if (nValue + 1 > Generator.MaxDistance) throw new OverflowException("distance exceeds the two-byte range");
+            if (solved > 0 || nValue % 10 == 0) Log("pass " + nValue + ": solved " + solved + " positions in " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
+            if (nValue + 1 > MaxDistance) throw new OverflowException("distance exceeds one byte");
             return solved;
         }
 
         /// <summary>The position is lost for Black in n-1 and was reached by a White move: every legal White-to-move predecessor wins in n.</summary>
-        private long WhitePredecessors(int wk, int wa, int wb, int bk, ushort n)
+        private long WhitePredecessors(int wk, int wa, int wb, int bk, byte n)
         {
             long solved = 0;
             foreach (var d in G.King)
@@ -263,7 +264,7 @@ namespace Chess4D.Tablebase
             return solved;
         }
 
-        private long PiecePredecessors(PieceType type, int from, bool isA, int wk, int wa, int wb, int bk, ushort n)
+        private long PiecePredecessors(PieceType type, int from, bool isA, int wk, int wa, int wb, int bk, byte n)
         {
             long solved = 0;
             if (type == PieceType.Knight)
@@ -291,57 +292,75 @@ namespace Chess4D.Tablebase
             return solved;
         }
 
-        private long MarkWin(int wk, int wa, int wb, int bk, ushort n)
+        private long MarkWin(int wk, int wa, int wb, int bk, byte n)
         {
             Index(wk, wa, wb, bk, 0, out long pair, out int slot);
-            ushort[] vals = Values[pair];
-            if (vals[slot] != Generator.Unknown) return 0;
-            vals[slot] = n;
+            byte[] vals = Values[pair];
+            if (vals[slot] != Unknown) return 0;
+            vals[slot] = n; // every writer in a pass writes the same number
             return 1;
         }
 
-        /// <summary>The position is won for White in n-1 and was reached by a black king move: each distinct canonical predecessor loses one escape.</summary>
-        private long BlackPredecessors(int wk, int wa, int wb, int bk, int n, long[] preds)
+        /// <summary>The position is won for White and was reached by a black king move from p: p is lost if every legal black move from it now leads to a won position.</summary>
+        private long BlackPredecessors(int wk, int wa, int wb, int bk)
         {
-            int count = 0;
+            long solved = 0;
             foreach (var d in G.King)
             {
                 int p = G.Step(bk, d);
                 if (p < 0 || p == wk || p == wa || p == wb) continue;
                 if (Geo.KingsAdjacent(wk, p)) continue;
-                Index(wk, wa, wb, p, 1, out long pp, out int ps);
-                preds[count++] = pp * slotsPerPair + ps;
-            }
-            if (count > 1) Array.Sort(preds, 0, count);
-            long solved = 0, prev = -1;
-            for (int i = 0; i < count; i++)
-            {
-                long q = preds[i];
-                if (q == prev) continue;
-                prev = q;
-                long pair = q / slotsPerPair;
-                int slot = (int)(q % slotsPerPair);
-                if (Values[pair][slot] != Generator.Unknown) continue;
-                int left = Interlocked.Decrement(ref counters[pair][slot >> 1]);
-                if ((left & 0xFF) != 0 || (left & (1 << 30)) != 0) continue;
-                int v = Math.Max(n, left >> 8);
-                Values[pair][slot] = (ushort)v;
-                if (v > n) RaiseMax(v);
+                Index(wk, wa, wb, p, 1, out long pair, out int slot);
+                if (Values[pair][slot] != Unknown) continue;
+                int v = LossDistance(wk, wa, wb, p);
+                if (v < 0) continue;
+                if (v > MaxDistance) throw new OverflowException("distance exceeds one byte");
+                Values[pair][slot] = (byte)v; // idempotent: every evaluation of p computes the same number
+                RaiseMax(v);
                 solved++;
             }
             return solved;
+        }
+
+        /// <summary>Plies to mate for Black to move from this position if every legal move leads to a won position, else -1.</summary>
+        private int LossDistance(int wk, int wa, int wb, int bk)
+        {
+            int worst = -1;
+            foreach (var d in G.King)
+            {
+                int t = G.Step(bk, d);
+                if (t < 0 || t == wk) continue;
+                int v;
+                if (t == wa || t == wb)
+                {
+                    ushort sv = CaptureValue(wk, wa, wb, t);
+                    if (sv == Generator.Illegal) continue;
+                    if (sv >= Generator.Stalemate) return -1;
+                    v = sv;
+                }
+                else
+                {
+                    if (Attacked(wk, wa, wb, t)) continue;
+                    Index(wk, wa, wb, t, 0, out long pair, out int slot);
+                    byte b = Values[pair][slot];
+                    if (b >= Stalemate) return -1; // unknown (not yet won) or a marker: Black escapes for now
+                    v = b;
+                }
+                if (v > worst) worst = v;
+            }
+            return worst < 0 ? -1 : worst + 1;
         }
 
         private void Finish()
         {
             long wins = 0, losses = 0;
             int maxW = -1, maxB = -1;
-            foreach (ushort[] vals in Values)
+            foreach (byte[] vals in Values)
             {
                 for (int s = 0; s < vals.Length; s++)
                 {
-                    ushort v = vals[s];
-                    if (v >= Generator.Stalemate) continue;
+                    byte v = vals[s];
+                    if (v >= Stalemate) continue;
                     if ((s & 1) == 0) { wins++; if (v > maxW) maxW = v; } else { losses++; if (v > maxB) maxB = v; }
                 }
             }
@@ -366,7 +385,7 @@ namespace Chess4D.Tablebase
               .Append(" vs K, ").Append(G.Dimensions).Append(" dimensions, side ").Append(G.Side).Append(RuleText(G)).Append('\n');
             sb.Append("table entries ").Append(EntryCount).Append(", duplicate slots ").Append(DeadSlots * 2).Append('\n');
             sb.Append("legal positions: white to move ").Append(LegalWtm).Append(", black to move ").Append(LegalBtm).Append('\n');
-            sb.Append("checkmates ").Append(Mates).Append(", stalemates ").Append(Stalemates).Append(", black-to-move positions drawn at once by capturing a piece ").Append(CaptureEscapes).Append('\n');
+            sb.Append("checkmates ").Append(Mates).Append(", stalemates ").Append(Stalemates).Append(", black-to-move positions with an immediately drawing capture ").Append(CaptureEscapes).Append('\n');
             sb.Append("white-to-move wins ").Append(Wins).Append(" (").Append(Percent(Wins, LegalWtm)).Append("%), black-to-move losses ").Append(Losses).Append(" (").Append(Percent(Losses, LegalBtm)).Append("%)\n");
             sb.Append("longest forced mate: white to move ").Append(MaxWtmDistance).Append(" plies, black to move ").Append(MaxBtmDistance).Append(" plies; passes ").Append(Iteration).Append('\n');
 
@@ -375,14 +394,14 @@ namespace Chess4D.Tablebase
             var hist = new SortedDictionary<int, long>();
             for (long pair = 0; pair < Sym.PairCount; pair++)
             {
-                ushort[] vals = Values[pair];
+                byte[] vals = Values[pair];
                 for (int s = 0; s < vals.Length; s += 2)
                 {
-                    ushort v = vals[s];
-                    if (v == Generator.Illegal) continue;
+                    byte v = vals[s];
+                    if (v == Illegal) continue;
                     int lvl = Centrality((s >> 1) % cells);
                     legal[lvl]++;
-                    if (v < Generator.Stalemate) { won[lvl]++; hist.TryGetValue(v, out long c); hist[v] = c + 1; }
+                    if (v < Stalemate) { won[lvl]++; hist.TryGetValue(v, out long c); hist[v] = c + 1; }
                 }
             }
             sb.Append("white-to-move wins by the black king's distance from the nearest edge (canonical positions):");
@@ -410,7 +429,7 @@ namespace Chess4D.Tablebase
             {
                 long pair = rng.NextInt64(Sym.PairCount);
                 int slot = rng.Next(slotsPerPair);
-                ushort v = Values[pair][slot];
+                ushort v = Widen(Values[pair][slot]);
                 if (v == Generator.Illegal) continue;
                 DecodePair(pair, out int wk, out int wa);
                 int stm = slot & 1, bk = (slot >> 1) % cells, wb = (slot >> 1) / cells;
