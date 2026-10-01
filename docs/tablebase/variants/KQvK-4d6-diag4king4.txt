@@ -1,0 +1,8 @@
+K+Q vs K, 4 dimensions, side 6, rule variant: diagonals up to 4 axes, king up to 4 axes
+symmetry group order 384, king classes 15, canonical (king, piece) pairs 5985, table entries 15513120 of which 3508200 are duplicate slots (unreduced black king under the pair stabiliser)
+legal positions: white to move 5243492, black to move 5727795
+checkmates 286, stalemates 0
+white-to-move wins 5243492 (100.00%), black-to-move losses 5502865
+longest forced mate: white to move 27 plies (14 moves), black to move 28 plies
+passes 30
+white-to-move distance histogram (plies: positions): 1:13583 3:24577 5:41595 7:17149 9:3294 11:24005 13:24351 15:91023 17:381389 19:710899 21:3382385 23:496057 25:33021 27:164

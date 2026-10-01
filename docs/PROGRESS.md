@@ -716,3 +716,16 @@ both 100% won, longest 36 moves (K+Q+R) and 15 moves (K+Q+B). The K+Q+R
 length nearly doubled from side 4, so on 8^4 it likely exceeds fifty moves;
 K+Q+B grew from 11 to 15 and is the practical mating pair. FINDINGS table
 updated; summaries under `docs/tablebase/variants/`.
+
+### 2026-10-02 — Literature search
+
+Owner asked for prior work on 4D mating material before any publication.
+Result in `docs/LITERATURE.md`: the difficulty of mating in 4D is known
+among variant designers (Parton, Joyce, Aikin, Reiniger) and the orthogonal
+King has precedent (Chesseract), but no exhaustive 4D result was found; the
+only tablebase work is H. G. Muller's for 3D Raumschach (2014). Our
+generator reproduces his "KQK is won" (8 moves on 5x5x5) and confirms the
+Reiniger/Joyce 4x4x4x4 observation. New finding from the cross-check: with
+80-direction King and Queen, K+Q wins at sides 4, 5 and 6 (4, 8, 14 moves)
+and is a draw at 7 and 8, so Reiniger's "any size board" conjecture is
+false. Search limits recorded in the file (web only; some pages 403).
