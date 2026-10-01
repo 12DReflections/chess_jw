@@ -701,3 +701,18 @@ without result to save compute. Table in `docs/FINDINGS.md`; a Word copy
 was given to the owner. The full-board four-piece table under the owner's
 King is the remaining gap: about 9 trillion entries at the current indexing
 (an earlier note said 36 GB; that was an arithmetic slip).
+
+### 2026-10-01 — 5^4 four-piece tables under the owner's King
+
+Owner asked whether the full-board four-piece question could be made
+calculable. Answer recorded: pruning White's moves is sound (a "cage"
+tablebase, a day or two of work), pruning Black's is not; the cheap hedge
+is the next board size. `FourPieceGenerator` rewritten to one byte per
+position with no successor counters (lost positions are re-examined when a
+successor is solved); identical results at 2D and 4^4, 8 tests green.
+Then K+Q+R and K+Q+B against the owner's King on 5^4 (6.5 billion entries,
+6.2 GB each, about 35 minutes each, 5,000-sample consistency 0 failures):
+both 100% won, longest 36 moves (K+Q+R) and 15 moves (K+Q+B). The K+Q+R
+length nearly doubled from side 4, so on 8^4 it likely exceeds fifty moves;
+K+Q+B grew from 11 to 15 and is the practical mating pair. FINDINGS table
+updated; summaries under `docs/tablebase/variants/`.

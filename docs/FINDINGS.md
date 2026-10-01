@@ -270,10 +270,10 @@ stated. The owner's King is the 12-move board-King above.
 | White vs lone King | Settled King (32), 8^4 | Owner's King (12) | 2D chess |
 |---|---|---|---|
 | K+Q | not possible | not possible (8^4 exact); win in 8 moves with a 3-axis Queen | 10 moves |
-| K+Q+R | not possible | win on 4^4 in 19 moves; on 8^4 over 2 million mates in one exist, about 950 of them with the King 2-3 cells from every edge, but the forced length is not computable here (a table under the 64-element group is about 9 trillion entries at the current indexing) | 6 moves |
+| K+Q+R | not possible | **win on 4^4 (19 moves) and on 5^4 (36 moves, every one of 2.13 billion positions, central ones included)**; 8^4 not computable here (about 9 trillion entries), but over 2 million mates in one exist there, about 950 with the King 2-3 cells from every edge | 6 moves |
 | K+R+R | not possible | not possible (8^4 exact: 5,764 mates in one, edge only) | 7 moves |
 | K+R+B | not possible | not forced on 4^4 (0.04%); 8^4 unresolved (won set passed 2 million) | 16 moves |
-| K+Q+B | not possible | win on 4^4 in 11 moves; 8^4 not computable here, likely win | 8 moves |
+| K+Q+B | not possible | **win on 4^4 (11 moves) and on 5^4 (15 moves, every one of 2.08 billion positions)**; 8^4 not computable here, likely win | 8 moves |
 | K+B+B | not possible (no mate exists) | not possible on 8^4 (exact: 1,081,121 won classes, all on an edge, longest 11 moves), although 4^4 is a 25-move win with opposite-parity Bishops | 19 moves (opposite colours) |
 | K+N+N | not possible | not possible (8^4 exact: 53,425 won, edge only) | not possible |
 | K+B+N | not possible | not forced on 4^4 (0.06%); 8^4 unresolved (won set passed 2 million) | 33 moves |
@@ -283,6 +283,17 @@ The 2D column reproduces the published values (K+Q 10, K+B+B 19, K+B+N
 the other columns. The K+B+B row is the warning against reading 4^4 as 8^4:
 a small-board win can vanish on the full board, so the K+Q+R and K+Q+B
 wins are marked likely, not confirmed, until a full-board table is run.
+
+The 5^4 tables (2026-10-01, one byte per position, 6.5 billion entries
+each, 36 and 35 minutes) strengthen both: at side 5 every legal position is
+still won, including the 3.4 million with the King two cells from every
+edge, so the win is not an edge effect. The mate lengths differ sharply.
+K+Q+B grows slowly (11 moves at side 4, 15 at side 5) and should stay
+practical at side 8. K+Q+R nearly doubles (19 then 36 moves): the Rook's
+lines are nearly useless in 4D, so the Queen does the herding alone and the
+Rook's job reduces to covering the last cells; extrapolated to side 8 the
+longest K+Q+R mate would exceed a fifty-move rule. Under the owner's King,
+Queen and Bishop is the practical mating pair, not Queen and Rook.
 Summaries under `docs/tablebase/variants/`.
 
 ### The cover inequality: why this King cannot be mated away from an edge
