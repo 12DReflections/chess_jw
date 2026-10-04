@@ -384,21 +384,37 @@ choice for self-play, not a mating question. The tables for the variant are repr
 with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
 summaries for every variant tried are under `docs/tablebase/variants/`.
 
-## Against the published claims (2026-10-04)
+## Relation to the published work (2026-10-04)
 
 `docs/LITERATURE.md` section 8 tabulates every printed claim about mating
 material in 3D and 4D chess that could be tested here, with the result.
-Two matter most. Rinaldi and Chiru (*AppliedMath* 2026), the only refereed
-paper on 8x8x8x8 chess, state that K+Q and K+R beat a lone King under a
-two-axis Queen and a Chebyshev (80-move) King; under exactly those
-definitions neither ending has a single checkmate position on 8^4, 4^4 or
-5^4. Joe Joyce's 2004 claim that K+3Q cannot force mate against his
-16-move Hyperchess King on 4x4x4x4, with a concrete position, is confirmed
-exactly: the position is a draw with either side to move, and only about
-0.6% of positions are won (longest mate 70 moves). H. G. Muller's 2014
-Raumschach result "KQK is won" is reproduced (8 moves on 5x5x5), and the
-variant designers' 4x4x4x4 full-king K+Q win is confirmed (4 moves) while
-the conjecture that it holds "on any size board" fails from side 7.
+The natural predecessor of this project is Rinaldi and Chiru, *AppliedMath*
+6(3):48 (2026): the same 8x8x8x8 board and the same two-axis Queen, with a
+Chebyshev (80-move) King. They set up the framework, posed the endgame
+question and answered it empirically, by engine-assisted play from random
+placements and an informal strategy sketch, labelling the results
+"empirical demonstrations rather than formal proofs". This project extends
+that work to exhaustive computation at the current limit of what is
+tractable: three-piece endings solved exactly on 8^4, four-piece endings
+exactly on 4^4 and 5^4 and bounded on 8^4, the cover inequality as the
+hand-checkable half, and the frontier (full-board four-piece tables under
+reduced symmetry) stated.
+
+One finding bears directly on their section 5.3. Under their Definitions 7
+and 9 as implemented here, K+Q vs K and K+R vs K have no checkmate
+position on 8^4, 4^4 or 5^4, so the engine-assisted demonstrations cannot
+have ended in checkmate under those definitions; a rule or win criterion
+the paper does not state must have been in play. This is reported as a
+finding that invites clarification, not as a judgement of the paper.
+
+The variant designers' printed claims all check out exactly where
+testable: Muller's 2014 Raumschach "KQK is won" (8 moves on 5x5x5); the
+4x4x4x4 full-King K+Q win (4 moves) of Pacey, Reiniger and Joyce, together
+with the observation that it does not extend past side 6; Aikin's
+orthogonal-King K+Q (20 moves on 4^4); and Joyce's 2004 position (BK 3333,
+WK 1122, WQ 1111 1112 1121), which is a draw with either side to move
+exactly as he said, with K+3Q winning only about 0.6% of positions under
+his rules (longest mate 70 moves).
 
 ## Formal statement and the counting bound (2026-09-19)
 

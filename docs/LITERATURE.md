@@ -23,12 +23,19 @@ coverage of the king's 32 escape cells (20 for K+Q, 25 for K+Q+R).
 
 ## 0. Summary
 
-1. **No exhaustive or proved result on four-dimensional mating material
-   exists in print.** The one refereed 8^4 chess paper (Rinaldi and Chiru
-   2026) uses this project's two-axis queen with a full 80-move king and
-   offers an informal "strategy sketch" that K+R, and empirically K+Q, win.
-   Section 8 shows that under their ruleset K+Q and K+R have **no checkmate
-   position at all** on 8^4 (nor on 4^4 or 5^4); the claim is false.
+1. **No exhaustive result on four-dimensional mating material exists in
+   print.** The one refereed 8^4 chess paper (Rinaldi and Chiru 2026) sets
+   up the board and ruleset, poses the endgame question, and answers it
+   empirically with engine-assisted play and an informal strategy sketch
+   (K+R "plausibly" wins; K+Q tested likewise). This project extends that
+   work to exhaustive computation: three-piece endings solved exactly on
+   8^4, four-piece endings exactly on small boards, and the frontier
+   stated. One finding bears directly on their section 5.3: under their
+   Definitions 7 and 9 as implemented here, K+Q and K+R have no checkmate
+   position on 8^4 (nor on 4^4 or 5^4), so their engine-assisted
+   demonstrations must have used a different criterion or rule; the point
+   is reported as a finding inviting clarification, not as a verdict on
+   their paper.
 2. **The phenomenon is old folklore in the variant literature.** Maack
    (1908) wrote that mating is "decidedly harder in space" and proposed
    restricting the bare king; Beasley (2007) wrote that in three dimensions
@@ -439,7 +446,8 @@ Academic treatments of higher-dimensional chess:
   win in 4D; informal strategy sketch)", with a rook "on a controlling
   hyperplane"; "not a complete proof". No retrograde analysis or tablebase.
   Does not cite Maack, Dawson, Pritchard, Reiniger, Evans-Hamkins or Ripa.
-  **Refuted in section 8.**
+  The natural predecessor of this project: same board, same queen; the
+  endgame question it raises is answered exhaustively here (section 8).
 - Ripa, M. (2026). Metric spaces in chess and international chess pieces
   graph diameters. *Recreational Math. Mag.* 13(22):31-65.
   doi:10.2478/rmm-2026-0003. arXiv:2311.00016. [full text, definitions]
@@ -476,15 +484,21 @@ purpose (`--diag`, `--king`, `--boardking`, `--pairdiag`).
 | Reiniger 2010: K+Q "can mate a lone K on any size board" | 80/80, sides 4-8 | win at sides 4, 5, 6 (4, 8, 14 moves); 0.40% at 7, 0.11% at 8 | **false**: threshold between 6 and 7 |
 | Aikin (Chesseract): orthogonal king, two-axis queen | 4^4 | K+Q wins every position, longest 20 moves (on 8^4 the same rules give 0.02%) | consistent with a playable 4^4 game |
 | Joyce 2004: Hyperchess K+3Q v K drawn; the given position | 4^4, pair diagonals, group order 128 | K+Q: no checkmate exists; K+2Q: 494 won classes, mates in one only; K+3Q: 8,029,990 won classes of about 1.4 x 10^9, longest 139 plies (70 moves); the position BK 3333, WK 1122, WQ 1111 1112 1121 is a **draw with either side to move** | agrees exactly |
-| Rinaldi and Chiru 2026: K+Q and K+R win on 8^4 (engine-assisted; Prop. 6) | 8^4, two-axis sliders, 80-move Chebyshev king (their definitions) | **K+Q: zero checkmate positions, zero stalemates. K+R: zero checkmate positions.** Also zero on 4^4 and 5^4 | **refuted**: no mate can exist, so no engine can have found one under their stated rules |
+| Rinaldi and Chiru 2026, section 5.3: engine-assisted K+Q and K+R wins on 8^4; Prop. 6 (informal) | 8^4, two-axis sliders, 80-move Chebyshev king (their Definitions 7 and 9) | **K+Q: zero checkmate positions, zero stalemates. K+R: zero checkmate positions.** Also zero on 4^4 and 5^4 | does not reproduce under the written definitions; clarification sought (see below) |
 
 Reading of the last row: with an 80-move king every interior cell has 80
 escapes and a corner cell 15; the two-axis queen and the white king
-together cannot cover even the corner's 15, so there is no checkmate
-position at all. Their engine's "winning continuations" cannot have been
-checkmates under the rules as written in their Definitions 7 and 9;
-either the engine used different rules (for instance a multi-king loss
-condition) or the search reported something other than mate.
+together cannot cover even the corner's 15, so no checkmate position
+exists. The engine-assisted "winning continuations" of their section 5.3
+therefore cannot have ended in checkmate under Definitions 7 and 9 as
+written; the likely explanations are a rule the paper does not state (a
+narrower king, a different queen), a win criterion other than checkmate
+(king capture, or the multi-king loss rule of their start position), or a
+heuristic score read as a win. Their engine is public; reading it would
+settle which. None of this touches the paper's framework results, and the
+authors label their endgame material as "empirical demonstrations rather
+than formal proofs". This project should be read as taking up that
+invitation.
 
 ## 9. Gaps in this review
 

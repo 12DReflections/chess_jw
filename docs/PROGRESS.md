@@ -741,11 +741,13 @@ Gibbins, Parton, Pritchard/Beasley 2007, Reiniger, the variant designers'
 primary rule pages, and Rinaldi & Chiru 2026 in full). Written up in
 `docs/LITERATURE.md` with per-item read flags and a list of gaps.
 
-Headline: no exhaustive or proved 4D mating-material result exists in
-print. The one refereed 8^4 paper claims K+Q and K+R win (engine-assisted,
-"informal sketch"); under its own definitions (two-axis sliders,
-Chebyshev 80-move king) our tables show **no checkmate position exists at
-all** for either ending on 8^4, 4^4 or 5^4. Also checked exactly: Muller's
+Headline: no exhaustive 4D mating-material result exists in print. The
+one refereed 8^4 paper (Rinaldi & Chiru 2026) is the natural predecessor:
+same board, same two-axis Queen, endgames treated empirically. This
+project is framed as extending it to exhaustive computation. Under its
+Definitions 7 and 9 (two-axis sliders, Chebyshev 80-move King) our tables
+find no checkmate position for K+Q or K+R on 8^4, 4^4 or 5^4, reported as a
+finding inviting clarification rather than a verdict. Also checked exactly: Muller's
 3D Raumschach "KQK is won" (agrees, 8 moves); the 4x4x4x4 full-king K+Q
 win (agrees, 4 moves) and its failure from side 7 up; Aikin's Chesseract
 K+Q (win, 20 moves on 4^4); Joyce's Hyperchess K+3Q draw and his exact
@@ -760,3 +762,12 @@ handles the pair-swapping group (order 128); `ThreePiece` King rule fixed
 for pair diagonals (it had let the King take cross-pair diagonals, caught
 by the consistency check); `sparse --probe` to query a position. 121
 tests green. Summaries under `docs/tablebase/variants/`.
+
+### 2026-10-04 — Framing decision
+
+Owner's direction: the work is an extension of Rinaldi & Chiru (2026)
+into the computability of 4D endgames, not a refutation; no claim is made
+that mate is impossible with enough material. "Refuted"/"false" wording
+removed from LITERATURE.md and FINDINGS.md; the K+Q/K+R discrepancy is
+stated as a reproducibility finding with the likely explanations and an
+invitation to clarify. Checking their public engine code is now optional.
