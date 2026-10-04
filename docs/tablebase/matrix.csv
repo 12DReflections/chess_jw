@@ -76,3 +76,52 @@ board-king-5,"(4, 5; {1,2}; {1}; boardKing)",N,4,5,5x5x5x5,dense3,3821099,0,0.00
 board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QQ,4,5,5x5x5x5,dense4,2024366658,2024366658,100.000,797379,23,forced win,"consistency 5000 samples, 0 failures",generate4 QQ --dims 4 --side 5 --diag 2 --boardking
 board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QR,4,5,5x5x5x5,dense4,2126266504,2126266504,100.000,149163,71,forced win,"consistency 5000 samples, 0 failures",generate4 QR --dims 4 --side 5 --diag 2 --boardking
 board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QB,4,5,5x5x5x5,dense4,2081821140,2081821140,100.000,226550,29,forced win,"consistency 5000 samples, 0 failures",generate4 QB --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QN,4,5,5x5x5x5,dense4,2102783089,2102783089,100.000,186889,53,forced win,"consistency 5000 samples, 0 failures",generate4 QN --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",RR,4,5,5x5x5x5,dense4,2233042890,1277,0.000,138,1,not forced,"consistency 5000 samples, 0 failures",generate4 RR --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",RB,4,5,5x5x5x5,dense4,2186699580,108123,0.005,586,21,not forced,"consistency 5000 samples, 0 failures",generate4 RB --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",RN,4,5,5x5x5x5,dense4,2208240893,3317,0.000,370,3,not forced,"consistency 5000 samples, 0 failures",generate4 RN --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",BB,4,5,5x5x5x5,dense4,2140658326,151744,0.007,1958,21,not forced,"consistency 5000 samples, 0 failures",generate4 BB --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",BN,4,5,5x5x5x5,dense4,2162238159,114995,0.005,1204,29,not forced,"consistency 5000 samples, 0 failures",generate4 BN --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",NN,4,5,5x5x5x5,dense4,2183501892,29571,0.001,748,9,not forced,"consistency 5000 samples, 0 failures",generate4 NN --dims 4 --side 5 --diag 2 --boardking
+hyperchess,"(4, 4; pair; pair)",Q,4,4,4x4x4x4,dense3,120792,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",R,4,4,4x4x4x4,dense3,124959,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",B,4,4,4x4x4x4,dense3,127311,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",N,4,4,4x4x4x4,dense3,122398,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",QQ,4,4,4x4x4x4,dense4,27178812,985,0.004,116,1,not forced,"consistency 5000 samples, 0 failures",generate4 QQ --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",QR,4,4,4x4x4x4,dense4,28017853,202,0.001,23,1,not forced,"consistency 5000 samples, 0 failures",generate4 QR --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",QB,4,4,4x4x4x4,dense4,28591784,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 QB --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",QN,4,4,4x4x4x4,dense4,27368113,581,0.002,61,1,not forced,"consistency 5000 samples, 0 failures",generate4 QN --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",RR,4,4,4x4x4x4,dense4,28878435,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 RR --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",RB,4,4,4x4x4x4,dense4,29475934,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 RB --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",RN,4,4,4x4x4x4,dense4,28209132,35,0.000,5,1,not forced,"consistency 5000 samples, 0 failures",generate4 RN --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",BB,4,4,4x4x4x4,dense4,30063577,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 BB --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",BN,4,4,4x4x4x4,dense4,28778327,15,0.000,4,1,not forced,"consistency 5000 samples, 0 failures",generate4 BN --dims 4 --side 4 --diag 2 --pairdiag
+hyperchess,"(4, 4; pair; pair)",NN,4,4,4x4x4x4,dense4,27538212,220,0.001,14,1,not forced,"consistency 5000 samples, 0 failures",generate4 NN --dims 4 --side 4 --diag 2 --pairdiag
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",Q,3,5,5x5x5,dense3,26307,26307,100.000,55,15,forced win,"consistency 5000 samples, 0 failures",generate Q --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",R,3,5,5x5x5,dense3,32631,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",B,3,5,5x5x5,dense3,30069,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",N,3,5,5x5x5,dense3,33145,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",QQ,3,5,5x5x5,dense4,2292020,2292020,100.000,51348,9,forced win,"consistency 5000 samples, 0 failures",generate4 QQ --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",QR,3,5,5x5x5,dense4,2813459,2813459,100.000,11617,15,forced win,"consistency 5000 samples, 0 failures",generate4 QR --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",QB,3,5,5x5x5,dense4,2601970,2601970,100.000,17994,11,forced win,"consistency 5000 samples, 0 failures",generate4 QB --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",QN,3,5,5x5x5,dense4,2844450,2844450,100.000,11228,15,forced win,"consistency 5000 samples, 0 failures",generate4 QN --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",RR,3,5,5x5x5,dense4,3449092,27930,0.810,128,19,not forced,"consistency 5000 samples, 0 failures",generate4 RR --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",RB,3,5,5x5x5,dense4,3194117,3190982,99.902,174,33,not forced,"consistency 5000 samples, 0 failures",generate4 RB --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",RN,3,5,5x5x5,dense4,3481692,13283,0.382,15,31,not forced,"consistency 5000 samples, 0 failures",generate4 RN --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",BB,3,5,5x5x5,dense4,2942738,2942738,100.000,906,23,forced win,"consistency 5000 samples, 0 failures",generate4 BB --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",BN,3,5,5x5x5,dense4,3217728,3213786,99.877,204,35,not forced,"consistency 5000 samples, 0 failures",generate4 BN --dims 3 --side 5 --diag 3
+raumschach,"(3, 5; {1,2,3}; {1,2,3})",NN,3,5,5x5x5,dense4,3504803,168,0.005,14,1,not forced,"consistency 5000 samples, 0 failures",generate4 NN --dims 3 --side 5 --diag 3
+orthogonal-king,"(4, 8; {1,2,3}; {1})",Q,4,8,8x8x8x8,dense3,176657908,176657908,100.000,20056,15,forced win,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",R,4,8,8x8x8x8,dense3,181353746,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",B,4,8,8x8x8x8,dense3,177993704,177993704,100.000,8,159,forced win,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",N,4,8,8x8x8x8,dense3,181273844,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",QQ,4,8,8x8x8x8,implied,,,,,,forced win (implied: K+Q alone is a forced win under this ruleset; not separately tabulated),,generate Q --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",QR,4,8,8x8x8x8,implied,,,,,,forced win (implied: K+Q alone is a forced win under this ruleset; not separately tabulated),,generate Q --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",QB,4,8,8x8x8x8,implied,,,,,,forced win (implied: K+Q alone is a forced win under this ruleset; not separately tabulated),,generate Q --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",QN,4,8,8x8x8x8,implied,,,,,,forced win (implied: K+Q alone is a forced win under this ruleset; not separately tabulated),,generate Q --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",RR,4,8,8x8x8x8,sparse,,8416 classes,,722,1,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse RR --dims 4 --side 8 --diag 3 --king 1
+orthogonal-king,"(4, 8; {1,2,3}; {1})",RB,4,8,8x8x8x8,sparse,,> 300000 classes,,,,won set exceeds the sparse cap (likely win; dense table needed),,sparse RB --dims 4 --side 8 --diag 3 --king 1 --cap 300000
+orthogonal-king,"(4, 8; {1,2,3}; {1})",RN,4,8,8x8x8x8,sparse,,> 300000 classes,,,,won set exceeds the sparse cap (likely win; dense table needed),,sparse RN --dims 4 --side 8 --diag 3 --king 1 --cap 300000
+orthogonal-king,"(4, 8; {1,2,3}; {1})",BB,4,8,8x8x8x8,sparse,,> 300000 classes,,,,won set exceeds the sparse cap (likely win; dense table needed),,sparse BB --dims 4 --side 8 --diag 3 --king 1 --cap 300000
+orthogonal-king,"(4, 8; {1,2,3}; {1})",BN,4,8,8x8x8x8,sparse,,> 300000 classes,,,,won set exceeds the sparse cap (likely win; dense table needed),,sparse BN --dims 4 --side 8 --diag 3 --king 1 --cap 300000
+orthogonal-king,"(4, 8; {1,2,3}; {1})",NN,4,8,8x8x8x8,sparse,,14681 classes,,1529,1,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse NN --dims 4 --side 8 --diag 3 --king 1

@@ -783,3 +783,17 @@ Table and readings in `docs/FINDINGS.md`. Muller's 2014 Raumschach mate
 lengths (K+R+R 10, K+R+N 16) reproduced exactly. Under the 2026 paper's
 80-move King nothing up to two pieces has a checkmate on 8^4 except
 cooperative K+Q+Q corner mates. Logs under `docs/tablebase/matrix/`.
+
+### 2026-10-04 (evening) — Reproducible dataset complete
+
+`Chess4D.Tablebase matrix` rebuilt every cell from the registry:
+`docs/tablebase/matrix.csv`, 126 cells (nine ruleset rows x fourteen
+material sets), 172 minutes, zero verification failures, each row with its
+command. Two build fixes on the way: quoted CSV fields broke resume
+detection (recomputed cells; fixed with a proper CSV parser and a dedupe),
+and 8^4 two-piece cells under reduced symmetry would have taken hours each
+to hit the sparse cap (now: Queen pairs implied when K+Q alone wins, early
+cap otherwise, and the owner's King's pairs moved to a 5^4 registry entry).
+New exact results: owner's King on 5^4, K+Q+Q 12 moves, K+Q+N 27, all
+queenless pairs draws. FINDINGS matrix section regenerated from the CSV;
+PAPER.md updated.

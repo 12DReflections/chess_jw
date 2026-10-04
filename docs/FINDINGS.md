@@ -430,29 +430,37 @@ and Queen cannot checkmate a lone King at all, not even with cooperation.
 
 ## Cross-validation matrix: every ruleset in the literature, every material set (2026-10-04)
 
-The rulesets below are the tuples (d, n; D_Q, D_K) of `docs/LITERATURE.md`:
-d dimensions, side n, D_Q the axis-counts a slider may change per step,
-D_K the same for the King. Each cell is an exact table on the variant's
-native board: three-piece endings by the dense generator (or the sparse
-solver where the dense table overflows), two-piece endings by the dense
-four-piece generator on sides 4 and 5 and by the sparse solver on side 8.
-**WIN n** = forced from every legal position, longest n moves; **WIN\* n**
-= forced from every position with Bishops of opposite parity (about half
-of all positions, as in 2D); **draw (p%, n)** = not forceable, p% of
-positions won, longest n moves; **none** = no checkmate position exists at
-all. Blank = not computed; "cap" = won set too large for the sparse solver
-(a win on the smaller boards; see the earlier tables). Zero verification
-failures in every cell. Logs and summaries under `docs/tablebase/matrix/`.
+Built by `Chess4D.Tablebase matrix` from the registry `docs/rulesets.json`
+into `docs/tablebase/matrix.csv` (126 cells, 172 minutes on the laptop,
+zero verification failures; each row carries its regenerating command).
+Rulesets are the tuples (d, n; D_Q; D_K) of `docs/LITERATURE.md`. Every
+cell is exact on the stated board: three-piece endings by the dense
+generator (or the sparse solver where the dense table overflows),
+two-piece endings by the dense four-piece generator up to about 7 x 10^9
+entries and by the sparse solver otherwise.
+
+**WIN n** = forced from every legal position, longest n moves. A percentage
+in brackets (99.9%) marks a general win where the few unwon positions are
+those with a piece immediately lost, exactly as 2D's K+B+N (99.5%).
+**WIN\*** = forced with Bishops of opposite parity (about half of all
+positions), as in 2D. **draw (p%, n)** or **draw (c cl, n)** = not
+forceable; p% of positions, or c classes up to symmetry, won; longest n
+moves. **none** = no checkmate position exists at all. **cap** = the won
+set exceeded the sparse solver's cap on 8^4 (these are wins where tested
+on smaller boards). **WIN (implied by K+Q)** = not separately tabulated
+because K+Q alone is a forced win under that ruleset.
 
 | Ruleset | Q | R | B | N | QQ | QR | QB | QN | RR | RB | RN | BB | BN | NN |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Settled (4, 8; {1,2}, {1,2}) | draw (18 cl, 1) | none | none | none | draw (edge, 5) | draw (edge, 4) | draw (edge, 3) | draw (edge, 2) | draw (edge, 1) | draw (edge, 1) | draw (edge, 1) | none | none | none |
-| Rinaldi-Chiru (4, 8; {1,2}, {1..4}) | none | none | none | none | draw (3,311 cl, 3) | none | none | none | none | none | none | none | none | none |
-| Dawson Normal Form / 4\*Chess (4, 4; {1..4}, {1..4}) | WIN 4 | none | none | none | WIN 4 | WIN 5 | WIN 4 | WIN 5 | none | WIN 13 | none | WIN 7 | WIN 13 | none |
-| Chesseract (4, 4; {1,2}, {1}) | WIN 20 | none | none | none | WIN 8 | WIN 15 | WIN 10 | WIN 10 | draw (0.00%, 1) | WIN 33 | draw (0.01%, 2) | WIN\* 22 | draw (0.02%, 2) | draw (0.01%, 1) |
-| Owner's board-King (4, 8; {1,2}, {1} + x-y diagonals) | draw (14,358 cl, 9) | none | none | none |  | cap (WIN 19 on 4^4, 36 on 5^4) | cap (WIN 11 on 4^4, 15 on 5^4) |  | draw (edge, 1) | cap (not forced on 4^4) |  | draw (edge, 11) | cap (not forced on 4^4) | draw (edge, 5) |
-| Hyperchess (4, 4; pair diagonals; K 16 moves) | none | none | none | none | draw (0.00%, 1) | draw (0.00%, 1) | none | draw (0.00%, 1) | none | none | draw (0.00%, 1) | none | draw (0.00%, 1) | draw (0.00%, 1) |
-| Raumschach (3, 5; {1,2,3}, {1,2,3}) | WIN 8 | none | none | none | WIN 5 | WIN 8 | WIN 6 | WIN 8 | draw (0.81%, 10) | WIN 17 | draw (0.38%, 16) | WIN 12 | WIN 18 | draw (0.00%, 1) |
+| Settled (4, 8; {1,2}; {1,2}) | draw (0.000%, 1) | none | none | none | draw (106000 cl, 5) | draw (51625 cl, 4) | draw (56040 cl, 3) | draw (46588 cl, 2) | draw (49 cl, 1) | draw (400 cl, 1) | draw (70 cl, 1) | none | none | none |
+| Rinaldi-Chiru (4, 8; {1,2}; {1..4}) | none | none | none | none | draw (3311 cl, 3) | none | none | none | none | none | none | none | none | none |
+| Dawson Normal Form / 4\*Chess (4, 4; {1..4}; {1..4}) | **WIN 4** | none | none | none | **WIN 4** | **WIN 5** | **WIN 4** | **WIN 5** | none | **WIN 13** (99.95%) | none | **WIN 7** | **WIN 13** (99.96%) | none |
+| Chesseract (4, 4; {1,2}; {1}) | **WIN 20** | none | none | none | **WIN 8** | **WIN 15** | **WIN 10** | **WIN 10** | draw (0.005%, 1) | **WIN 33** (100.00%) | draw (0.011%, 2) | **WIN\* 22** | draw (0.016%, 2) | draw (0.014%, 1) |
+| Owner's board-King (4, 8; {1,2}; {1}+xy) | draw (14358 cl, 9) | none | none | none | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row | see 5^4 row |
+| Owner's board-King, 5^4 (two-piece endings) | draw (0.094%, 14) | none | none | none | **WIN 12** | **WIN 36** | **WIN 15** | **WIN 27** | draw (0.000%, 1) | draw (0.005%, 11) | draw (0.000%, 2) | draw (0.007%, 11) | draw (0.005%, 15) | draw (0.001%, 5) |
+| Hyperchess (4, 4; pair diagonals) | none | none | none | none | draw (0.004%, 1) | draw (0.001%, 1) | none | draw (0.002%, 1) | none | none | draw (0.000%, 1) | none | draw (0.000%, 1) | draw (0.001%, 1) |
+| Raumschach (3, 5; {1,2,3}; {1,2,3}) | **WIN 8** | none | none | none | **WIN 5** | **WIN 8** | **WIN 6** | **WIN 8** | draw (0.810%, 10) | **WIN 17** (99.90%) | draw (0.382%, 16) | **WIN 12** | **WIN 18** (99.88%) | draw (0.005%, 1) |
+| Orthogonal King + 3-axis Queen (4, 8; {1,2,3}; {1}) | **WIN 8** | none | **WIN 80** | none | WIN (implied by K+Q) | WIN (implied by K+Q) | WIN (implied by K+Q) | WIN (implied by K+Q) | draw (8416 cl, 1) | cap | cap | cap | cap | draw (14681 cl, 1) |
 
 Hyperchess K+3Q (not in the table): draw, 0.6% won, longest 70 moves; the
 position Joyce gave is a draw with either side to move.
@@ -462,13 +470,15 @@ Readings:
 - **Agreement with the only prior computation.** Muller (2014) reported
   for Raumschach that K+R+R has wins with longest mate in 10 and K+R+N
   longest mate in 16, and that 4-men endings without a Queen are general
-  draws. Our Raumschach row gives exactly 10 and 16 moves, 0.81% and
-  0.38% won. Two independent generators, eleven years apart, agree.
+  draws. The Raumschach row gives exactly 10 and 16 moves, 0.81% and 0.38%
+  won. Two independent generators, eleven years apart, agree.
 - **The 80-move King (Rinaldi and Chiru) is unmatable by two-axis
   pieces.** On 8x8x8x8 no single piece and no pair has a checkmate
-  position, except 3,311 cooperative K+Q+Q corner mates. Any endgame
-  claim under that ruleset must therefore involve three or more pieces or
-  a different King.
+  position, except 3,311 cooperative K+Q+Q corner mates.
+- **The owner's King on 5^4**: every pair containing a Queen is a forced
+  win (K+Q+Q 12 moves, K+Q+B 15, K+Q+N 27, K+Q+R 36); every queenless pair
+  is a draw. K+Q alone remains a draw. This is the cleanest "Queen plus
+  one" rule found in any 4D ruleset.
 - **Small boards flatter the attacker.** Everything with a Queen wins on
   4^4 under the Dawson rules and under Chesseract; the settled rules'
   draws on 8^4 are a large-board phenomenon (see the 80/80 threshold
@@ -478,6 +488,9 @@ Readings:
   Rook "doesn't" present a barrier is borne out in every column.
 - **Bishop pairs behave as in 2D** wherever they win at all: half the
   positions (opposite parity) are won, half are dead draws.
+- **The orthogonal King with a 3-axis Bishop**: the lone Bishop forces
+  mate (80 moves), so every pair containing it is a win too (capped on
+  8^4).
 
 ## Relation to the published work (2026-10-04)
 

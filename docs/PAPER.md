@@ -131,8 +131,9 @@ endgames studied. Registry: `docs/rulesets.json`.
 
 ## 6. Across the rulesets [exact on native boards]
 
-The matrix (`FINDINGS.md`, "Cross-validation matrix"): seven rulesets x
-fourteen material sets. Readings:
+The matrix (`FINDINGS.md`, "Cross-validation matrix"; dataset
+`docs/tablebase/matrix.csv`, 126 cells, zero verification failures):
+nine ruleset rows x fourteen material sets. Readings:
 
 1. Muller's Raumschach lengths reproduced exactly (10, 16).
 2. The Chebyshev (80-move) king is unmatable by any one or two two-axis
@@ -148,6 +149,9 @@ fourteen material sets. Readings:
    bishop pair wins.
 6. Joyce's Hyperchess position is a draw either side to move; K+3Q wins
    about 0.6% of positions, longest 70 moves.
+7. Under the owner's King on 5^4, "Queen plus one piece wins, nothing
+   else does": K+Q+Q 12, K+Q+B 15, K+Q+N 27, K+Q+R 36 moves; all
+   queenless pairs draw.
 
 ## 7. Restoring the mate: the king as a dial [exact unless noted]
 
@@ -156,7 +160,7 @@ fourteen material sets. Readings:
 | settled (32 moves) | any | draw | draw | draw |
 | orthogonal (8) | settled | draw (0.02%, 22-move mates exist) | - | - |
 | orthogonal (8) | 3-axis | **win, 8 moves** | **win** (80 moves 3-axis, 14 moves 4-axis) | - |
-| board-king (12) | settled | draw | draw | **win** on 4^4 (19) and 5^4 (36) [bounded] |
+| board-king (12) | settled | draw | draw | **win** on 4^4 (19) and 5^4 (36) [bounded]; on 5^4 every Queen pair wins (Q+Q 12, Q+B 15, Q+N 27) and every queenless pair draws |
 | board-king (12) | 3-axis | **win**, 7 (6^4), 8 (7^4) moves | draw | - |
 | Chebyshev (80) | settled | no checkmate exists | no checkmate | no checkmate |
 
