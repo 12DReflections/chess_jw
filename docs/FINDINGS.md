@@ -384,6 +384,50 @@ choice for self-play, not a mating question. The tables for the variant are repr
 with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
 summaries for every variant tried are under `docs/tablebase/variants/`.
 
+## The counting theorem: mating material grows with dimension (2026-10-04)
+
+Generalising the cover inequality. A King that steps along one or two axes
+has 2d^2 escape cells in the open. A line-piece (rook, two-axis bishop,
+their union the line-queen) attacks along lines through its own cell, so
+from any placement it covers only a linear number of those escapes.
+`docs/cover_bound.py` enumerates every placement of the white King and one
+piece around a central black King (side 7, so every cell within distance 3
+exists; the piece is blocked only by the black King, an over-count for
+White; a piece on an escape cell counts only if defended):
+
+| d | escapes 2d^2 | queen alone | rook alone | bishop alone | king alone | best K+Q | best K+R | best K+B |
+|---|---|---|---|---|---|---|---|---|
+| 2 | 8 | 5 | 4 | 2 | 3 | 7 | 6 | 5 |
+| 3 | 18 | 8 | 4 | 4 | 6 | 14 | 10 | 10 |
+| 4 | 32 | 12 | 6 | 8 | 7 | 19 | 13 | 15 |
+| 5 | 50 | 16 | 8 | 12 | 9 | 25 | 17 | 21 |
+
+The queen covers 4d - 4 escapes, the best K+Q pair about 6d - 5, against
+2d^2 to cover: already in 2D the pair falls one short (7 of 8), which is
+why 2D's K+Q mates only on the edge, and the shortfall grows as d^2. Since
+each additional line-piece adds O(d), **the number of line-pieces needed to
+cover a central King's escapes grows at least linearly in d**, roughly
+d/3 pieces. This is the theorem behind "lines are not walls": the attack
+set of a line-piece has codimension d - 1, and confinement needs
+codimension 1. A Chebyshev King (3^d - 1 escapes) against line-pieces
+widens the gap to exponential; a hyperplane-attacking piece closes it.
+
+Dimension sweep under the settled convention (K and Q change at most two
+axes), exact tables:
+
+| d | board | K+Q | K+R |
+|---|---|---|---|
+| 2 | 8^2 | win, 10 moves | win, 16 moves |
+| 3 | 8^3 | draw (0.02%, 3 moves) | draw (mates in one only) |
+| 4 | 8^4 | draw (18 positions, mate in one) | no checkmate exists |
+| 5 | 5^5 and 6^5 | **no checkmate exists** | no checkmate exists |
+| 6 | 4^6, 5^6 | (running) | (running) |
+
+The d = 5 result confirms the corner bound derived on 2026-09-19 (a corner
+King has d + C(d,2) flights, the white King covers at most 6 and the Queen
+d, so mate needs C(d,2) <= 6, i.e. d <= 4): from five dimensions on, King
+and Queen cannot checkmate a lone King at all, not even with cooperation.
+
 ## Cross-validation matrix: every ruleset in the literature, every material set (2026-10-04)
 
 The rulesets below are the tuples (d, n; D_Q, D_K) of `docs/LITERATURE.md`:

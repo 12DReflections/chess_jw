@@ -1,0 +1,13 @@
+{
+  "notation": "(d, n; D_Q; D_K [; flags]) - d dimensions, side n, D_Q the axis-counts a slider may change per step (diag = max), D_K for the King (king = max, 0 = same as D_Q); flags: boardKing (2D king within the x-y board, straight steps across), pairDiagonals (Joyce: diagonals only within the x-y and z-w pairs).",
+  "rulesets": [
+    { "name": "settled",        "tuple": "(4, 8; {1,2}; {1,2})",            "dims": 4, "side": 8, "diag": 2, "king": 0, "source": "this project, SPEC.md section 2; Evans & Hamkins 2014 section 4 use the same convention in 3D" },
+    { "name": "rinaldi-chiru",  "tuple": "(4, 8; {1,2}; {1,2,3,4})",        "dims": 4, "side": 8, "diag": 2, "king": 4, "source": "Rinaldi & Chiru, AppliedMath 6(3):48, 2026, Definitions 7 and 9" },
+    { "name": "dawson-normal",  "tuple": "(4, 4; {1,2,3,4}; {1,2,3,4})",    "dims": 4, "side": 4, "diag": 4, "king": 4, "source": "Dawson 1926 via Dickins 1971 pp. 16-19; Pacey, 4*Chess; Reiniger & Joyce 2010" },
+    { "name": "chesseract",     "tuple": "(4, 4; {1,2}; {1})",              "dims": 4, "side": 4, "diag": 2, "king": 1, "source": "Aikin, Chesseract (chessvariants.com)" },
+    { "name": "board-king",     "tuple": "(4, 8; {1,2}; {1}; boardKing)",   "dims": 4, "side": 8, "diag": 2, "king": 0, "boardKing": true, "source": "this project, owner's proposal 2026-09-27" },
+    { "name": "hyperchess",     "tuple": "(4, 4; pair; pair)",              "dims": 4, "side": 4, "diag": 2, "king": 0, "pairDiagonals": true, "source": "Joyce 2004, Hyperchess (chessvariants.com)" },
+    { "name": "raumschach",     "tuple": "(3, 5; {1,2,3}; {1,2,3})",        "dims": 3, "side": 5, "diag": 3, "king": 0, "source": "Maack 1908 (8x8x8), 5x5x5 standard; Muller 2014 tables" },
+    { "name": "orthogonal-king","tuple": "(4, 8; {1,2,3}; {1})",            "dims": 4, "side": 8, "diag": 3, "king": 1, "source": "this project, variant tested 2026-09-26 (Reiniger's crippled king with a 3-axis Queen)" }
+  ]
+}

@@ -19,6 +19,7 @@ namespace Chess4D.Tablebase
             if (cmd == "safe") return Safe(args);
             if (cmd == "generate4") return Generate4(args);
             if (cmd == "sparse") return Sparse(args);
+            if (cmd == "matrix") return MatrixCmd(args);
             PieceType piece = ParsePiece(args.Length > 1 ? args[1] : "Q");
             int dims = 4, side = 8, diag = 2, king = 0, threads = Environment.ProcessorCount, verifyWins = 40, verifyDraws = 40;
             bool boardKing = false, pairDiag = false;
@@ -124,6 +125,28 @@ namespace Chess4D.Tablebase
             File.WriteAllText(Path.Combine(outDir, gen.Name + ".txt"), summary);
             log("total time " + total.Elapsed.TotalMinutes.ToString("F1") + " min, verification failures " + failures.Count);
             return failures.Count == 0 ? 0 : 2;
+        }
+
+        /// <summary>matrix --registry docs/rulesets.json --csv docs/tablebase/matrix.csv [--materials Q,R,...] [--cap n]: the reproducible ruleset-by-material dataset.</summary>
+        private static int MatrixCmd(string[] args)
+        {
+            string registry = "docs/rulesets.json", csv = "docs/tablebase/matrix.csv";
+            string[] materials = { "Q", "R", "B", "N", "QQ", "QR", "QB", "QN", "RR", "RB", "RN", "BB", "BN", "NN" };
+            long cap = 3_000_000;
+            for (int i = 1; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--registry": registry = args[++i]; break;
+                    case "--csv": csv = args[++i]; break;
+                    case "--materials": materials = args[++i].Split(','); break;
+                    case "--cap": cap = long.Parse(args[++i]); break;
+                }
+            }
+            var sw = Stopwatch.StartNew();
+            int failures = Matrix.Run(registry, csv, materials, cap, s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s));
+            Console.WriteLine("matrix done in " + sw.Elapsed.TotalMinutes.ToString("F1") + " min, cell failures " + failures);
+            return failures == 0 ? 0 : 2;
         }
 
         /// <summary>sparse QR [--dims 4] [--side 8] [--out dir]: exact solve that stores only decided positions; for boards where almost nothing is won.</summary>
