@@ -1,0 +1,9 @@
+K+B+N vs K, 3 dimensions, side 5, rule variant: diagonals up to 3 axes, king up to 3 axes
+table entries 14218750, duplicate slots 3550000
+legal positions: white to move 3217728, black to move 4241226
+checkmates 204, stalemates 1009, black-to-move positions with an immediately drawing capture 127246
+white-to-move wins 3213786 (99.88%), black-to-move losses 3349736 (78.98%)
+longest forced mate: white to move 35 plies, black to move 36 plies; passes 38
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2656784/2659105 (99.91%)  1: 539498/541098 (99.70%)  2: 17504/17525 (99.88%)
+white-to-move distance histogram (plies: positions): 1:2357 3:9998 5:17066 7:27356 9:31975 11:35274 13:53705 15:90398 17:249224 19:400942 21:360659 23:527339 25:757369 27:481479 29:135392 31:31233 33:1986 35:34
+one-ply consistency against the full rules: 5000 sampled positions, 0 failures

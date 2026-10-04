@@ -1,0 +1,18 @@
+KQQ vs K, 4 dimensions, side 8, rule variant: diagonals up to 2 axes, king up to 4 axes (sparse exact solve; counts are positions up to symmetry)
+checkmates 108, white-to-move wins 3311, black-to-move losses 125, every other legal position is a draw
+longest forced mate: white to move 5 plies, black to move 4 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 3311  1: 0  2: 0  3: 0
+white-to-move distance histogram (plies: classes): 1:2366 3:115 5:830
+WTM mate in 5 plies  K2110 Q2101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q3101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q4101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q5101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q6101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q7101 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0301 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0401 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0501 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0601 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0701 Q0121 k0000
+WTM mate in 5 plies  K2110 Q0211 Q0013 k0000
+one-ply verification of every stored position against the full rules: 0 failures

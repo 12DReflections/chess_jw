@@ -771,3 +771,15 @@ that mate is impossible with enough material. "Refuted"/"false" wording
 removed from LITERATURE.md and FINDINGS.md; the K+Q/K+R discrepancy is
 stated as a reproducibility finding with the likely explanations and an
 invitation to clarify. Checking their public engine code is now optional.
+
+### 2026-10-04 — Cross-validation matrix
+
+Owner asked whether the checkmates could be cross-validated against every
+ruleset in the literature table. Ran seven rulesets (settled, Rinaldi-
+Chiru, Dawson Normal Form, Chesseract, owner's board-King, Hyperchess,
+Raumschach) against the four single pieces and the ten pairs, exact on
+each variant's native board; 90-odd tables, every verification clean.
+Table and readings in `docs/FINDINGS.md`. Muller's 2014 Raumschach mate
+lengths (K+R+R 10, K+R+N 16) reproduced exactly. Under the 2026 paper's
+80-move King nothing up to two pieces has a checkmate on 8^4 except
+cooperative K+Q+Q corner mates. Logs under `docs/tablebase/matrix/`.

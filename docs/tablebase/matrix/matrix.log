@@ -1,0 +1,464 @@
+### settled-8 | Q | --side 8
+legal positions: white to move 178112508, black to move 181847414
+checkmates 1, stalemates 1
+white-to-move wins 18 (0.00%), black-to-move losses 1
+longest forced mate: white to move 1 plies (1 moves), black to move -1 plies
+15:43:58  consistency: checked 5000 sampled positions, 0 failures
+### settled-8 | R | --side 8
+legal positions: white to move 180518184, black to move 181847414
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:44:27  consistency: checked 5000 sampled positions, 0 failures
+### settled-8 | B | --side 8
+legal positions: white to move 179441738, black to move 181847414
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:44:56  consistency: checked 5000 sampled positions, 0 failures
+### settled-8 | N | --side 8
+legal positions: white to move 180438662, black to move 181847414
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:45:25  consistency: checked 5000 sampled positions, 0 failures
+### rinaldi-chiru-8 | Q | --side 8 --king 4
+legal positions: white to move 176704206, black to move 180405988
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:46:28  consistency: checked 5000 sampled positions, 0 failures
+### rinaldi-chiru-8 | R | --side 8 --king 4
+legal positions: white to move 179088714, black to move 180405988
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:47:29  consistency: checked 5000 sampled positions, 0 failures
+### rinaldi-chiru-8 | B | --side 8 --king 4
+legal positions: white to move 178021480, black to move 180405988
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:48:31  consistency: checked 5000 sampled positions, 0 failures
+### rinaldi-chiru-8 | N | --side 8 --king 4
+legal positions: white to move 179009584, black to move 180405988
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:32  consistency: checked 5000 sampled positions, 0 failures
+### dawson-normal-4 | Q | --side 4 --diag 4
+legal positions: white to move 32464, black to move 42985
+checkmates 120, stalemates 0
+white-to-move wins 32464 (100.00%), black-to-move losses 37029
+longest forced mate: white to move 7 plies (4 moves), black to move 8 plies
+15:49:34  consistency: checked 5000 sampled positions, 0 failures
+### dawson-normal-4 | R | --side 4 --diag 4
+legal positions: white to move 40646, black to move 42985
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:35  consistency: checked 5000 sampled positions, 0 failures
+### dawson-normal-4 | B | --side 4 --diag 4
+legal positions: white to move 34803, black to move 42985
+checkmates 0, stalemates 10
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:36  consistency: checked 5000 sampled positions, 0 failures
+### dawson-normal-4 | N | --side 4 --diag 4
+legal positions: white to move 40147, black to move 42985
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:36  consistency: checked 5000 sampled positions, 0 failures
+### chesseract-4 | Q | --side 4 --king 1
+legal positions: white to move 42951, black to move 49964
+checkmates 36, stalemates 7
+white-to-move wins 42951 (100.00%), black-to-move losses 48611
+longest forced mate: white to move 39 plies (20 moves), black to move 40 plies
+15:49:37  consistency: checked 5000 sampled positions, 0 failures
+### chesseract-4 | R | --side 4 --king 1
+legal positions: white to move 47214, black to move 49964
+checkmates 0, stalemates 1
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:38  consistency: checked 5000 sampled positions, 0 failures
+### chesseract-4 | B | --side 4 --king 1
+legal positions: white to move 45701, black to move 49964
+checkmates 0, stalemates 17
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:39  consistency: checked 5000 sampled positions, 0 failures
+### chesseract-4 | N | --side 4 --king 1
+legal positions: white to move 46637, black to move 49964
+checkmates 0, stalemates 11
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:40  consistency: checked 5000 sampled positions, 0 failures
+### boardking-8 | Q | --side 8 --boardking
+Unhandled exception. System.OverflowException: Arithmetic operation resulted in an overflow.
+g3: no matches found: /private/tmp/claude-501/-Users-julianwise-unityprojects-chess-jw/6fc97710-903a-4df9-a99d-d77d312e889e/scratchpad/matrix/*.tb
+### boardking-8 | R | --side 8 --boardking
+Unhandled exception. System.OverflowException: Arithmetic operation resulted in an overflow.
+g3: no matches found: /private/tmp/claude-501/-Users-julianwise-unityprojects-chess-jw/6fc97710-903a-4df9-a99d-d77d312e889e/scratchpad/matrix/*.tb
+### boardking-8 | B | --side 8 --boardking
+Unhandled exception. System.OverflowException: Arithmetic operation resulted in an overflow.
+g3: no matches found: /private/tmp/claude-501/-Users-julianwise-unityprojects-chess-jw/6fc97710-903a-4df9-a99d-d77d312e889e/scratchpad/matrix/*.tb
+### boardking-8 | N | --side 8 --boardking
+Unhandled exception. System.OverflowException: Arithmetic operation resulted in an overflow.
+g3: no matches found: /private/tmp/claude-501/-Users-julianwise-unityprojects-chess-jw/6fc97710-903a-4df9-a99d-d77d312e889e/scratchpad/matrix/*.tb
+### hyperchess-4 | Q | --side 4 --pairdiag
+legal positions: white to move 120792, black to move 131478
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:42  consistency: checked 5000 sampled positions, 0 failures
+### hyperchess-4 | R | --side 4 --pairdiag
+legal positions: white to move 124959, black to move 131478
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:43  consistency: checked 5000 sampled positions, 0 failures
+### hyperchess-4 | B | --side 4 --pairdiag
+legal positions: white to move 127311, black to move 131478
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:44  consistency: checked 5000 sampled positions, 0 failures
+### hyperchess-4 | N | --side 4 --pairdiag
+legal positions: white to move 122398, black to move 131478
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:45  consistency: checked 5000 sampled positions, 0 failures
+### raumschach-5 | Q | --dims 3 --side 5 --diag 3
+legal positions: white to move 26307, black to move 36393
+checkmates 55, stalemates 4
+white-to-move wins 26307 (100.00%), black-to-move losses 31815
+longest forced mate: white to move 15 plies (8 moves), black to move 16 plies
+15:49:46  consistency: checked 5000 sampled positions, 0 failures
+### raumschach-5 | R | --dims 3 --side 5 --diag 3
+legal positions: white to move 32631, black to move 36393
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:46  consistency: checked 5000 sampled positions, 0 failures
+### raumschach-5 | B | --dims 3 --side 5 --diag 3
+legal positions: white to move 30069, black to move 36393
+checkmates 0, stalemates 10
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:47  consistency: checked 5000 sampled positions, 0 failures
+### raumschach-5 | N | --dims 3 --side 5 --diag 3
+legal positions: white to move 33145, black to move 36393
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+15:49:48  consistency: checked 5000 sampled positions, 0 failures
+### dawson-normal-4 | QQ | --side 4 --diag 4
+checkmates 128116, stalemates 140, black-to-move positions with an immediately drawing capture 0
+white-to-move wins 5804637 (100.00%), black-to-move losses 9662915 (100.00%)
+longest forced mate: white to move 7 plies, black to move 8 plies; passes 10
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 5613617/5613617 (100.00%)  1: 191020/191020 (100.00%)
+15:50:16  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | QR | --side 4 --diag 4
+checkmates 28305, stalemates 22, black-to-move positions with an immediately drawing capture 294237
+white-to-move wins 7110930 (100.00%), black-to-move losses 8453240 (87.48%)
+longest forced mate: white to move 9 plies, black to move 10 plies; passes 12
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 6816227/6816227 (100.00%)  1: 294703/294703 (100.00%)
+15:50:47  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | QB | --side 4 --diag 4
+checkmates 58528, stalemates 2929, black-to-move positions with an immediately drawing capture 257930
+white-to-move wins 6171007 (100.00%), black-to-move losses 8638469 (89.40%)
+longest forced mate: white to move 7 plies, black to move 8 plies; passes 10
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 5964417/5964417 (100.00%)  1: 206590/206590 (100.00%)
+15:51:18  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | QN | --side 4 --diag 4
+checkmates 32690, stalemates 22, black-to-move positions with an immediately drawing capture 287043
+white-to-move wins 6967720 (100.00%), black-to-move losses 8483872 (87.80%)
+longest forced mate: white to move 9 plies, black to move 10 plies; passes 12
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 6685969/6685969 (100.00%)  1: 281751/281751 (100.00%)
+15:51:50  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | RR | --side 4 --diag 4
+checkmates 0, stalemates 0, black-to-move positions with an immediately drawing capture 106165
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/8284357 (0.00%)  1: 0/454315 (0.00%)
+15:51:51  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | RB | --side 4 --diag 4
+checkmates 252, stalemates 1465, black-to-move positions with an immediately drawing capture 199205
+white-to-move wins 7560330 (99.95%), black-to-move losses 7479919 (77.41%)
+longest forced mate: white to move 25 plies, black to move 26 plies; passes 28
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 7241864/7244722 (99.96%)  1: 318466/319045 (99.82%)
+15:52:24  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | RN | --side 4 --diag 4
+checkmates 0, stalemates 0, black-to-move positions with an immediately drawing capture 92355
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/8124408 (0.00%)  1: 0/434737 (0.00%)
+15:52:26  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | BB | --side 4 --diag 4
+checkmates 4949, stalemates 4079, black-to-move positions with an immediately drawing capture 260487
+white-to-move wins 6556086 (100.00%), black-to-move losses 7730020 (80.00%)
+longest forced mate: white to move 13 plies, black to move 14 plies; passes 16
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 6332780/6332780 (100.00%)  1: 223306/223306 (100.00%)
+15:53:00  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | BN | --side 4 --diag 4
+checkmates 590, stalemates 1523, black-to-move positions with an immediately drawing capture 187813
+white-to-move wins 7403800 (99.96%), black-to-move losses 7497264 (77.59%)
+longest forced mate: white to move 25 plies, black to move 26 plies; passes 28
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 7099478/7102051 (99.96%)  1: 304322/304941 (99.80%)
+15:53:33  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### dawson-normal-4 | NN | --side 4 --diag 4
+checkmates 0, stalemates 0, black-to-move positions with an immediately drawing capture 85413
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/7962572 (0.00%)  1: 0/415793 (0.00%)
+15:53:35  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | QQ | --side 4 --king 1
+checkmates 80942, stalemates 11837, black-to-move positions with an immediately drawing capture 0
+white-to-move wins 8378377 (100.00%), black-to-move losses 11114139 (99.89%)
+longest forced mate: white to move 15 plies, black to move 40 plies; passes 41
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 7883131/7883131 (100.00%)  1: 495246/495246 (100.00%)
+15:53:48  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | QR | --side 4 --king 1
+checkmates 19249, stalemates 2830, black-to-move positions with an immediately drawing capture 255568
+white-to-move wins 9182608 (100.00%), black-to-move losses 10867578 (97.68%)
+longest forced mate: white to move 29 plies, black to move 40 plies; passes 41
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 8616433/8616433 (100.00%)  1: 566175/566175 (100.00%)
+15:54:00  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | QB | --side 4 --king 1
+checkmates 32742, stalemates 23161, black-to-move positions with an immediately drawing capture 244928
+white-to-move wins 8855543 (100.00%), black-to-move losses 10857887 (97.59%)
+longest forced mate: white to move 19 plies, black to move 40 plies; passes 41
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 8329675/8329675 (100.00%)  1: 525868/525868 (100.00%)
+15:54:11  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | QN | --side 4 --king 1
+checkmates 27501, stalemates 16661, black-to-move positions with an immediately drawing capture 249015
+white-to-move wins 8989344 (100.00%), black-to-move losses 10860300 (97.61%)
+longest forced mate: white to move 19 plies, black to move 40 plies; passes 41
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 8447231/8447231 (100.00%)  1: 542113/542113 (100.00%)
+15:54:23  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | RR | --side 4 --king 1
+checkmates 83, stalemates 420, black-to-move positions with an immediately drawing capture 132177
+white-to-move wins 456 (0.00%), black-to-move losses 83 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 456/9411320 (0.00%)  1: 0/646624 (0.00%)
+15:54:24  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | RB | --side 4 --king 1
+checkmates 898, stalemates 8281, black-to-move positions with an immediately drawing capture 238771
+white-to-move wins 9705728 (100.00%), black-to-move losses 10617196 (95.43%)
+longest forced mate: white to move 65 plies, black to move 66 plies; passes 68
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 9104560/9104570 (100.00%)  1: 601168/601168 (100.00%)
+15:54:35  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | RN | --side 4 --king 1
+checkmates 167, stalemates 5837, black-to-move positions with an immediately drawing capture 112465
+white-to-move wins 1058 (0.01%), black-to-move losses 176 (0.00%)
+longest forced mate: white to move 3 plies, black to move 2 plies; passes 5
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 1040/9225676 (0.01%)  1: 18/619135 (0.00%)
+15:54:37  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | BB | --side 4 --king 1
+checkmates 386, stalemates 28069, black-to-move positions with an immediately drawing capture 341394
+white-to-move wins 4655724 (49.77%), black-to-move losses 5316580 (47.79%)
+longest forced mate: white to move 43 plies, black to move 44 plies; passes 46
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 4380628/8796322 (49.80%)  1: 275096/558159 (49.29%)
+15:54:44  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | BN | --side 4 --king 1
+checkmates 297, stalemates 22161, black-to-move positions with an immediately drawing capture 220093
+white-to-move wins 1547 (0.02%), black-to-move losses 299 (0.00%)
+longest forced mate: white to move 3 plies, black to move 2 plies; passes 5
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 1547/8921073 (0.02%)  1: 0/575481 (0.00%)
+15:54:46  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### chesseract-4 | NN | --side 4 --king 1
+checkmates 242, stalemates 18485, black-to-move positions with an immediately drawing capture 101108
+white-to-move wins 1338 (0.01%), black-to-move losses 242 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 1338/9038082 (0.01%)  1: 0/592533 (0.00%)
+15:54:47  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | QQ | --side 4 --pairdiag
+checkmates 116, stalemates 365, black-to-move positions with an immediately drawing capture 692830
+white-to-move wins 985 (0.00%), black-to-move losses 124 (0.00%)
+longest forced mate: white to move 1 plies, black to move 2 plies; passes 4
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 985/25546650 (0.00%)  1: 0/1632162 (0.00%)
+15:54:49  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | QR | --side 4 --pairdiag
+checkmates 23, stalemates 51, black-to-move positions with an immediately drawing capture 535939
+white-to-move wins 202 (0.00%), black-to-move losses 23 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 202/26311207 (0.00%)  1: 0/1706646 (0.00%)
+15:54:51  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | QB | --side 4 --pairdiag
+checkmates 0, stalemates 14, black-to-move positions with an immediately drawing capture 600678
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/26872615 (0.00%)  1: 0/1719169 (0.00%)
+15:54:54  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | QN | --side 4 --pairdiag
+checkmates 61, stalemates 146, black-to-move positions with an immediately drawing capture 475847
+white-to-move wins 581 (0.00%), black-to-move losses 61 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 581/25741860 (0.00%)  1: 0/1626253 (0.00%)
+15:54:56  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | RR | --side 4 --pairdiag
+checkmates 0, stalemates 18, black-to-move positions with an immediately drawing capture 362091
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/27094023 (0.00%)  1: 0/1784412 (0.00%)
+15:54:58  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | RB | --side 4 --pairdiag
+checkmates 0, stalemates 1, black-to-move positions with an immediately drawing capture 424759
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/27678075 (0.00%)  1: 0/1797859 (0.00%)
+15:55:00  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | RN | --side 4 --pairdiag
+checkmates 5, stalemates 65, black-to-move positions with an immediately drawing capture 307237
+white-to-move wins 35 (0.00%), black-to-move losses 5 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 35/26508455 (0.00%)  1: 0/1700677 (0.00%)
+15:55:02  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | BB | --side 4 --pairdiag
+checkmates 0, stalemates 0, black-to-move positions with an immediately drawing capture 507346
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/28253366 (0.00%)  1: 0/1810211 (0.00%)
+15:55:04  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | BN | --side 4 --pairdiag
+checkmates 4, stalemates 22, black-to-move positions with an immediately drawing capture 382866
+white-to-move wins 15 (0.00%), black-to-move losses 4 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 15/27065692 (0.00%)  1: 0/1712635 (0.00%)
+15:55:06  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### hyperchess-4 | NN | --side 4 --pairdiag
+checkmates 14, stalemates 63, black-to-move positions with an immediately drawing capture 268213
+white-to-move wins 220 (0.00%), black-to-move losses 14 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 220/25918461 (0.00%)  1: 0/1619751 (0.00%)
+15:55:08  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | QQ | --dims 3 --side 5 --diag 3
+checkmates 51348, stalemates 3471, black-to-move positions with an immediately drawing capture 0
+white-to-move wins 2292020 (100.00%), black-to-move losses 4237755 (99.92%)
+longest forced mate: white to move 9 plies, black to move 16 plies; passes 17
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 1924637/1924637 (100.00%)  1: 357012/357012 (100.00%)  2: 10371/10371 (100.00%)
+15:55:13  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | QR | --dims 3 --side 5 --diag 3
+checkmates 11617, stalemates 1338, black-to-move positions with an immediately drawing capture 169579
+white-to-move wins 2813459 (100.00%), black-to-move losses 3773306 (88.97%)
+longest forced mate: white to move 15 plies, black to move 16 plies; passes 18
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2311759/2311759 (100.00%)  1: 485251/485251 (100.00%)  2: 16449/16449 (100.00%)
+15:55:18  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | QB | --dims 3 --side 5 --diag 3
+checkmates 17994, stalemates 2954, black-to-move positions with an immediately drawing capture 157672
+white-to-move wins 2601970 (100.00%), black-to-move losses 3813017 (89.90%)
+longest forced mate: white to move 11 plies, black to move 16 plies; passes 17
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2179015/2179015 (100.00%)  1: 410711/410711 (100.00%)  2: 12244/12244 (100.00%)
+15:55:23  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | QN | --dims 3 --side 5 --diag 3
+checkmates 11228, stalemates 910, black-to-move positions with an immediately drawing capture 167411
+white-to-move wins 2844450 (100.00%), black-to-move losses 3774976 (89.01%)
+longest forced mate: white to move 15 plies, black to move 16 plies; passes 18
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2357751/2357751 (100.00%)  1: 471834/471834 (100.00%)  2: 14865/14865 (100.00%)
+15:55:28  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | RR | --dims 3 --side 5 --diag 3
+checkmates 128, stalemates 162, black-to-move positions with an immediately drawing capture 103268
+white-to-move wins 27930 (0.81%), black-to-move losses 2087 (0.05%)
+longest forced mate: white to move 19 plies, black to move 18 plies; passes 21
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 27930/2766751 (1.01%)  1: 0/656470 (0.00%)  2: 0/25871 (0.00%)
+15:55:29  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | RB | --dims 3 --side 5 --diag 3
+checkmates 174, stalemates 1085, black-to-move positions with an immediately drawing capture 146109
+white-to-move wins 3190982 (99.90%), black-to-move losses 3362649 (79.28%)
+longest forced mate: white to move 33 plies, black to move 34 plies; passes 36
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2614744/2616547 (99.93%)  1: 556819/558128 (99.77%)  2: 19419/19442 (99.88%)
+15:55:34  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | RN | --dims 3 --side 5 --diag 3
+checkmates 15, stalemates 123, black-to-move positions with an immediately drawing capture 86467
+white-to-move wins 13283 (0.38%), black-to-move losses 822 (0.02%)
+longest forced mate: white to move 31 plies, black to move 30 plies; passes 33
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 13283/2820227 (0.47%)  1: 0/638046 (0.00%)  2: 0/23419 (0.00%)
+15:55:36  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | BB | --dims 3 --side 5 --diag 3
+checkmates 906, stalemates 2205, black-to-move positions with an immediately drawing capture 175173
+white-to-move wins 2942738 (100.00%), black-to-move losses 3432661 (80.94%)
+longest forced mate: white to move 23 plies, black to move 24 plies; passes 26
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2457407/2457407 (100.00%)  1: 470910/470910 (100.00%)  2: 14421/14421 (100.00%)
+15:55:41  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | BN | --dims 3 --side 5 --diag 3
+checkmates 204, stalemates 1009, black-to-move positions with an immediately drawing capture 127246
+white-to-move wins 3213786 (99.88%), black-to-move losses 3349736 (78.98%)
+longest forced mate: white to move 35 plies, black to move 36 plies; passes 38
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 2656784/2659105 (99.91%)  1: 539498/541098 (99.70%)  2: 17504/17525 (99.88%)
+15:55:46  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### raumschach-5 | NN | --dims 3 --side 5 --diag 3
+checkmates 14, stalemates 84, black-to-move positions with an immediately drawing capture 73077
+white-to-move wins 168 (0.00%), black-to-move losses 14 (0.00%)
+longest forced mate: white to move 1 plies, black to move 0 plies; passes 3
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 168/2865178 (0.01%)  1: 0/618475 (0.00%)  2: 0/21150 (0.00%)
+15:55:47  consistency: checked 5000 sampled positions against the full rules, 0 failures
+### rinaldi-chiru-8 | QQ | --side 8 --king 4
+checkmates 108, white-to-move wins 3311, black-to-move losses 125, every other legal position is a draw
+longest forced mate: white to move 5 plies, black to move 4 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 3311  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | QR | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | QB | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | QN | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | RR | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | RB | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | RN | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | BB | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | BN | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+### rinaldi-chiru-8 | NN | --side 8 --king 4
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+one-ply verification of every stored position against the full rules: 0 failures
+ALLDONE10
+### boardking-8s | Q | sparse
+checkmates 251, white-to-move wins 14358, black-to-move losses 275, every other legal position is a draw
+longest forced mate: white to move 17 plies, black to move 16 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 14358  1: 0  2: 0  3: 0
+### boardking-8s | R | sparse
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+### boardking-8s | B | sparse
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+### boardking-8s | N | sparse
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+ALLDONE11

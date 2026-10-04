@@ -1,0 +1,9 @@
+K+R+R vs K, 4 dimensions, side 4, rule variant: Hyperchess pair diagonals (diagonals only within the x-y and z-w pairs; King 16 moves, Queen 16 directions)
+table entries 87293952, duplicate slots 18317340
+legal positions: white to move 28878435, black to move 31853418
+checkmates 0, stalemates 18, black-to-move positions with an immediately drawing capture 362091
+white-to-move wins 0 (0.00%), black-to-move losses 0 (0.00%)
+longest forced mate: white to move -1 plies, black to move -1 plies; passes 2
+white-to-move wins by the black king's distance from the nearest edge (canonical positions):  0: 0/27094023 (0.00%)  1: 0/1784412 (0.00%)
+white-to-move distance histogram (plies: positions):
+one-ply consistency against the full rules: 5000 sampled positions, 0 failures

@@ -384,6 +384,57 @@ choice for self-play, not a mating question. The tables for the variant are repr
 with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
 summaries for every variant tried are under `docs/tablebase/variants/`.
 
+## Cross-validation matrix: every ruleset in the literature, every material set (2026-10-04)
+
+The rulesets below are the tuples (d, n; D_Q, D_K) of `docs/LITERATURE.md`:
+d dimensions, side n, D_Q the axis-counts a slider may change per step,
+D_K the same for the King. Each cell is an exact table on the variant's
+native board: three-piece endings by the dense generator (or the sparse
+solver where the dense table overflows), two-piece endings by the dense
+four-piece generator on sides 4 and 5 and by the sparse solver on side 8.
+**WIN n** = forced from every legal position, longest n moves; **WIN\* n**
+= forced from every position with Bishops of opposite parity (about half
+of all positions, as in 2D); **draw (p%, n)** = not forceable, p% of
+positions won, longest n moves; **none** = no checkmate position exists at
+all. Blank = not computed; "cap" = won set too large for the sparse solver
+(a win on the smaller boards; see the earlier tables). Zero verification
+failures in every cell. Logs and summaries under `docs/tablebase/matrix/`.
+
+| Ruleset | Q | R | B | N | QQ | QR | QB | QN | RR | RB | RN | BB | BN | NN |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Settled (4, 8; {1,2}, {1,2}) | draw (18 cl, 1) | none | none | none | draw (edge, 5) | draw (edge, 4) | draw (edge, 3) | draw (edge, 2) | draw (edge, 1) | draw (edge, 1) | draw (edge, 1) | none | none | none |
+| Rinaldi-Chiru (4, 8; {1,2}, {1..4}) | none | none | none | none | draw (3,311 cl, 3) | none | none | none | none | none | none | none | none | none |
+| Dawson Normal Form / 4\*Chess (4, 4; {1..4}, {1..4}) | WIN 4 | none | none | none | WIN 4 | WIN 5 | WIN 4 | WIN 5 | none | WIN 13 | none | WIN 7 | WIN 13 | none |
+| Chesseract (4, 4; {1,2}, {1}) | WIN 20 | none | none | none | WIN 8 | WIN 15 | WIN 10 | WIN 10 | draw (0.00%, 1) | WIN 33 | draw (0.01%, 2) | WIN\* 22 | draw (0.02%, 2) | draw (0.01%, 1) |
+| Owner's board-King (4, 8; {1,2}, {1} + x-y diagonals) | draw (14,358 cl, 9) | none | none | none |  | cap (WIN 19 on 4^4, 36 on 5^4) | cap (WIN 11 on 4^4, 15 on 5^4) |  | draw (edge, 1) | cap (not forced on 4^4) |  | draw (edge, 11) | cap (not forced on 4^4) | draw (edge, 5) |
+| Hyperchess (4, 4; pair diagonals; K 16 moves) | none | none | none | none | draw (0.00%, 1) | draw (0.00%, 1) | none | draw (0.00%, 1) | none | none | draw (0.00%, 1) | none | draw (0.00%, 1) | draw (0.00%, 1) |
+| Raumschach (3, 5; {1,2,3}, {1,2,3}) | WIN 8 | none | none | none | WIN 5 | WIN 8 | WIN 6 | WIN 8 | draw (0.81%, 10) | WIN 17 | draw (0.38%, 16) | WIN 12 | WIN 18 | draw (0.00%, 1) |
+
+Hyperchess K+3Q (not in the table): draw, 0.6% won, longest 70 moves; the
+position Joyce gave is a draw with either side to move.
+
+Readings:
+
+- **Agreement with the only prior computation.** Muller (2014) reported
+  for Raumschach that K+R+R has wins with longest mate in 10 and K+R+N
+  longest mate in 16, and that 4-men endings without a Queen are general
+  draws. Our Raumschach row gives exactly 10 and 16 moves, 0.81% and
+  0.38% won. Two independent generators, eleven years apart, agree.
+- **The 80-move King (Rinaldi and Chiru) is unmatable by two-axis
+  pieces.** On 8x8x8x8 no single piece and no pair has a checkmate
+  position, except 3,311 cooperative K+Q+Q corner mates. Any endgame
+  claim under that ruleset must therefore involve three or more pieces or
+  a different King.
+- **Small boards flatter the attacker.** Everything with a Queen wins on
+  4^4 under the Dawson rules and under Chesseract; the settled rules'
+  draws on 8^4 are a large-board phenomenon (see the 80/80 threshold
+  between sides 6 and 7 in the variants section).
+- **Rooks never mate alone in any ruleset tested**, and two Rooks force
+  mate in none of them; Beasley's 2007 remark that in three dimensions a
+  Rook "doesn't" present a barrier is borne out in every column.
+- **Bishop pairs behave as in 2D** wherever they win at all: half the
+  positions (opposite parity) are won, half are dead draws.
+
 ## Relation to the published work (2026-10-04)
 
 `docs/LITERATURE.md` section 8 tabulates every printed claim about mating

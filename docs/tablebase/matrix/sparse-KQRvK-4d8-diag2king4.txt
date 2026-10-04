@@ -1,0 +1,6 @@
+KQR vs K, 4 dimensions, side 8, rule variant: diagonals up to 2 axes, king up to 4 axes (sparse exact solve; counts are positions up to symmetry)
+checkmates 0, white-to-move wins 0, black-to-move losses 0, every other legal position is a draw
+longest forced mate: white to move -1 plies, black to move -1 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 0  1: 0  2: 0  3: 0
+white-to-move distance histogram (plies: classes):
+one-ply verification of every stored position against the full rules: 0 failures

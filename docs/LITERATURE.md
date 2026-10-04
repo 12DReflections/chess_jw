@@ -500,6 +500,10 @@ authors label their endgame material as "empirical demonstrations rather
 than formal proofs". This project should be read as taking up that
 invitation.
 
+The full ruleset-by-material matrix (seven rulesets, fourteen material
+sets) is in `docs/FINDINGS.md`, "Cross-validation matrix"; it reproduces
+Muller's Raumschach mate lengths (10 and 16 moves) exactly.
+
 ## 9. Gaps in this review
 
 - MathSciNet not available; Semantic Scholar and DBLP unreachable to
