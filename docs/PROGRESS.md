@@ -729,3 +729,34 @@ Reiniger/Joyce 4x4x4x4 observation. New finding from the cross-check: with
 80-direction King and Queen, K+Q wins at sides 4, 5 and 6 (4, 8, 14 moves)
 and is a draw at 7 and 8, so Reiniger's "any size board" conjecture is
 false. Search limits recorded in the file (web only; some pages 403).
+
+### 2026-10-04 — Academic literature review
+
+Owner asked for a proper review (Scholar-class sources, not forums). Four
+parallel streams covered retrograde analysis and tablebases, infinite
+chess, pursuit-evasion, chess-graph domination, the angel problem,
+symmetry reduction, verification of computed game results, and
+higher-dimensional chess in print (Maack 1908 in German, Dawson, Dickins,
+Gibbins, Parton, Pritchard/Beasley 2007, Reiniger, the variant designers'
+primary rule pages, and Rinaldi & Chiru 2026 in full). Written up in
+`docs/LITERATURE.md` with per-item read flags and a list of gaps.
+
+Headline: no exhaustive or proved 4D mating-material result exists in
+print. The one refereed 8^4 paper claims K+Q and K+R win (engine-assisted,
+"informal sketch"); under its own definitions (two-axis sliders,
+Chebyshev 80-move king) our tables show **no checkmate position exists at
+all** for either ending on 8^4, 4^4 or 5^4. Also checked exactly: Muller's
+3D Raumschach "KQK is won" (agrees, 8 moves); the 4x4x4x4 full-king K+Q
+win (agrees, 4 moves) and its failure from side 7 up; Aikin's Chesseract
+K+Q (win, 20 moves on 4^4); Joyce's Hyperchess K+3Q draw and his exact
+position (draw both ways; K+Q has no mate, K+2Q mates in one only, K+3Q
+longest forced mate 70 moves on a tiny won set).
+
+Code: `BoardGeometry` gained `pairDiagonals` (Joyce's rule) and a King
+that may out-reach the Queen (`kingAxes` up to the dimension count, built
+independently of the Queen's directions); `Board.IsAttacked`/`Attackers`
+now check King attacks from the King's own direction list; `Symmetry`
+handles the pair-swapping group (order 128); `ThreePiece` King rule fixed
+for pair diagonals (it had let the King take cross-pair diagonals, caught
+by the consistency check); `sparse --probe` to query a position. 121
+tests green. Summaries under `docs/tablebase/variants/`.

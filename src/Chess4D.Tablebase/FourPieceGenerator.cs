@@ -496,6 +496,7 @@ namespace Chess4D.Tablebase
 
         internal static string RuleText(BoardGeometry g)
         {
+            if (g.PairDiagonals) return ", rule variant: Hyperchess pair diagonals (diagonals only within the x-y and z-w pairs; King 16 moves, Queen 16 directions)";
             if (g.BoardKing) return ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, board-king (2D king on the x-y board, straight steps across z and w)";
             return g.DiagonalAxes == 2 && g.KingAxes == 2 ? "" : ", rule variant: diagonals up to " + g.DiagonalAxes + " axes, king up to " + g.KingAxes + " axes";
         }

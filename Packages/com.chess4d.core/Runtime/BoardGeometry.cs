@@ -31,12 +31,12 @@ namespace Chess4D.Core
         public readonly int CellCount;
         /// <summary>Most axes a diagonal slide may change at once: 2 is the settled rule (SPEC section 2); Dimensions gives the 80-direction Queen of SPEC section 6.</summary>
         public readonly int DiagonalAxes;
-        /// <summary>Most axes a King step may change at once; 1 is an orthogonal-only King. Never more than DiagonalAxes.</summary>
+        /// <summary>Most axes a King step may change at once; 1 is an orthogonal-only King, Dimensions the full Chebyshev King.</summary>
         public readonly int KingAxes;
         /// <summary>Rule variant: the King moves as a 2D king within the x-y board (axes 0 and 1, diagonals included) and steps straight along every other axis. Implies KingAxes = 1 for the other axes.</summary>
         public readonly bool BoardKing;
-        /// <summary>Indexed like Queen: is this direction also a King step?</summary>
-        public readonly bool[] QueenIsKing;
+        /// <summary>Rule variant (Joyce's Hyperchess): diagonals exist only within the axis pairs {0,1} and {2,3}; bishops have 8 directions, the Queen 16, the King 16 moves.</summary>
+        public readonly bool PairDiagonals;
         /// <summary>Stride[i] = Side^i. Cell index = sum of coord[i] * Stride[i].</summary>
         public readonly int[] Stride;
         private readonly byte[] coordTable;
@@ -60,8 +60,10 @@ namespace Chess4D.Core
         /// <param name="diagonalAxes">Rule variant: axes a diagonal may change at once (default 2). Clamped to the dimension count.</param>
         /// <param name="kingAxes">Rule variant: axes a King step may change at once; 0 (default) means the same as the Queen.</param>
         /// <param name="boardKing">Rule variant: 2D-king diagonals only within the x-y board; straight steps across the other axes.</param>
-        public BoardGeometry(int dimensions, int side, int diagonalAxes = 2, int kingAxes = 0, bool boardKing = false)
+        public BoardGeometry(int dimensions, int side, int diagonalAxes = 2, int kingAxes = 0, bool boardKing = false, bool pairDiagonals = false)
         {
+            if (pairDiagonals && dimensions != 4) throw new ArgumentException("pair diagonals are defined for four dimensions", nameof(pairDiagonals));
+            if (pairDiagonals) diagonalAxes = 2;
             if (dimensions < 2 || dimensions > CoreInfo.MaxDimensions)
                 throw new ArgumentOutOfRangeException(nameof(dimensions), "Dimensions must be between 2 and " + CoreInfo.MaxDimensions);
             if (side < 4 || side > 255)
@@ -72,7 +74,8 @@ namespace Chess4D.Core
             Dimensions = dimensions;
             Side = side;
             DiagonalAxes = Math.Min(diagonalAxes, dimensions);
-            KingAxes = boardKing ? 1 : kingAxes == 0 ? DiagonalAxes : Math.Min(kingAxes, DiagonalAxes);
+            PairDiagonals = pairDiagonals;
+            KingAxes = boardKing ? 1 : kingAxes == 0 ? DiagonalAxes : Math.Min(kingAxes, dimensions); // may exceed DiagonalAxes: a Chebyshev King beside a two-axis Queen
             BoardKing = boardKing;
             Stride = new int[dimensions];
             long count = 1;
@@ -99,17 +102,32 @@ namespace Chess4D.Core
             Queen = new Direction[Rook.Length + Bishop.Length];
             Array.Copy(Rook, 0, Queen, 0, Rook.Length);
             Array.Copy(Bishop, 0, Queen, Rook.Length, Bishop.Length);
-            QueenIsKing = new bool[Queen.Length];
+            // King steps: every direction in {-1,0,1}^n changing 1..KingAxes axes (restricted to the x-y board diagonals for a board-King,
+            // and to the pair diagonals under pair-diagonal rules). Built independently of the Queen so the King may out-reach her.
             var kingList = new List<Direction>();
-            for (int i = 0; i < Queen.Length; i++)
+            for (int axes = 1; axes <= KingAxes; axes++)
+                for (int mask = 0; mask < (1 << dimensions); mask++)
+                {
+                    if (BitCount(mask) != axes) continue;
+                    if (axes >= 2 && BoardKing && mask != 0b0011) continue;
+                    if (axes >= 2 && PairDiagonals && mask != 0b0011 && mask != 0b1100) continue;
+                    for (int signs = 0; signs < (1 << axes); signs++)
+                    {
+                        int[] v = new int[dimensions];
+                        int k = 0;
+                        for (int a = 0; a < dimensions; a++)
+                            if ((mask & (1 << a)) != 0) { v[a] = (signs & (1 << k)) != 0 ? -1 : 1; k++; }
+                        kingList.Add(Make(v));
+                    }
+                }
+            if (BoardKing)
             {
-                Direction d = Queen[i];
-                bool ok = d.Axes <= KingAxes || (BoardKing && d.Axes == 2 && d.Vec[0] != 0 && d.Vec[1] != 0);
-                QueenIsKing[i] = ok;
-                if (ok) kingList.Add(d);
+                kingList.Clear();
+                foreach (var d in Rook) kingList.Add(d);
+                foreach (var d in Bishop) if (d.Axes == 2 && d.Vec[0] != 0 && d.Vec[1] != 0) kingList.Add(d);
             }
-            KingDirectionCount = kingList.Count;
-            King = kingList.Count == Queen.Length ? Queen : kingList.ToArray();
+            King = kingList.ToArray();
+            KingDirectionCount = King.Length;
             Knight = BuildKnight();
 
             PawnForward = new Direction[2];
@@ -172,6 +190,7 @@ namespace Chess4D.Core
                 for (int mask = 0; mask < (1 << Dimensions); mask++)
                 {
                     if (BitCount(mask) != axes) continue;
+                    if (PairDiagonals && mask != 0b0011 && mask != 0b1100) continue;
                     for (int signs = 0; signs < (1 << axes); signs++)
                     {
                         int[] v = new int[Dimensions];

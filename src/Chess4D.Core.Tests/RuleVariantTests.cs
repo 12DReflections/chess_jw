@@ -14,6 +14,7 @@ namespace Chess4D.Core.Tests
         [TestCase(4, 8, 4, 2, 8, 72, 80, 32)]   // full Queen, settled King
         [TestCase(4, 8, 2, 1, 8, 24, 32, 8)]    // orthogonal King
         [TestCase(3, 8, 3, 0, 6, 20, 26, 26)]
+        [TestCase(4, 8, 2, 4, 8, 24, 32, 80)]
         public void DirectionCounts(int dims, int side, int diag, int king, int rook, int bishop, int queen, int kingDirs)
         {
             var g = new BoardGeometry(dims, side, diag, king);
@@ -53,10 +54,13 @@ namespace Chess4D.Core.Tests
         [TestCase(2, 1, false)]
         [TestCase(2, 0, true)]
         [TestCase(3, 0, true)]
-        public void BoardAndFastGeometryAgreeOnAttacks(int diag, int king, bool boardKing)
+        [TestCase(2, 0, false, true)]
+        [TestCase(2, 4, false)]  // two-axis Queen beside a full Chebyshev King (Rinaldi and Chiru 2026)
+        public void BoardAndFastGeometryAgreeOnAttacks(int diag, int king, bool boardKing, bool pairDiagonals = false)
         {
             // Board.IsAttacked walks direction lists; ThreePiece.Attacks reasons from coordinate differences. Both were changed for variants.
-            var g = new BoardGeometry(4, 6, diag, king, boardKing);
+            var g = new BoardGeometry(4, 6, diag, king, boardKing, pairDiagonals);
+            if (pairDiagonals) { Assert.That(g.King.Length, Is.EqualTo(16)); Assert.That(g.Queen.Length, Is.EqualTo(16)); Assert.That(new Symmetry(g).TransformCount, Is.EqualTo(128)); }
             var geo = new ThreePiece(g, PieceType.Queen);
             var rng = new Random(21);
             var b = new Board(g);

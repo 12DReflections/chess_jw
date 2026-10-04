@@ -1,0 +1,18 @@
+KQQ vs K, 4 dimensions, side 4, rule variant: Hyperchess pair diagonals (diagonals only within the x-y and z-w pairs; King 16 moves, Queen 16 directions) (sparse exact solve; counts are positions up to symmetry)
+checkmates 60, white-to-move wins 494, black-to-move losses 64, every other legal position is a draw
+longest forced mate: white to move 1 plies, black to move 2 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 494  1: 0
+white-to-move distance histogram (plies: classes): 1:494
+WTM mate in 1 plies  K1110 Q2100 Q1010 k0000
+WTM mate in 1 plies  K1110 Q2100 Q2010 k0000
+WTM mate in 1 plies  K1110 Q2100 Q3010 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0110 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0210 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0310 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0012 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0013 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0021 k0000
+WTM mate in 1 plies  K1110 Q2100 Q0032 k0000
+WTM mate in 1 plies  K1111 Q1110 Q1032 k1020
+WTM mate in 1 plies  K1111 Q1100 Q1032 k1020
+one-ply verification of every stored position against the full rules: 0 failures

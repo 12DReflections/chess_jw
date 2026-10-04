@@ -21,7 +21,7 @@ namespace Chess4D.Tablebase
             if (cmd == "sparse") return Sparse(args);
             PieceType piece = ParsePiece(args.Length > 1 ? args[1] : "Q");
             int dims = 4, side = 8, diag = 2, king = 0, threads = Environment.ProcessorCount, verifyWins = 40, verifyDraws = 40;
-            bool boardKing = false;
+            bool boardKing = false, pairDiag = false;
             string outDir = Path.Combine("Builds", "tablebase");
             bool checkpoint = true;
             for (int i = 2; i < args.Length; i++)
@@ -33,6 +33,7 @@ namespace Chess4D.Tablebase
                     case "--diag": diag = int.Parse(args[++i]); break;
                     case "--king": king = int.Parse(args[++i]); break;
                     case "--boardking": boardKing = true; break;
+                    case "--pairdiag": pairDiag = true; break;
                     case "--out": outDir = args[++i]; break;
                     case "--threads": threads = int.Parse(args[++i]); break;
                     case "--no-checkpoint": checkpoint = false; break;
@@ -40,7 +41,7 @@ namespace Chess4D.Tablebase
                 }
             }
             Directory.CreateDirectory(outDir);
-            var geometry = new BoardGeometry(dims, side, diag, king, boardKing);
+            var geometry = new BoardGeometry(dims, side, diag, king, boardKing, pairDiag);
             string name = "K" + Piece.ToChar(Piece.Make(piece, Color.White)) + "vK-" + dims + "d" + side + Variant(geometry);
             if (cmd == "list" || cmd == "verify")
             {
@@ -91,7 +92,7 @@ namespace Chess4D.Tablebase
         {
             if (args.Length < 2 || args[1].Length != 2) { Console.WriteLine("usage: generate4 <two letters from QRBN> [--dims n] [--side s] [--out dir] [--threads n]"); return 1; }
             int dims = 4, side = 4, diag = 2, king = 0, threads = Environment.ProcessorCount;
-            bool boardKing = false;
+            bool boardKing = false, pairDiag = false;
             string outDir = Path.Combine("Builds", "tablebase");
             for (int i = 2; i < args.Length; i++)
             {
@@ -102,6 +103,7 @@ namespace Chess4D.Tablebase
                     case "--diag": diag = int.Parse(args[++i]); break;
                     case "--king": king = int.Parse(args[++i]); break;
                     case "--boardking": boardKing = true; break;
+                    case "--pairdiag": pairDiag = true; break;
                     case "--out": outDir = args[++i]; break;
                     case "--threads": threads = int.Parse(args[++i]); break;
                 }
@@ -110,7 +112,7 @@ namespace Chess4D.Tablebase
             var total = Stopwatch.StartNew();
             PieceType[] m = SafeRegion.ParseMaterial(args[1]);
             Action<string> log = s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s);
-            var gen = new FourPieceGenerator(new BoardGeometry(dims, side, diag, king, boardKing), m[0], m[1], log) { Threads = threads };
+            var gen = new FourPieceGenerator(new BoardGeometry(dims, side, diag, king, boardKing, pairDiag), m[0], m[1], log) { Threads = threads };
             log("table " + gen.Name + ": " + gen.EntryCount + " entries");
             gen.Initialise();
             gen.Solve();
@@ -129,8 +131,9 @@ namespace Chess4D.Tablebase
         {
             if (args.Length < 2) { Console.WriteLine("usage: sparse <material, letters from QRBN> [--dims n] [--side s] [--out dir]"); return 1; }
             int dims = 4, side = 8, diag = 2, king = 0;
-            bool boardKing = false;
+            bool boardKing = false, pairDiag = false;
             long cap = 20_000_000;
+            string probe = null;
             string outDir = null;
             for (int i = 2; i < args.Length; i++)
             {
@@ -141,15 +144,29 @@ namespace Chess4D.Tablebase
                     case "--diag": diag = int.Parse(args[++i]); break;
                     case "--king": king = int.Parse(args[++i]); break;
                     case "--boardking": boardKing = true; break;
+                    case "--pairdiag": pairDiag = true; break;
                     case "--cap": cap = long.Parse(args[++i]); break;
+                    case "--probe": probe = args[++i]; break; // e.g. "K0011 Q0000 Q0001 Q0010 k2222": white King, white pieces in material order, black king
                     case "--out": outDir = args[++i]; break;
                 }
             }
             Action<string> log = s => Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "  " + s);
             SparseSolver.WonLimitDefault = cap;
-            var solver = SparseSolver.For(new BoardGeometry(dims, side, diag, king, boardKing), SafeRegion.ParseMaterial(args[1]), log);
+            var solver = SparseSolver.For(new BoardGeometry(dims, side, diag, king, boardKing, pairDiag), SafeRegion.ParseMaterial(args[1]), log);
             var sb = new System.Text.StringBuilder(solver.Summary());
             foreach (string line in solver.Deepest(12)) sb.Append(line).Append('\n');
+            if (probe != null)
+            {
+                var g = solver.G;
+                string[] parts = probe.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                int Cell(string tok) { var c = new int[g.Dimensions]; for (int i = 0; i < g.Dimensions; i++) c[i] = tok[tok.Length - g.Dimensions + i] - '0'; return g.CellOf(c); }
+                int wk = Cell(parts[0]), bk = Cell(parts[parts.Length - 1]);
+                var w = new int[parts.Length - 2];
+                for (int i = 0; i < w.Length; i++) w[i] = Cell(parts[i + 1]);
+                int vw = solver.ProbeWtm(wk, w, bk), vb = solver.ProbeBtm(wk, w, bk);
+                sb.Append("probe ").Append(probe).Append(": white to move ").Append(vw < 0 ? "draw" : "mate in " + vw + " plies")
+                  .Append("; black to move ").Append(vb < 0 ? "draw" : "mate in " + vb + " plies").Append('\n');
+            }
             var failures = solver.VerifyOnePly();
             foreach (string f in failures) sb.Append("FAIL ").Append(f).Append('\n');
             sb.Append("one-ply verification of every stored position against the full rules: ").Append(failures.Count).Append(" failures\n");
@@ -167,7 +184,7 @@ namespace Chess4D.Tablebase
         {
             if (args.Length < 2) { Console.WriteLine("usage: safe <material, letters from QRBN> [--dims n] [--side s] [--out dir]"); return 1; }
             int dims = 4, side = 8, diag = 2, king = 0;
-            bool boardKing = false;
+            bool boardKing = false, pairDiag = false;
             string outDir = null;
             for (int i = 2; i < args.Length; i++)
             {
@@ -178,11 +195,12 @@ namespace Chess4D.Tablebase
                     case "--diag": diag = int.Parse(args[++i]); break;
                     case "--king": king = int.Parse(args[++i]); break;
                     case "--boardking": boardKing = true; break;
+                    case "--pairdiag": pairDiag = true; break;
                     case "--out": outDir = args[++i]; break;
                 }
             }
             var sw = Stopwatch.StartNew();
-            var sg = new BoardGeometry(dims, side, diag, king, boardKing);
+            var sg = new BoardGeometry(dims, side, diag, king, boardKing, pairDiag);
             var result = SafeRegion.Compute(sg, SafeRegion.ParseMaterial(args[1]), Console.WriteLine);
             Console.Write(result.Report);
             Console.WriteLine("time " + sw.Elapsed.TotalSeconds.ToString("F1") + " s");
@@ -197,6 +215,7 @@ namespace Chess4D.Tablebase
         /// <summary>File-name suffix for a rule variant; empty for the settled rules.</summary>
         public static string Variant(BoardGeometry g)
         {
+            if (g.PairDiagonals) return "-pairdiag";
             if (g.BoardKing) return "-diag" + g.DiagonalAxes + "boardking";
             if (g.DiagonalAxes == 2 && g.KingAxes == 2) return "";
             return "-diag" + g.DiagonalAxes + "king" + g.KingAxes;

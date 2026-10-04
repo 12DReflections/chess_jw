@@ -39,6 +39,8 @@ namespace Chess4D.Tablebase
             Permute(new int[n], new bool[n], 0, perms);
             // A board-King distinguishes the x-y board from the other axes: keep only permutations that map {0,1} onto itself.
             if (g.BoardKing) perms.RemoveAll(perm => (perm[0] > 1) || (perm[1] > 1));
+            // Pair diagonals distinguish the partition {{0,1},{2,3}}: axes may swap within a pair, and the pairs may swap.
+            else if (g.PairDiagonals) perms.RemoveAll(perm => (perm[0] / 2) != (perm[1] / 2));
             TransformCount = perms.Count << n;
             map = new int[TransformCount][];
             int t = 0;
@@ -132,9 +134,15 @@ namespace Chess4D.Tablebase
             {
                 int v = G.Coord(cell, i);
                 if (v > half) return false;
-                if (G.BoardKing && i == 2) prev = -1; // axes are only interchangeable within {x,y} and within the rest
+                if ((G.BoardKing || G.PairDiagonals) && i == 2) prev = -1; // axes are only interchangeable within {x,y} and within the rest
                 if (v < prev) return false;
                 prev = v;
+            }
+            if (G.PairDiagonals)
+            {
+                // The two pairs may also be swapped: order them lexicographically.
+                int a0 = G.Coord(cell, 0), a1 = G.Coord(cell, 1), b0 = G.Coord(cell, 2), b1 = G.Coord(cell, 3);
+                if (a0 > b0 || (a0 == b0 && a1 > b1)) return false;
             }
             return true;
         }

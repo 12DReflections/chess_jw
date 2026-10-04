@@ -384,6 +384,22 @@ choice for self-play, not a mating question. The tables for the variant are repr
 with `Chess4D.Tablebase generate Q --diag 3 --king 1` (about a minute);
 summaries for every variant tried are under `docs/tablebase/variants/`.
 
+## Against the published claims (2026-10-04)
+
+`docs/LITERATURE.md` section 8 tabulates every printed claim about mating
+material in 3D and 4D chess that could be tested here, with the result.
+Two matter most. Rinaldi and Chiru (*AppliedMath* 2026), the only refereed
+paper on 8x8x8x8 chess, state that K+Q and K+R beat a lone King under a
+two-axis Queen and a Chebyshev (80-move) King; under exactly those
+definitions neither ending has a single checkmate position on 8^4, 4^4 or
+5^4. Joe Joyce's 2004 claim that K+3Q cannot force mate against his
+16-move Hyperchess King on 4x4x4x4, with a concrete position, is confirmed
+exactly: the position is a draw with either side to move, and only about
+0.6% of positions are won (longest mate 70 moves). H. G. Muller's 2014
+Raumschach result "KQK is won" is reproduced (8 moves on 5x5x5), and the
+variant designers' 4x4x4x4 full-king K+Q win is confirmed (4 moves) while
+the conjecture that it holds "on any size board" fails from side 7.
+
 ## Formal statement and the counting bound (2026-09-19)
 
 Recorded from the owner's questions on what is proved and what generalises.

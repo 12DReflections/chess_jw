@@ -1,0 +1,8 @@
+K+Q vs K, 4 dimensions, side 4, rule variant: Hyperchess pair diagonals (diagonals only within the x-y and z-w pairs; King 16 moves, Queen 16 directions)
+symmetry group order 128, king classes 6, canonical (king, piece) pairs 666, table entries 340992 of which 59940 are duplicate slots (unreduced black king under the pair stabiliser)
+legal positions: white to move 120792, black to move 131478
+checkmates 0, stalemates 0
+white-to-move wins 0 (0.00%), black-to-move losses 0
+longest forced mate: white to move -1 plies, black to move -1 plies
+passes 2
+white-to-move distance histogram (plies: positions):

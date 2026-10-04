@@ -1,0 +1,19 @@
+KQQQ vs K, 4 dimensions, side 4, rule variant: Hyperchess pair diagonals (diagonals only within the x-y and z-w pairs; King 16 moves, Queen 16 directions) (sparse exact solve; counts are positions up to symmetry)
+checkmates 55168, white-to-move wins 8029990, black-to-move losses 532094, every other legal position is a draw
+longest forced mate: white to move 139 plies, black to move 140 plies
+white-to-move wins by the black king's distance from the nearest edge:  0: 8029822  1: 168
+white-to-move distance histogram (plies: classes): 1:320241 3:97065 5:152304 7:244954 9:293154 11:356422 13:291210 15:161527 17:141584 19:189858 21:254179 23:293147 25:308931 27:320466 29:297725 31:290386 33:280516 35:279062 37:282515 39:268077 41:238718 43:215472 45:198168 47:185009 49:178285 51:161555 53:157576 55:156770 57:151178 59:139606 61:141001 63:119746 65:99172 67:88660 69:79060 71:76598 73:65793 75:57783 77:49901 79:38625 81:31071 83:30353 85:29801 87:26466 89:24253 91:20992 93:17632 95:14397 97:15739 99:13179 101:11306 103:9322 105:9575 107:11445 109:9944 111:7175 113:5293 115:4792 117:3273 119:2757 121:1930 123:1531 125:1440 127:1651 129:1212 131:772 133:354 135:202 137:110 139:24
+WTM mate in 139 plies  K1110 Q3201 Q3331 Q3213 k3303
+WTM mate in 139 plies  K1110 Q3201 Q3331 Q3223 k3303
+WTM mate in 139 plies  K1110 Q3201 Q3331 Q3233 k3303
+WTM mate in 139 plies  K1110 Q3201 Q3331 Q3202 k3303
+WTM mate in 139 plies  K1110 Q3201 Q3331 Q1003 k3303
+WTM mate in 139 plies  K1110 Q3201 Q3221 Q3331 k3303
+WTM mate in 139 plies  K1110 Q3230 Q3201 Q3331 k3303
+WTM mate in 139 plies  K1110 Q3200 Q3331 Q3213 k3303
+WTM mate in 139 plies  K1110 Q3221 Q3331 Q3213 k3303
+WTM mate in 139 plies  K1110 Q3230 Q3331 Q3213 k3303
+WTM mate in 139 plies  K1110 Q3331 Q3222 Q3213 k3302
+WTM mate in 139 plies  K1110 Q3331 Q3232 Q3213 k3302
+probe K0011 Q0000 Q0001 Q0010 k2222: white to move draw; black to move draw
+one-ply verification of every stored position against the full rules: 0 failures

@@ -33,11 +33,16 @@ namespace Chess4D.Tablebase
                 if (nonzero == 0) axisA = i; else if (nonzero == 1) axisB = i;
                 nonzero++;
             }
-            bool diagonal = nonzero >= 2 && nonzero <= G.DiagonalAxes && minAbs == maxAbs;
+            bool diagonal = nonzero >= 2 && nonzero <= G.DiagonalAxes && minAbs == maxAbs
+                && (!G.PairDiagonals || (axisA == 0 && axisB == 1) || (axisA == 2 && axisB == 3));
             switch (type)
             {
                 case PieceType.King:
-                    return maxAbs == 1 && (nonzero <= G.KingAxes || (G.BoardKing && nonzero == 2 && axisA == 0 && axisB == 1));
+                    if (maxAbs != 1) return false;
+                    if (nonzero == 1) return true;
+                    if (G.BoardKing) return nonzero == 2 && axisA == 0 && axisB == 1;
+                    if (G.PairDiagonals) return nonzero == 2 && ((axisA == 0 && axisB == 1) || (axisA == 2 && axisB == 3));
+                    return nonzero <= G.KingAxes;
                 case PieceType.Knight:
                     {
                         if (nonzero != 2 || maxAbs != 2) return false;

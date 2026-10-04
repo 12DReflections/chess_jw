@@ -352,12 +352,10 @@ namespace Chess4D.Core
         {
             Direction[] q = G.Queen;
             int rookCount = G.Rook.Length;
-            bool[] kingDir = G.QueenIsKing;
             for (int i = 0; i < q.Length; i++)
             {
                 Direction d = q[i];
                 int c = G.Step(cell, d);
-                bool first = true;
                 while (c >= 0)
                 {
                     byte p = cells[c];
@@ -368,15 +366,20 @@ namespace Chess4D.Core
                             PieceType t = Piece.TypeOf(p);
                             if (t == PieceType.Queen) return true;
                             if (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop) return true;
-                            if (first && kingDir[i] && t == PieceType.King) return true;
+
                         }
                         break;
                     }
-                    first = false;
                     c = G.Step(c, d);
                 }
             }
 
+            Direction[] kg = G.King;
+            for (int i = 0; i < kg.Length; i++)
+            {
+                int c = G.Step(cell, kg[i]);
+                if (c >= 0 && Piece.Is(cells[c], PieceType.King, by)) return true;
+            }
             Direction[] kn = G.Knight;
             for (int i = 0; i < kn.Length; i++)
             {
@@ -398,12 +401,10 @@ namespace Chess4D.Core
         {
             Direction[] q = G.Queen;
             int rookCount = G.Rook.Length;
-            bool[] kingDir = G.QueenIsKing;
             for (int i = 0; i < q.Length; i++)
             {
                 Direction d = q[i];
                 int c = G.Step(cell, d);
-                bool first = true;
                 while (c >= 0)
                 {
                     byte p = cells[c];
@@ -412,14 +413,19 @@ namespace Chess4D.Core
                         if (Piece.ColorOf(p) == by)
                         {
                             PieceType t = Piece.TypeOf(p);
-                            if (t == PieceType.Queen || (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop) || (first && kingDir[i] && t == PieceType.King))
+                            if (t == PieceType.Queen || (i < rookCount ? t == PieceType.Rook : t == PieceType.Bishop))
                                 output.Add(c);
                         }
                         break;
                     }
-                    first = false;
                     c = G.Step(c, d);
                 }
+            }
+            Direction[] kg = G.King;
+            for (int i = 0; i < kg.Length; i++)
+            {
+                int c = G.Step(cell, kg[i]);
+                if (c >= 0 && Piece.Is(cells[c], PieceType.King, by)) output.Add(c);
             }
             Direction[] kn = G.Knight;
             for (int i = 0; i < kn.Length; i++)
