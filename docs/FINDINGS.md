@@ -421,9 +421,9 @@ axes), exact tables:
 | 3 | 8^3 | draw (0.02%, 3 moves) | draw (mates in one only) |
 | 4 | 8^4 | draw (18 positions, mate in one) | no checkmate exists |
 | 5 | 5^5 and 6^5 | **no checkmate exists** | no checkmate exists |
-| 6 | 4^6, 5^6 | (running) | (running) |
+| 6 | 4^6 and 5^6 | **no checkmate exists** | no checkmate exists |
 
-The d = 5 result confirms the corner bound derived on 2026-09-19 (a corner
+The d = 5 and d = 6 results confirm the corner bound derived on 2026-09-19 (a corner
 King has d + C(d,2) flights, the white King covers at most 6 and the Queen
 d, so mate needs C(d,2) <= 6, i.e. d <= 4): from five dimensions on, King
 and Queen cannot checkmate a lone King at all, not even with cooperation.
