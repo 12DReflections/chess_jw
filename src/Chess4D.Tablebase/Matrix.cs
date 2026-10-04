@@ -28,6 +28,8 @@ namespace Chess4D.Tablebase
             public bool boardKing { get; set; }
             public bool pairDiagonals { get; set; }
             public string source { get; set; }
+            public bool skipPairs { get; set; }
+            public string note { get; set; }
             public BoardGeometry Geometry() { return new BoardGeometry(dims, side, diag, king, boardKing, pairDiagonals); }
             public string Flags()
             {
@@ -49,8 +51,8 @@ namespace Chess4D.Tablebase
             if (File.Exists(csvPath))
                 foreach (string line in File.ReadAllLines(csvPath))
                 {
-                    string[] f = line.Split(',');
-                    if (f.Length > 2 && f[0] != "ruleset") done.Add(f[0] + "|" + f[2]);
+                    List<string> f = ParseCsvLine(line);
+                    if (f.Count > 2 && f[0] != "ruleset") done.Add(f[0] + "|" + f[2]);
                 }
             else File.WriteAllText(csvPath, Header + "\n");
             int failures = 0;
@@ -58,6 +60,7 @@ namespace Chess4D.Tablebase
                 foreach (string mat in materials)
                 {
                     if (done.Contains(rs.name + "|" + mat)) continue;
+                    if (rs.skipPairs && mat.Length >= 2) { string skip = Csv(rs, mat, "none", "", "", "", "", "", "not computed on this board (see the registry note)", "", ""); File.AppendAllText(csvPath, skip + "\n"); continue; }
                     string row;
                     try { row = Cell(rs, mat, sparseCap, log); }
                     catch (Exception e) { row = Csv(rs, mat, "none", "", "", "", "", "", "error: " + e.GetType().Name, "", ""); failures++; }
@@ -97,8 +100,20 @@ namespace Chess4D.Tablebase
                     return Csv(rs, mat, "dense4", gen.LegalWtm.ToString(), gen.Wins.ToString(), Pct(gen.Wins, gen.LegalWtm), gen.Mates.ToString(), gen.MaxWtmDistance.ToString(), status, "consistency 5000 samples, " + f.Count + " failures", "generate4 " + mat + " " + rs.Flags());
                 }
             }
-            // Sparse: exact when little is won; reports a cap otherwise.
-            SparseSolver.WonLimitDefault = sparseCap;
+            // Implied cells: if K+Q alone is a forced win under this ruleset, every pair containing a Queen is a win too; say so rather than spend hours hitting the cap.
+            if (pieces.Length == 2 && (pieces[0] == PieceType.Queen || pieces[1] == PieceType.Queen))
+            {
+                var sym1 = new Symmetry(g);
+                if (sym1.EntryCount < int.MaxValue)
+                {
+                    var kq = new Generator(g, PieceType.Queen) { Log = s => { } };
+                    kq.Initialise(); kq.Solve();
+                    if (kq.Wins == kq.LegalWtm && kq.Wins > 0)
+                        return Csv(rs, mat, "implied", "", "", "", "", "", "forced win (implied: K+Q alone is a forced win under this ruleset; not separately tabulated)", "", "generate Q " + rs.Flags());
+                }
+            }
+            // Sparse: exact when little is won; reports a cap otherwise. On large boards a pair that is winning would take hours to reach the cap, so cap early.
+            SparseSolver.WonLimitDefault = pieces.Length >= 2 && g.CellCount >= 4096 ? Math.Min(sparseCap, 300_000) : sparseCap;
             try
             {
                 var sp = SparseSolver.For(g, pieces, s => { });
@@ -108,8 +123,30 @@ namespace Chess4D.Tablebase
             }
             catch (InvalidOperationException)
             {
-                return Csv(rs, mat, "sparse", "", "> " + sparseCap + " classes", "", "", "", "won set exceeds the sparse cap (likely win; dense table needed)", "", "sparse " + mat + " " + rs.Flags() + " --cap " + sparseCap);
+                return Csv(rs, mat, "sparse", "", "> " + SparseSolver.WonLimitDefault + " classes", "", "", "", "won set exceeds the sparse cap (likely win; dense table needed)", "", "sparse " + mat + " " + rs.Flags() + " --cap " + SparseSolver.WonLimitDefault);
             }
+        }
+
+        private static List<string> ParseCsvLine(string line)
+        {
+            var fields = new List<string>();
+            var sb = new StringBuilder();
+            bool quoted = false;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (quoted)
+                {
+                    if (c == '"' && i + 1 < line.Length && line[i + 1] == '"') { sb.Append('"'); i++; }
+                    else if (c == '"') quoted = false;
+                    else sb.Append(c);
+                }
+                else if (c == '"') quoted = true;
+                else if (c == ',') { fields.Add(sb.ToString()); sb.Clear(); }
+                else sb.Append(c);
+            }
+            fields.Add(sb.ToString());
+            return fields;
         }
 
         private static string Pct(long a, long b) { return b > 0 ? (100.0 * a / b).ToString("F3") : ""; }

@@ -1,0 +1,78 @@
+ruleset,tuple,material,dims,side,board,solver,legal_wtm,won_wtm,won_pct,checkmates,longest_wtm_plies,status,verification,command
+settled,"(4, 8; {1,2}; {1,2})",Q,4,8,8x8x8x8,dense3,178112508,18,0.000,1,1,not forced,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",R,4,8,8x8x8x8,dense3,180518184,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",B,4,8,8x8x8x8,dense3,179441738,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",N,4,8,8x8x8x8,dense3,180438662,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",QQ,4,8,8x8x8x8,sparse,,106000 classes,,2888,9,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse QQ --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",QR,4,8,8x8x8x8,sparse,,51625 classes,,1282,7,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse QR --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",QB,4,8,8x8x8x8,sparse,,56040 classes,,1364,5,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse QB --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",QN,4,8,8x8x8x8,sparse,,46588 classes,,1102,3,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse QN --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",RR,4,8,8x8x8x8,sparse,,49 classes,,16,1,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse RR --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",RB,4,8,8x8x8x8,sparse,,400 classes,,32,1,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse RB --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",RN,4,8,8x8x8x8,sparse,,70 classes,,5,1,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse RN --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",BB,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse BB --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",BN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse BN --dims 4 --side 8 --diag 2
+settled,"(4, 8; {1,2}; {1,2})",NN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse NN --dims 4 --side 8 --diag 2
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",Q,4,8,8x8x8x8,dense3,176704206,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",R,4,8,8x8x8x8,dense3,179088714,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",B,4,8,8x8x8x8,dense3,178021480,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",N,4,8,8x8x8x8,dense3,179009584,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",QQ,4,8,8x8x8x8,sparse,,3311 classes,,108,5,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse QQ --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",QR,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse QR --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",QB,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse QB --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",QN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse QN --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",RR,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse RR --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",RB,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse RB --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",RN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse RN --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",BB,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse BB --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",BN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse BN --dims 4 --side 8 --diag 2 --king 4
+rinaldi-chiru,"(4, 8; {1,2}; {1,2,3,4})",NN,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse NN --dims 4 --side 8 --diag 2 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",Q,4,4,4x4x4x4,dense3,32464,32464,100.000,120,7,forced win,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",R,4,4,4x4x4x4,dense3,40646,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",B,4,4,4x4x4x4,dense3,34803,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",N,4,4,4x4x4x4,dense3,40147,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",QQ,4,4,4x4x4x4,dense4,5804637,5804637,100.000,128116,7,forced win,"consistency 5000 samples, 0 failures",generate4 QQ --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",QR,4,4,4x4x4x4,dense4,7110930,7110930,100.000,28305,9,forced win,"consistency 5000 samples, 0 failures",generate4 QR --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",QB,4,4,4x4x4x4,dense4,6171007,6171007,100.000,58528,7,forced win,"consistency 5000 samples, 0 failures",generate4 QB --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",QN,4,4,4x4x4x4,dense4,6967720,6967720,100.000,32690,9,forced win,"consistency 5000 samples, 0 failures",generate4 QN --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",RR,4,4,4x4x4x4,dense4,8738672,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 RR --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",RB,4,4,4x4x4x4,dense4,7563767,7560330,99.955,252,25,not forced,"consistency 5000 samples, 0 failures",generate4 RB --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",RN,4,4,4x4x4x4,dense4,8559145,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 RN --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",BB,4,4,4x4x4x4,dense4,6556086,6556086,100.000,4949,13,forced win,"consistency 5000 samples, 0 failures",generate4 BB --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",BN,4,4,4x4x4x4,dense4,7406992,7403800,99.957,590,25,not forced,"consistency 5000 samples, 0 failures",generate4 BN --dims 4 --side 4 --diag 4 --king 4
+dawson-normal,"(4, 4; {1,2,3,4}; {1,2,3,4})",NN,4,4,4x4x4x4,dense4,8378365,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate4 NN --dims 4 --side 4 --diag 4 --king 4
+chesseract,"(4, 4; {1,2}; {1})",Q,4,4,4x4x4x4,dense3,42951,42951,100.000,36,39,forced win,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",R,4,4,4x4x4x4,dense3,47214,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",B,4,4,4x4x4x4,dense3,45701,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",N,4,4,4x4x4x4,dense3,46637,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",QQ,4,4,4x4x4x4,dense4,8378377,8378377,100.000,80942,15,forced win,"consistency 5000 samples, 0 failures",generate4 QQ --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",QR,4,4,4x4x4x4,dense4,9182608,9182608,100.000,19249,29,forced win,"consistency 5000 samples, 0 failures",generate4 QR --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",QB,4,4,4x4x4x4,dense4,8855543,8855543,100.000,32742,19,forced win,"consistency 5000 samples, 0 failures",generate4 QB --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",QN,4,4,4x4x4x4,dense4,8989344,8989344,100.000,27501,19,forced win,"consistency 5000 samples, 0 failures",generate4 QN --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",RR,4,4,4x4x4x4,dense4,10057944,456,0.005,83,1,not forced,"consistency 5000 samples, 0 failures",generate4 RR --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",RB,4,4,4x4x4x4,dense4,9705738,9705728,100.000,898,65,not forced,"consistency 5000 samples, 0 failures",generate4 RB --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",RN,4,4,4x4x4x4,dense4,9844811,1058,0.011,167,3,not forced,"consistency 5000 samples, 0 failures",generate4 RN --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",BB,4,4,4x4x4x4,dense4,9354481,4655724,49.770,386,43,not forced,"consistency 5000 samples, 0 failures",generate4 BB --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",BN,4,4,4x4x4x4,dense4,9496554,1547,0.016,297,3,not forced,"consistency 5000 samples, 0 failures",generate4 BN --dims 4 --side 4 --diag 2 --king 1
+chesseract,"(4, 4; {1,2}; {1})",NN,4,4,4x4x4x4,dense4,9630615,1338,0.014,242,1,not forced,"consistency 5000 samples, 0 failures",generate4 NN --dims 4 --side 4 --diag 2 --king 1
+board-king,"(4, 8; {1,2}; {1}; boardKing)",Q,4,8,8x8x8x8,sparse,,14358 classes,,251,17,not forced (sparse exact),"one-ply check of every stored position, 0 failures",sparse Q --dims 4 --side 8 --diag 2 --boardking
+board-king,"(4, 8; {1,2}; {1}; boardKing)",R,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse R --dims 4 --side 8 --diag 2 --boardking
+board-king,"(4, 8; {1,2}; {1}; boardKing)",B,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse B --dims 4 --side 8 --diag 2 --boardking
+board-king,"(4, 8; {1,2}; {1}; boardKing)",N,4,8,8x8x8x8,sparse,,0 classes,,0,-1,no checkmate exists,"one-ply check of every stored position, 0 failures",sparse N --dims 4 --side 8 --diag 2 --boardking
+board-king,"(4, 8; {1,2}; {1}; boardKing)",QQ,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",QR,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",QB,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",QN,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",RR,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",RB,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",RN,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",BB,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",BN,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king,"(4, 8; {1,2}; {1}; boardKing)",NN,4,8,8x8x8x8,none,,,,,,not computed on this board (see the registry note),,
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",Q,4,5,5x5x5x5,dense3,3663853,3447,0.094,91,27,not forced,"consistency 5000 samples, 0 failures",generate Q --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",R,4,5,5x5x5x5,dense3,3858343,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate R --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",B,4,5,5x5x5x5,dense3,3778973,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate B --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",N,4,5,5x5x5x5,dense3,3821099,0,0.000,0,-1,no checkmate exists,"consistency 5000 samples, 0 failures",generate N --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QQ,4,5,5x5x5x5,dense4,2024366658,2024366658,100.000,797379,23,forced win,"consistency 5000 samples, 0 failures",generate4 QQ --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QR,4,5,5x5x5x5,dense4,2126266504,2126266504,100.000,149163,71,forced win,"consistency 5000 samples, 0 failures",generate4 QR --dims 4 --side 5 --diag 2 --boardking
+board-king-5,"(4, 5; {1,2}; {1}; boardKing)",QB,4,5,5x5x5x5,dense4,2081821140,2081821140,100.000,226550,29,forced win,"consistency 5000 samples, 0 failures",generate4 QB --dims 4 --side 5 --diag 2 --boardking
